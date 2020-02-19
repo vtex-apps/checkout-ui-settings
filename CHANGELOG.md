@@ -7,5 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Use default settings for template.
+
 ### Added
 - Initial version of the project created.
