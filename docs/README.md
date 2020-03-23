@@ -9,7 +9,7 @@ In practice, it means that Checkout UI Settings allows A/B testing in your store
 ## Configuration
 
 1.  Using your terminal and the [VTEX IO Toolbelt](https://vtex.io/docs/recipes/development/vtex-io-cli-installment-and-command-reference), log into the desired account;
-2.  Run `vtex list` to access the list of apps that are already installed on the account you're working on. If the Checkout UI Settings option already exists, you can skip to step 6 of this step-by-step;
+2.  Run `vtex list` to access the list of apps that are already installed on the account you're working on. If the Checkout UI Settings option already exists, you can skip to step 7 of this step-by-step;
 3.  If the Checkout UI Settings app was not found in the list of installed apps, run the `vtex init` command;
 4. Select the `checkout-ui-settings` option;
 5.  Open the `checkout-ui-settings`  app in whichever code editor you prefer;
