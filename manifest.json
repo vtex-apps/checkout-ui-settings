@@ -1,7 +1,7 @@
 {
   "name": "checkout-ui-settings",
   "vendor": "vtex",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "title": "Checkout UI Settings",
   "description": "Declare custom settings to be used by checkout ui",
   "builders": {
