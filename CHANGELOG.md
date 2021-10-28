@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed:
+
+- Toolbelt name to VTEX IO CLI.
+- Documentation links redirecting to Developer Portal.
+- Broken callout.
+
 ## [0.1.0] - 2020-04-29
 ###  Added
 - `checkout-instore-custom.css` and `checkout-instore-custom.js` to template.
