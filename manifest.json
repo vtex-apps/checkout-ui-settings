@@ -1,15 +1,11 @@
 {
-  "name": "checkout-ui-settings",
-  "vendor": "vtex",
+  "name": "custom-shipping-step-by-items",
+  "vendor": "tfgroup",
   "version": "0.1.0",
-  "title": "Checkout UI Settings",
-  "description": "Declare custom settings to be used by checkout ui",
+  "title": "Custom Checkout UI Settings",
+  "description": "[TFG] custom-shipping-step-by-items app",
   "builders": {
-    "docs": "0.x",
     "checkout-ui-custom": "0.x"
-  },
-  "scripts": {
-    "prereleasy": "bash lint.sh"
   },
   "credentialType": "absolute",
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
