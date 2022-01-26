@@ -8,7 +8,7 @@ module.exports = {
   ],
   output: {
     filename: 'checkout6-custom.js',
-    path: path.resolve(__dirname, './'),
+    path: path.resolve(__dirname, './')
   },
   module: {
     rules: [
@@ -18,7 +18,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name].css',
+              name: '[name].css'
             }
           },
           {
