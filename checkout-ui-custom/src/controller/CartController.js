@@ -15,20 +15,10 @@ const CartController = (() => {
     return categories;
   };
 
-  $(window).on('hashchange', () => {
+  $(window).on('hashchange orderFormUpdated.vtex', () => {
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
-        const { items } = vtexjs.checkout.orderForm;
-        state.categories = {
-          ...getCategories(items)
-        };
-      }, ORDERFORM_TIMEOUT);
-    }
-  });
-
-  $(window).on('orderFormUpdated.vtex', () => {
-    if (window.location.hash === STEPS.SHIPPING) {
-      setTimeout(() => {
+        // eslint-disable-next-line no-undef
         const { items } = vtexjs.checkout.orderForm;
         state.categories = {
           ...getCategories(items)

@@ -15,15 +15,17 @@ function setAppConfiguration(config) {
   config.furnitureId = "1";
   config.tvId = "1";
   config.simCardId = "1";
-  config.buildingType = [
-    "Free standing",
-    "House in complex",
-    "Townhouse",
-    "Apartment",
-  ];
-  config.parkingDistance = [15, 25, 50, 100, 500];
-  config.deliveryFloor = ["1", "2", "3+"];
-  config.liftStairs = ["lift", "stairs"];
+  config.furnitureForm = {
+    buildingType: [
+      "Free standing",
+      "House in complex",
+      "Townhouse",
+      "Apartment",
+    ],
+    parkingDistance: [15, 25, 50, 100],
+    deliveryFloor: ["1", "2", "3+"],
+    liftStairs: ["lift", "stairs"],
+  };
   config.RICAMsg =
     "You can't collect this order in store because your cart contains items which require either RICA or TV License validation.";
   config.MixedProductsMsg =
