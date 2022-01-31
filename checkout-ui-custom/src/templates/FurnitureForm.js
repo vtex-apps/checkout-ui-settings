@@ -69,7 +69,7 @@ const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStair
 
   // Complete Form
   return `
-    <div id="tfg-custom-shipping-step">
+    <div id="tfg-custom-furniture-step">
       <p class="tfg-custom-title">Furniture information needed</p>
       <p class="tfg-custom-subtitle">We need some more information to prepare delivery of your
       furniture items to your address.</p>

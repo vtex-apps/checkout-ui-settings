@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
 
 const CartController = (() => {
@@ -15,16 +16,26 @@ const CartController = (() => {
     return categories;
   };
 
-  $(window).on('hashchange orderFormUpdated.vtex', () => {
+  const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
-        // eslint-disable-next-line no-undef
-        const { items } = vtexjs.checkout.orderForm;
-        state.categories = {
-          ...getCategories(items)
-        };
+        if (vtexjs.checkout.orderForm) {
+          const { items } = vtexjs.checkout.orderForm;
+          state.categories = {
+            ...getCategories(items)
+          };
+        }
       }, ORDERFORM_TIMEOUT);
     }
+  };
+
+  // EVENTS SUBSCRIPTION
+  $(document).ready(() => {
+    runCustomization();
+  });
+
+  $(window).on('hashchange orderFormUpdated.vtex', () => {
+    runCustomization();
   });
 
   const publicInit = () => {

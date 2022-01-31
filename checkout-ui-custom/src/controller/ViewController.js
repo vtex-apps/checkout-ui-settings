@@ -55,19 +55,14 @@ const ViewController = (() => {
   };
 
   const showCustomSections = () => {
-    if (state.showFurnitureForm) {
+    const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
+
+    if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
     }
   };
 
-  $(document).ready(() => {
-    if (typeof (setAppConfiguration) !== 'undefined' && window.location.hash === STEPS.SHIPPING) {
-      // eslint-disable-next-line no-undef
-      setAppConfiguration(config);
-    }
-  });
-
-  $(window).on('hashchange orderFormUpdated.vtex', () => {
+  const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
         restartState();
@@ -75,6 +70,20 @@ const ViewController = (() => {
         showCustomSections();
       }, ORDERFORM_TIMEOUT);
     }
+  };
+
+  // EVENTS SUBSCRIPTION
+  $(document).ready(() => {
+    if (typeof (setAppConfiguration) !== 'undefined' && window.location.hash === STEPS.SHIPPING) {
+      // eslint-disable-next-line no-undef
+      setAppConfiguration(config);
+    }
+
+    runCustomization();
+  });
+
+  $(window).on('hashchange orderFormUpdated.vtex', () => {
+    runCustomization();
   });
 
   const publicInit = () => {

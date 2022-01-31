@@ -9,7 +9,11 @@ const STEPS = {
 // OrderForm timeout
 const ORDERFORM_TIMEOUT = 500;
 
+// OrderForm configuration app-name
+const CUSTOM_FIELDS_APP = 'customShippingInfo';
+
 export {
   STEPS,
-  ORDERFORM_TIMEOUT
+  ORDERFORM_TIMEOUT,
+  CUSTOM_FIELDS_APP
 };
