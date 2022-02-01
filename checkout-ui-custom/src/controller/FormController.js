@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 import {
   STEPS,
+  ORDERFORM_TIMEOUT,
   CUSTOM_FIELDS_APP
 } from '../utils/const';
 import ViewController from './ViewController';
@@ -74,41 +76,78 @@ const FormController = (() => {
   };
 
   const addEventBtnShipping = () => {
-    if ($('#btn-go-to-payment').attr('captureEvt') === undefined) {
-      $('#btn-go-to-payment').attr('captureEvt', '0');
+    if ($('#shipping-data #btn-go-to-payment').attr('captureFurnitureEvt') === undefined) {
+      $('#shipping-data #btn-go-to-payment').attr('captureFurnitureEvt', '0');
 
-      $(document).on('click', '#shipping-data #btn-go-to-payment', (o) => {
+      $(document).on('click', '#shipping-data #btn-go-to-payment', (e) => {
         const btn = $(this);
 
-        if (btn.attr('captureEvt') !== '1') {
+        if (btn.attr('captureFurnitureEvt') !== '1') {
           // Block native behaviour
-          o.preventDefault();
-          o.stopImmediatePropagation();
+          e.stopImmediatePropagation();
+          e.preventDefault();
 
           // Custom fields validations
           checkCustomFields();
 
           if (state.valid) {
-            saveFurnitureForm().then(() => {
-              $('#btn-go-to-payment').attr('captureEvt', '1');
-              $('#btn-go-to-payment').attr('disabled', false);
+            saveFurnitureForm();
 
-              // Execute native behaviour
-              // $('#btn-go-to-payment').click();
-            });
+            $('#shipping-data #btn-go-to-payment').attr('captureFurnitureEvt', '1');
 
-            btn.attr('disabled', true);
+            // Execute native behaviour
+            btn.click();
           }
         } else {
-          btn.attr('captureEvt', '0');
+          btn.attr('captureFurnitureEvt', '0');
         }
       });
     }
   };
 
+  const getCustomShippingInfo = () => {
+    const { customData } = vtexjs.checkout.orderForm;
+    let fields = {};
+
+    if (customData.customApps && customData.customApps.length > 0) {
+      customData.customApps.forEach((app) => {
+        if (app.id === CUSTOM_FIELDS_APP) {
+          fields = app.fields;
+        }
+      });
+    }
+
+    return fields;
+  };
+
+  const setValues = () => {
+    setTimeout(() => {
+      if (vtexjs.checkout.orderForm) {
+        const { showFurnitureForm, showTVIDForm } = ViewController.state;
+        const customShippingInfo = getCustomShippingInfo();
+
+        if (customShippingInfo) {
+          if (showFurnitureForm) {
+            $('#tfg-building-type').val(customShippingInfo.buildingType);
+            $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
+            $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
+            $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
+            $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
+            $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
+          }
+
+          if (showTVIDForm) {
+            // TODO:set tvid field
+          }
+        }
+      }
+    }, ORDERFORM_TIMEOUT);
+  };
+
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
       addEventBtnShipping();
+      setValues();
     }
   };
 
@@ -117,8 +156,14 @@ const FormController = (() => {
     runCustomization();
   });
 
-  $(window).on('hashchange orderFormUpdated.vtex', () => {
+  $(window).on('hashchange', () => {
     runCustomization();
+  });
+
+  $(window).on('orderFormUpdated.vtex', () => {
+    if (window.location.hash === STEPS.SHIPPING) {
+      setValues();
+    }
   });
 
   const publicInit = () => {

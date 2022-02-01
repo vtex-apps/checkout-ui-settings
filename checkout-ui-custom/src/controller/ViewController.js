@@ -64,8 +64,9 @@ const ViewController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
+      restartState();
+
       setTimeout(() => {
-        restartState();
         checkCartCategories();
         showCustomSections();
       }, ORDERFORM_TIMEOUT);
