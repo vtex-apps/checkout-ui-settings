@@ -17,8 +17,8 @@ const ViewController = (() => {
     furnitureForm: {
       buildingType: ['Free standing', 'House in complex', 'Townhouse', 'Apartment'],
       parkingDistance: [15, 25, 50, 100],
-      deliveryFloor: ['1', '2', '3+'],
-      liftStairs: ['lift', 'stairs']
+      deliveryFloor: ['Ground', '1', '2', '3+'],
+      liftStairs: ['Lift', 'Stairs']
     },
     RICAMsg: 'You can\'t collect this order in store because your cart contains items which '
       + 'require either RICA or TV License validation.',

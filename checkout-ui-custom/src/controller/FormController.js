@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import {
   STEPS,
   ORDERFORM_TIMEOUT,
@@ -8,7 +7,7 @@ import ViewController from './ViewController';
 
 const FormController = (() => {
   const state = {
-    valid: false
+    valid: true
   };
 
   const checkFurnitureForm = () => {
@@ -35,17 +34,32 @@ const FormController = (() => {
   const checkCustomFields = () => {
     const { showFurnitureForm, showTVIDForm } = ViewController.state;
     let furnitureFormError = false;
-    let TVIDFormError = false;
+    const TVIDFormError = false;
 
     if (showFurnitureForm) {
       furnitureFormError = checkFurnitureForm();
     }
 
     if (showTVIDForm) {
-      // TVIDFormError = checkTVIDForm(); // TODO: MODIFICAR
+      // TODO  checkTVIDForm();
     }
 
-    state.valid = (!furnitureFormError && !TVIDFormError);
+    state.valid = (!furnitureFormError || !TVIDFormError);
+  };
+
+  const checkNativeFields = () => {
+    const shippingFields = [
+      '#ship-street',
+      '#ship-number',
+      '#ship-city'
+    ];
+
+    shippingFields.forEach((field) => {
+      if ($(`${field}`).length > 0 && !$(`${field}`).val()) {
+        $(`${field}`).addClass('error');
+        state.valid = false;
+      }
+    });
   };
 
   const checkoutSendCustomData = (appId, customData) => {
@@ -72,36 +86,45 @@ const FormController = (() => {
     furnitureFields.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked');
     furnitureFields.assembleFurniture = $('#tfg-assemble-furniture').is(':checked');
 
-    return checkoutSendCustomData(CUSTOM_FIELDS_APP, furnitureFields);
+    checkoutSendCustomData(CUSTOM_FIELDS_APP, furnitureFields);
   };
 
-  const addEventBtnShipping = () => {
-    if ($('#shipping-data #btn-go-to-payment').attr('captureFurnitureEvt') === undefined) {
-      $('#shipping-data #btn-go-to-payment').attr('captureFurnitureEvt', '0');
+  function saveShippingAddress() {
+    $('#btn-go-to-payment').trigger('click');
+  }
 
-      $(document).on('click', '#shipping-data #btn-go-to-payment', (e) => {
-        const btn = $(this);
+  const checkShippingFields = () => {
+    const { showFurnitureForm, showTVIDForm } = ViewController.state;
 
-        if (btn.attr('captureFurnitureEvt') !== '1') {
-          // Block native behaviour
-          e.stopImmediatePropagation();
-          e.preventDefault();
+    checkNativeFields();
+    checkCustomFields();
 
-          // Custom fields validations
-          checkCustomFields();
+    if (state.valid) {
+      if (showFurnitureForm) {
+        saveFurnitureForm();
+      }
 
-          if (state.valid) {
-            saveFurnitureForm();
+      if (showTVIDForm) {
+        // TODO GUARDADO TVID
+      }
 
-            $('#shipping-data #btn-go-to-payment').attr('captureFurnitureEvt', '1');
+      saveShippingAddress();
+    }
+  };
 
-            // Execute native behaviour
-            btn.click();
-          }
-        } else {
-          btn.attr('captureFurnitureEvt', '0');
-        }
-      });
+  const addCustomBtnPayment = () => {
+    if ($('#custom-go-to-payment').length <= 0) {
+      const nativePaymentBtn = $('#btn-go-to-payment');
+      const customPaymentBtn = nativePaymentBtn.clone(false);
+
+      $(nativePaymentBtn).hide();
+      $(customPaymentBtn).data('bind', '');
+      $(customPaymentBtn).removeAttr('id').attr('id', 'custom-go-to-payment');
+      $(customPaymentBtn).removeAttr('data-bind');
+      $(customPaymentBtn).css('display', 'block');
+
+      $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);
+      $(customPaymentBtn).on('click', checkShippingFields);
     }
   };
 
@@ -146,7 +169,8 @@ const FormController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
-      addEventBtnShipping();
+      // addEventBtnShipping();
+      addCustomBtnPayment();
       setValues();
     }
   };
