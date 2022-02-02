@@ -7,44 +7,7 @@ import ViewController from './ViewController';
 
 const FormController = (() => {
   const state = {
-    valid: true
-  };
-
-  const checkFurnitureForm = () => {
-    const furnitureFields = [
-      'tfg-building-type',
-      'tfg-parking-distance',
-      'tfg-delivery-floor',
-      'tfg-lift-stairs'
-    ];
-    let hasError = false;
-
-    furnitureFields.forEach((field) => {
-      if ($(`#${field}`).length > 0 && !$(`#${field}`).val()) {
-        $(`#${field}`).addClass('error');
-        hasError = true;
-      } else {
-        $(`#${field}`).removeClass('error');
-      }
-    });
-
-    return hasError;
-  };
-
-  const checkCustomFields = () => {
-    const { showFurnitureForm, showTVIDForm } = ViewController.state;
-    let furnitureFormError = false;
-    const TVIDFormError = false;
-
-    if (showFurnitureForm) {
-      furnitureFormError = checkFurnitureForm();
-    }
-
-    if (showTVIDForm) {
-      // TODO  checkTVIDForm();
-    }
-
-    state.valid = (!furnitureFormError || !TVIDFormError);
+    validForm: true
   };
 
   const checkNativeFields = () => {
@@ -57,13 +20,47 @@ const FormController = (() => {
     shippingFields.forEach((field) => {
       if ($(`${field}`).length > 0 && !$(`${field}`).val()) {
         $(`${field}`).addClass('error');
-        state.valid = false;
+        state.validForm = false;
       }
     });
   };
 
+  const checkFurnitureForm = () => {
+    const furnitureFields = [
+      'tfg-building-type',
+      'tfg-parking-distance',
+      'tfg-delivery-floor',
+      'tfg-lift-stairs'
+    ];
+
+    furnitureFields.forEach((field) => {
+      if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
+        $(`#${field}`).addClass('error');
+        state.validForm = false;
+      } else {
+        $(`#${field}`).removeClass('error');
+      }
+    });
+  };
+
+  const checkFields = () => {
+    const { showFurnitureForm, showTVIDForm } = ViewController.state;
+
+    // Reset state
+    state.validForm = true;
+
+    checkNativeFields();
+
+    if (showFurnitureForm) {
+      checkFurnitureForm();
+    }
+
+    if (showTVIDForm) {
+      // TODO  checkTVIDForm();
+    }
+  };
+
   const checkoutSendCustomData = (appId, customData) => {
-    // eslint-disable-next-line no-undef
     const { orderFormId } = vtexjs.checkout.orderForm;
 
     return $.ajax({
@@ -82,7 +79,9 @@ const FormController = (() => {
     furnitureFields.buildingType = $('#tfg-building-type').val();
     furnitureFields.parkingDistance = $('#tfg-parking-distance').val();
     furnitureFields.deliveryFloor = $('#tfg-delivery-floor').val();
-    furnitureFields.liftOrStairs = $('#tfg-lift-stairs').val();
+    if (!$('#tfg-lift-stairs').attr('disabled')) {
+      furnitureFields.liftOrStairs = $('#tfg-lift-stairs').val();
+    }
     furnitureFields.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked');
     furnitureFields.assembleFurniture = $('#tfg-assemble-furniture').is(':checked');
 
@@ -96,10 +95,9 @@ const FormController = (() => {
   const checkShippingFields = () => {
     const { showFurnitureForm, showTVIDForm } = ViewController.state;
 
-    checkNativeFields();
-    checkCustomFields();
+    checkFields();
 
-    if (state.valid) {
+    if (state.validForm) {
       if (showFurnitureForm) {
         saveFurnitureForm();
       }
@@ -174,6 +172,17 @@ const FormController = (() => {
       setValues();
     }
   };
+
+  // INPUT EVENT SUBSCRIPTION
+  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', () => {
+    const selectedFloor = $('#tfg-delivery-floor').val();
+
+    if (selectedFloor === 'Ground') {
+      $('#tfg-lift-stairs').attr('disabled', 'disabled');
+    } else {
+      $('#tfg-lift-stairs').removeAttr('disabled');
+    }
+  });
 
   // EVENTS SUBSCRIPTION
   $(document).ready(() => {
