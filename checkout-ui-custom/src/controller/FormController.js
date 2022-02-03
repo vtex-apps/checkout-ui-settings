@@ -11,21 +11,6 @@ const FormController = (() => {
     validForm: true
   };
 
-  const checkNativeFields = () => {
-    const shippingFields = [
-      '#ship-street',
-      '#ship-number',
-      '#ship-city'
-    ];
-
-    shippingFields.forEach((field) => {
-      if ($(`${field}`).length > 0 && !$(`${field}`).val()) {
-        $(`${field}`).addClass('error');
-        state.validForm = false;
-      }
-    });
-  };
-
   const checkFurnitureForm = () => {
     const furnitureFields = [
       'tfg-building-type',
@@ -49,8 +34,6 @@ const FormController = (() => {
 
     // Reset state
     state.validForm = true;
-
-    checkNativeFields();
 
     if (showFurnitureForm) {
       checkFurnitureForm();
