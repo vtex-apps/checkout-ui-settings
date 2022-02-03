@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import {
   STEPS,
   ORDERFORM_TIMEOUT,
@@ -174,13 +175,19 @@ const FormController = (() => {
   };
 
   // INPUT EVENT SUBSCRIPTION
-  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', () => {
-    const selectedFloor = $('#tfg-delivery-floor').val();
-
-    if (selectedFloor === 'Ground') {
+  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
+    if ($(this).val() === 'Ground') {
       $('#tfg-lift-stairs').attr('disabled', 'disabled');
     } else {
       $('#tfg-lift-stairs').removeAttr('disabled');
+    }
+  });
+
+  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector', function () {
+    if ($(this).val()) {
+      $(this).addClass('tfg-input-completed');
+    } else {
+      $(this).removeClass('tfg-input-completed');
     }
   });
 

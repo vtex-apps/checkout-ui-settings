@@ -71,20 +71,25 @@ const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStair
   return `
     <div id="tfg-custom-furniture-step">
       <p class="tfg-custom-title">Furniture information needed</p>
-      <p class="tfg-custom-subtitle">We need some more information to prepare delivery of your
-      furniture items to your address.</p>
+      <p class="tfg-custom-subtitle">
+        We need some more information to prepare delivery of your furniture items to your address.
+      </p>
       ${buildingTypeInput}
       ${parkingDistanceInput}
       ${deliveryFloorInput}
       ${liftStairsInput}
-      <label class="checkbox tfg-custom-label">
-        <input type="checkbox" id="tfg-sufficient-space">
-        <span class="tfg-checkbox-text">Is there sufficent corner/passage door space?</span>
-      </label>
-      <label class="checkbox tfg-custom-label">
-        <input type="checkbox" id="tfg-assemble-furniture">
-        <span class="tfg-checkbox-text">Would you like us to assemble your furniture items?</span>
-      </label>
+      <p class="tfg-custom-checkbox">
+        <label class="tfg-checkbox-label">
+          <input type='checkbox' id="tfg-sufficient-space"/>
+          <span class="tfg-checkbox-text">Is there sufficent corner/passage door space?</span>
+        </label>
+      </p>
+      <p class="tfg-custom-checkbox">
+        <label class="tfg-checkbox-label">
+          <input type='checkbox' id="tfg-assemble-furniture"/>
+          <span class="tfg-checkbox-text">Would you like us to assemble your furniture items?</span>
+        </label>
+      </p>
     </div>
   `;
 };
