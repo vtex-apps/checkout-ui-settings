@@ -11,6 +11,24 @@ const FormController = (() => {
     validForm: true
   };
 
+  const checkNativeForm = () => {
+    const nativeFields = [
+      'ship-street',
+      'ship-city',
+      'ship-state',
+      'ship-receiverName'
+    ];
+
+    nativeFields.forEach((field) => {
+      if ($(`#${field}`).length > 0 && !$(`#${field}`).val()) {
+        $(`#${field}`).addClass('error');
+        state.validForm = false;
+      } else {
+        $(`#${field}`).removeClass('error');
+      }
+    });
+  };
+
   const checkFurnitureForm = () => {
     const furnitureFields = [
       'tfg-building-type',
@@ -34,6 +52,8 @@ const FormController = (() => {
 
     // Reset state
     state.validForm = true;
+
+    checkNativeForm();
 
     if (showFurnitureForm) {
       checkFurnitureForm();
@@ -136,7 +156,11 @@ const FormController = (() => {
             $('#tfg-building-type').val(customShippingInfo.buildingType);
             $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
             $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
-            $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
+            if ($('#tfg-delivery-floor').val() === 'Ground') {
+              $('#tfg-lift-stairs').attr('disabled', 'disabled');
+            } else {
+              $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
+            }
             $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
             $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
           }
@@ -161,6 +185,9 @@ const FormController = (() => {
   $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
     if ($(this).val() === 'Ground') {
       $('#tfg-lift-stairs').attr('disabled', 'disabled');
+      if ($('#tfg-lift-stairs').hasClass('error')) {
+        $('#tfg-lift-stairs').removeClass('error');
+      }
     } else {
       $('#tfg-lift-stairs').removeAttr('disabled');
     }
@@ -168,6 +195,7 @@ const FormController = (() => {
 
   $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector', function () {
     if ($(this).val()) {
+      $(this).removeClass('error');
       $(this).addClass('tfg-input-completed');
     } else {
       $(this).removeClass('tfg-input-completed');
