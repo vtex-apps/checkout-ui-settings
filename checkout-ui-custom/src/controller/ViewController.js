@@ -6,14 +6,15 @@ const ViewController = (() => {
   const state = {
     showFurnitureForm: false,
     showTVIDForm: false,
+    showTVIDMsg: false,
     showRICAMsg: false,
     showMixedCategoriesMsg: false
   };
 
   const config = {
-    furnitureId: '1',
-    tvId: '1',
-    simCardId: '1',
+    furnitureId: '0',
+    tvId: '0',
+    simCardId: '0',
     furnitureForm: {
       buildingType: ['Free standing', 'House in complex', 'Townhouse', 'Apartment'],
       parkingDistance: [15, 25, 50, 100],
@@ -29,29 +30,23 @@ const ViewController = (() => {
   const restartState = () => {
     state.showFurnitureForm = false;
     state.showTVIDForm = false;
+    state.showTVIDMsg = false;
     state.showRICAMsg = false;
     state.showMixedCategoriesMsg = false;
   };
 
-  const hasMixedCategories = (furnitureId) => {
+  const checkCartCategories = () => {
     const { categories } = CartController.state;
     const allCategoriesIds = Object.keys(categories);
 
-    return (allCategoriesIds.includes(furnitureId) && !allCategoriesIds.includes(furnitureId));
-  };
-
-  const checkCartCategories = () => {
-    const { categories } = CartController.state;
-
-    Object.entries(categories).forEach((category) => {
-      const [categoryId] = category[0];
-
-      state.showFurnitureForm = !state.showFurnitureForm && config.furnitureId === categoryId;
-      state.showTVIDForm = !state.showTVIDForm && config.tvId === categoryId;
-      state.showRICAMsg = !state.showRICAMsg && config.simCardId === categoryId;
-    });
-
-    state.showMixedCategoriesMsg = hasMixedCategories(config.furnitureId);
+    state.showFurnitureForm = allCategoriesIds.includes(config.furnitureId);
+    state.showTVIDForm = allCategoriesIds.includes(config.tvId);
+    state.showTVIDMsg = state.showTVIDForm;
+    state.showRICAMsg = allCategoriesIds.includes(config.simCardId);
+    state.showMixedCategoriesMsg = (
+      allCategoriesIds.includes(config.furnitureId)
+      && !allCategoriesIds.every((value) => value === config.furnitureId)
+    );
   };
 
   const showCustomSections = () => {
