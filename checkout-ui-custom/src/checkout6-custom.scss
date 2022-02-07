@@ -138,3 +138,50 @@
     }
   }
 }
+
+#tfg-custom-tvrica-msg {
+  padding: 8px;
+  margin: 10px 0px;
+  border-radius: 4px;
+  background: #F7EFF9;
+
+  .tfg-custom-text {
+    font-size: 13px;
+    line-height: 140%;
+    margin-bottom: 0;
+
+    color: #222222;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 8px 16px;
+
+    .tfg-custom-text {
+      font-size: 12px;
+    }
+  }
+}
+
+.vtex-omnishipping-1-x-deliveryChannelsWrapper {
+  &.custom-disabled {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 999;
+      cursor: not-allowed !important;
+    }
+
+    #shipping-option-pickup-in-point {
+      position: relative;
+      background: #E6E6E6 !important;
+
+      span {
+        color: #A3A3A3 !important;
+      }
+    }
+  }
+}

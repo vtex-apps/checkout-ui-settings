@@ -1,13 +1,15 @@
 import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
-import FurnitureForm from '../templates/FurnitureForm';
+import {
+  FurnitureForm,
+  TVorRICAMsg
+} from '../templates';
 import CartController from './CartController';
 
 const ViewController = (() => {
   const state = {
     showFurnitureForm: false,
     showTVIDForm: false,
-    showTVIDMsg: false,
-    showRICAMsg: false,
+    showTVorRICAMsg: false,
     showMixedCategoriesMsg: false
   };
 
@@ -21,7 +23,7 @@ const ViewController = (() => {
       deliveryFloor: ['Ground', '1', '2', '3+'],
       liftStairs: ['Lift', 'Stairs']
     },
-    RICAMsg: 'You can\'t collect this order in store because your cart contains items which '
+    TVorRICAMsg: 'You can\'t collect this order in store because your cart contains items which '
       + 'require either RICA or TV License validation.',
     MixedProductsMsg: 'We\'ll ship your furniture and other items in your cart to the selected address. '
       + 'Only the furniture delivery fee will apply.'
@@ -30,8 +32,7 @@ const ViewController = (() => {
   const restartState = () => {
     state.showFurnitureForm = false;
     state.showTVIDForm = false;
-    state.showTVIDMsg = false;
-    state.showRICAMsg = false;
+    state.showTVorRICAMsg = false;
     state.showMixedCategoriesMsg = false;
   };
 
@@ -41,19 +42,29 @@ const ViewController = (() => {
 
     state.showFurnitureForm = allCategoriesIds.includes(config.furnitureId);
     state.showTVIDForm = allCategoriesIds.includes(config.tvId);
-    state.showTVIDMsg = state.showTVIDForm;
-    state.showRICAMsg = allCategoriesIds.includes(config.simCardId);
+    state.showTVorRICAMsg = state.showTVIDForm || allCategoriesIds.includes(config.simCardId);
     state.showMixedCategoriesMsg = (
       allCategoriesIds.includes(config.furnitureId)
       && !allCategoriesIds.every((value) => value === config.furnitureId)
     );
+
+    console.log('## state', state);
   };
 
   const showCustomSections = () => {
     const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
+    const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
 
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
+    }
+
+    if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
+      setTimeout(() => {
+        $('#shipping-option-delivery').trigger('click');
+        $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
+        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
+      }, ORDERFORM_TIMEOUT);
     }
   };
 
