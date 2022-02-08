@@ -183,7 +183,7 @@ const FormController = (() => {
           }
 
           if (showTVIDForm) {
-            // TODO:set tvid field
+            $('#tfg-tv-licence').val(customShippingInfo.tvID);
           }
         }
       }

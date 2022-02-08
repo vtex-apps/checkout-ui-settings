@@ -30,13 +30,6 @@ const ViewController = (() => {
       + 'Only the furniture delivery fee will apply.'
   };
 
-  const restartState = () => {
-    state.showFurnitureForm = false;
-    state.showTVIDForm = false;
-    state.showTVorRICAMsg = false;
-    state.showMixedCategoriesMsg = false;
-  };
-
   const checkCartCategories = () => {
     const { categories } = CartController.state;
     const allCategoriesIds = Object.keys(categories);
@@ -48,12 +41,10 @@ const ViewController = (() => {
       allCategoriesIds.includes(config.furnitureId)
       && !allCategoriesIds.every((value) => value === config.furnitureId)
     );
-
-    console.log('## state', state);
   };
 
   const addBorderTop = () => {
-    if ($('.tfg-custom-step').length > 0) {
+    if ($('.tfg-custom-step').length > 1) {
       $('.tfg-custom-step, .vtex-omnishipping-1-x-shippingSectionTitle').addClass('custom-step-border');
     }
   };
@@ -72,11 +63,9 @@ const ViewController = (() => {
     }
 
     if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
-      setTimeout(() => {
-        $('#shipping-option-delivery').trigger('click');
-        $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
-        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
-      }, ORDERFORM_TIMEOUT);
+      $('#shipping-option-delivery').trigger('click');
+      $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
+      $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
     }
 
     addBorderTop();
@@ -84,8 +73,6 @@ const ViewController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
-      restartState();
-
       setTimeout(() => {
         checkCartCategories();
         showCustomSections();
