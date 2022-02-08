@@ -2,7 +2,8 @@ import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
 import {
   FurnitureForm,
   TVorRICAMsg,
-  TVIDForm
+  TVIDForm,
+  RICAMsg
 } from '../templates';
 import CartController from './CartController';
 
@@ -10,6 +11,7 @@ const ViewController = (() => {
   const state = {
     showFurnitureForm: false,
     showTVIDForm: false,
+    showRICAMsg: false,
     showTVorRICAMsg: false,
     showMixedCategoriesMsg: false
   };
@@ -36,7 +38,8 @@ const ViewController = (() => {
 
     state.showFurnitureForm = allCategoriesIds.includes(config.furnitureId);
     state.showTVIDForm = allCategoriesIds.includes(config.tvId);
-    state.showTVorRICAMsg = state.showTVIDForm || allCategoriesIds.includes(config.simCardId);
+    state.showRICAMsg = allCategoriesIds.includes(config.simCardId);
+    state.showTVorRICAMsg = state.showTVIDForm || state.showRICAMsg;
     state.showMixedCategoriesMsg = (
       allCategoriesIds.includes(config.furnitureId)
       && !allCategoriesIds.every((value) => value === config.furnitureId)
@@ -50,11 +53,16 @@ const ViewController = (() => {
   };
 
   const showCustomSections = () => {
-    const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
+    const tvRICAStepExists = ($('#tfg-custom-rica-msg').length > 0);
     const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
+    const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
 
-    if (state.showTVorRICAMsg && !tvIDStepExists) {
+    if (state.showRICAMsg && !tvRICAStepExists) {
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAMsg());
+    }
+
+    if (state.showTVIDForm && !tvIDStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(TVIDForm());
     }
 
@@ -73,6 +81,11 @@ const ViewController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
+      if (typeof (setAppConfiguration) !== 'undefined' && window.location.hash === STEPS.SHIPPING) {
+        // eslint-disable-next-line no-undef
+        setAppConfiguration(config);
+      }
+
       setTimeout(() => {
         checkCartCategories();
         showCustomSections();
@@ -82,11 +95,6 @@ const ViewController = (() => {
 
   // EVENTS SUBSCRIPTION
   $(document).ready(() => {
-    if (typeof (setAppConfiguration) !== 'undefined' && window.location.hash === STEPS.SHIPPING) {
-      // eslint-disable-next-line no-undef
-      setAppConfiguration(config);
-    }
-
     runCustomization();
   });
 

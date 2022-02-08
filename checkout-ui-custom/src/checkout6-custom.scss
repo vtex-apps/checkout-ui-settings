@@ -5,13 +5,17 @@
 .vtex-omnishipping-1-x-deliveryGroup {
   margin-top: 10px !important;
 
+  .tfg-custom-step {
+    margin-bottom: 25px;
+  }
+
   .custom-step-border {
     border-top: 1px solid #B2B2B2;
     padding-top: 25px;
   }
 
   .tfg-custom-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     line-height: 140%;
 
@@ -19,7 +23,7 @@
   }
 
   .tfg-custom-subtitle {
-    font-size: 13px;
+    font-size: 12px;
     line-height: 140%;
 
     color: #535353;
@@ -40,25 +44,27 @@
     }
 
     input {
-      border: 1px solid #B2B2B2;
-      box-sizing: border-box;
-      border-radius: 4px;
-    }
+      border: 1px solid #B2B2B2 !important;
+      box-sizing: border-box !important;
+      border-radius: 4px !important;
 
-    @media (min-width: 1024px) {
-      .tfg-custom-title {
-        font-size: 13px;
-      }
-
-      .tfg-custom-subtitle {
-        font-size: 12px;
+      &.error {
+        border: 1px solid red !important;
       }
     }
   }
 
-  #tfg-custom-furniture-step {
-    margin-bottom: 25px;
+  @media (min-width: 1024px) {
+    .tfg-custom-title {
+      font-size: 13px;
+    }
 
+    .tfg-custom-subtitle {
+      font-size: 12px;
+    }
+  }
+
+  #tfg-custom-furniture-step {
     .tfg-custom-input {
       label {
         font-family: Inter;
@@ -172,10 +178,6 @@
         }
       }
     }
-  }
-
-  #tfg-custom-tvid-step {
-    margin-bottom: 25px;
   }
 }
 
