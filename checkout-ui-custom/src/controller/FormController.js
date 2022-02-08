@@ -47,6 +47,15 @@ const FormController = (() => {
     });
   };
 
+  const checkTVForm = () => {
+    if ($('#tfg-tv-licence').length > 0 && !$('#tfg-tv-licence').val()) {
+      $('#tfg-tv-licence').addClass('error');
+      state.validForm = false;
+    } else {
+      $('#tfg-tv-licence').removeClass('error');
+    }
+  };
+
   const checkFields = () => {
     const { showFurnitureForm, showTVIDForm } = ViewController.state;
 
@@ -60,7 +69,7 @@ const FormController = (() => {
     }
 
     if (showTVIDForm) {
-      // TODO  checkTVIDForm();
+      checkTVForm();
     }
   };
 
@@ -92,6 +101,14 @@ const FormController = (() => {
     checkoutSendCustomData(CUSTOM_FIELDS_APP, furnitureFields);
   };
 
+  const saveTVForm = () => {
+    const TVFields = {
+      tvID: $('#tfg-tv-licence').val()
+    };
+
+    checkoutSendCustomData(CUSTOM_FIELDS_APP, TVFields);
+  };
+
   function saveShippingAddress() {
     $('#btn-go-to-payment').trigger('click');
   }
@@ -107,7 +124,7 @@ const FormController = (() => {
       }
 
       if (showTVIDForm) {
-        // TODO GUARDADO TVID
+        saveTVForm();
       }
 
       saveShippingAddress();

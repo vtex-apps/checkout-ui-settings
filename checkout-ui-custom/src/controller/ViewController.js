@@ -1,7 +1,8 @@
 import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
 import {
   FurnitureForm,
-  TVorRICAMsg
+  TVorRICAMsg,
+  TVIDForm
 } from '../templates';
 import CartController from './CartController';
 
@@ -51,9 +52,20 @@ const ViewController = (() => {
     console.log('## state', state);
   };
 
+  const addBorderTop = () => {
+    if ($('.tfg-custom-step').length > 0) {
+      $('.tfg-custom-step, .vtex-omnishipping-1-x-shippingSectionTitle').addClass('custom-step-border');
+    }
+  };
+
   const showCustomSections = () => {
     const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
+    const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
+
+    if (state.showTVorRICAMsg && !tvIDStepExists) {
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(TVIDForm());
+    }
 
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
@@ -66,6 +78,8 @@ const ViewController = (() => {
         $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
       }, ORDERFORM_TIMEOUT);
     }
+
+    addBorderTop();
   };
 
   const runCustomization = () => {
