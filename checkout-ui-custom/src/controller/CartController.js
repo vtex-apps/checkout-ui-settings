@@ -17,7 +17,7 @@ const CartController = (() => {
   };
 
   const runCustomization = () => {
-    if (window.location.hash === STEPS.SHIPPING) {
+    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
       setTimeout(() => {
         if (vtexjs.checkout.orderForm) {
           const { items } = vtexjs.checkout.orderForm;

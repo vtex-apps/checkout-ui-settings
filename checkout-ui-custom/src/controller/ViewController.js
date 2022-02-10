@@ -1,4 +1,5 @@
 import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
+import { getCustomShippingData } from '../utils/functions';
 import {
   FurnitureForm,
   TVorRICAMsg,
@@ -79,16 +80,45 @@ const ViewController = (() => {
     addBorderTop();
   };
 
+  const shippingCustomDataCompleted = () => {
+    let validData = false;
+    const customShippingInfo = getCustomShippingData();
+
+    if (state.showFurnitureForm
+      && customShippingInfo.assembleFurniture
+      && customShippingInfo.buildingType
+      && customShippingInfo.deliveryFloor
+      && customShippingInfo.hasSufficientSpace
+      && customShippingInfo.parkingDistance) {
+      validData = true;
+    }
+
+    if (state.showTVIDForm && customShippingInfo.tvID) {
+      validData = true;
+    }
+
+    return validData;
+  };
+
   const runCustomization = () => {
-    if (window.location.hash === STEPS.SHIPPING) {
-      if (typeof (setAppConfiguration) !== 'undefined' && window.location.hash === STEPS.SHIPPING) {
+    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
+      if (typeof (setAppConfiguration) !== 'undefined') {
         // eslint-disable-next-line no-undef
         setAppConfiguration(config);
       }
 
       setTimeout(() => {
         checkCartCategories();
-        showCustomSections();
+
+        if (window.location.hash === STEPS.SHIPPING) {
+          showCustomSections();
+        } else if (window.location.hash === STEPS.PAYMENT) {
+          setTimeout(() => {
+            if ((state.showFurnitureForm || state.showTVIDForm) && !shippingCustomDataCompleted()) {
+              window.location.hash = STEPS.SHIPPING;
+            }
+          }, 600);
+        }
       }, ORDERFORM_TIMEOUT);
     }
   };
