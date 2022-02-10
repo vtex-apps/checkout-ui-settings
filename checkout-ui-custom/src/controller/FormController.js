@@ -27,7 +27,6 @@ const FormController = (() => {
         $(`.${field}`).removeClass('error');
       }
     });
-    console.log('post checkNativeForm', state);
   };
 
   const checkFurnitureForm = () => {
@@ -46,7 +45,6 @@ const FormController = (() => {
         $(`.${field}`).removeClass('error');
       }
     });
-    console.log('post checkFurnitureForm', state);
   };
 
   const checkTVForm = () => {
@@ -56,7 +54,6 @@ const FormController = (() => {
     } else {
       $('.tfg-tv-licence').removeClass('error');
     }
-    console.log('post checkTVForm', state);
   };
 
   const checkFields = () => {
@@ -65,18 +62,13 @@ const FormController = (() => {
     // Reset state
     state.validForm = true;
 
-    console.log('ViewController.state', ViewController.state);
-    console.log('pre checkNativeForm', state);
-
     checkNativeForm();
 
     if (showFurnitureForm) {
-      console.log('pre checkFurnitureForm', state);
       checkFurnitureForm();
     }
 
     if (showTVIDForm) {
-      console.log('pre checkTVForm', state);
       checkTVForm();
     }
   };
@@ -171,38 +163,37 @@ const FormController = (() => {
   };
 
   const setValues = () => {
-    setTimeout(() => {
-      if (vtexjs.checkout.orderForm) {
-        const { showFurnitureForm, showTVIDForm } = ViewController.state;
-        const customShippingInfo = getCustomShippingInfo();
+    if (vtexjs.checkout.orderForm) {
+      const { showFurnitureForm, showTVIDForm } = ViewController.state;
+      const customShippingInfo = getCustomShippingInfo();
 
-        if (customShippingInfo) {
-          if (showFurnitureForm) {
-            $('#tfg-building-type').val(customShippingInfo.buildingType);
-            $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
-            $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
-            if ($('#tfg-delivery-floor').val() === 'Ground') {
-              $('#tfg-lift-stairs').attr('disabled', 'disabled');
-            } else {
-              $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
-            }
-            $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
-            $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
+      if (customShippingInfo) {
+        if (showFurnitureForm) {
+          $('#tfg-building-type').val(customShippingInfo.buildingType);
+          $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
+          $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
+          if ($('#tfg-delivery-floor').val() === 'Ground') {
+            $('#tfg-lift-stairs').attr('disabled', 'disabled');
+          } else {
+            $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
           }
+          $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
+          $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
+        }
 
-          if (showTVIDForm) {
-            $('#tfg-tv-licence').val(customShippingInfo.tvID);
-          }
+        if (showTVIDForm) {
+          $('#tfg-tv-licence').val(customShippingInfo.tvID);
         }
       }
-    }, ORDERFORM_TIMEOUT);
+    }
   };
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
-      // addEventBtnShipping();
-      addCustomBtnPayment();
-      setValues();
+      setTimeout(() => {
+        addCustomBtnPayment();
+        setValues();
+      }, ORDERFORM_TIMEOUT);
     }
   };
 
@@ -240,14 +231,8 @@ const FormController = (() => {
     runCustomization();
   });
 
-  $(window).on('hashchange', () => {
+  $(window).on('hashchange orderFormUpdated.vtex', () => {
     runCustomization();
-  });
-
-  $(window).on('orderFormUpdated.vtex', () => {
-    if (window.location.hash === STEPS.SHIPPING) {
-      setValues();
-    }
   });
 
   const publicInit = () => {
