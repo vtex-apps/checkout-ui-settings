@@ -1,7 +1,7 @@
 const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStairs }) => {
   // Building type selector
   let buildingTypeInput = `
-    <p class="tfg-custom-input">
+    <p class="input tfg-custom-input tfg-building-type">
       <label>Building type</label>
       <select class="input-xlarge tfg-custom-selector" id="tfg-building-type">
         <option disabled selected value="">Please select</option>
@@ -18,7 +18,7 @@ const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStair
 
   // Parking selector
   let parkingDistanceInput = `
-  <p class="tfg-custom-input">
+  <p class="input tfg-custom-input tfg-parking-distance">
     <label>Distance to parking</label>
     <select class="input-xlarge tfg-custom-selector" id="tfg-parking-distance">
       <option disabled selected value="">Please select</option>
@@ -35,7 +35,7 @@ const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStair
 
   // Delivery floor selector
   let deliveryFloorInput = `
-  <p class="tfg-custom-input">
+  <p class="input tfg-custom-input tfg-delivery-floor">
     <label>Delivery floor</label>
     <select class="input-xlarge tfg-custom-selector" id="tfg-delivery-floor">
       <option disabled selected value="">Please select</option>
@@ -52,7 +52,7 @@ const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStair
 
   // Lift/Stairs selector
   let liftStairsInput = `
-  <p class="tfg-custom-input">
+  <p class="input tfg-custom-input tfg-lift-stairs">
     <label>Lift or staris</label>
     <select class="input-xlarge tfg-custom-selector" id="tfg-lift-stairs">
       <option disabled selected value="">Please select</option>

@@ -21,12 +21,13 @@ const FormController = (() => {
 
     nativeFields.forEach((field) => {
       if ($(`#${field}`).length > 0 && !$(`#${field}`).val()) {
-        $(`#${field}`).addClass('error');
+        $(`.${field}`).addClass('error');
         state.validForm = false;
       } else {
-        $(`#${field}`).removeClass('error');
+        $(`.${field}`).removeClass('error');
       }
     });
+    console.log('post checkNativeForm', state);
   };
 
   const checkFurnitureForm = () => {
@@ -39,21 +40,23 @@ const FormController = (() => {
 
     furnitureFields.forEach((field) => {
       if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
-        $(`#${field}`).addClass('error');
+        $(`.${field}`).addClass('error');
         state.validForm = false;
       } else {
-        $(`#${field}`).removeClass('error');
+        $(`.${field}`).removeClass('error');
       }
     });
+    console.log('post checkFurnitureForm', state);
   };
 
   const checkTVForm = () => {
     if ($('#tfg-tv-licence').length > 0 && !$('#tfg-tv-licence').val()) {
-      $('#tfg-tv-licence').addClass('error');
+      $('.tfg-tv-licence').addClass('error');
       state.validForm = false;
     } else {
-      $('#tfg-tv-licence').removeClass('error');
+      $('.tfg-tv-licence').removeClass('error');
     }
+    console.log('post checkTVForm', state);
   };
 
   const checkFields = () => {
@@ -62,13 +65,18 @@ const FormController = (() => {
     // Reset state
     state.validForm = true;
 
+    console.log('ViewController.state', ViewController.state);
+    console.log('pre checkNativeForm', state);
+
     checkNativeForm();
 
     if (showFurnitureForm) {
+      console.log('pre checkFurnitureForm', state);
       checkFurnitureForm();
     }
 
     if (showTVIDForm) {
+      console.log('pre checkTVForm', state);
       checkTVForm();
     }
   };
@@ -201,21 +209,29 @@ const FormController = (() => {
   // INPUT EVENT SUBSCRIPTION
   $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
     if ($(this).val() === 'Ground') {
+      $('#tfg-lift-stairs').val('');
       $('#tfg-lift-stairs').attr('disabled', 'disabled');
-      if ($('#tfg-lift-stairs').hasClass('error')) {
-        $('#tfg-lift-stairs').removeClass('error');
-      }
+      $('.tfg-lift-stairs').removeClass('error');
     } else {
       $('#tfg-lift-stairs').removeAttr('disabled');
     }
   });
 
-  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector', function () {
+  $(document).on('change',
+    '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector, .vtex-omnishipping-1-x-deliveryGroup .tfg-input',
+    function () {
+      if ($(this).val()) {
+        $(this).parent().removeClass('error');
+        $(this).addClass('tfg-input-completed');
+      } else {
+        $(this).removeClass('tfg-input-completed');
+      }
+    });
+
+  $(document).on('change', '.vtex-omnishipping-1-x-addressForm input', function () {
     if ($(this).val()) {
-      $(this).removeClass('error');
-      $(this).addClass('tfg-input-completed');
-    } else {
-      $(this).removeClass('tfg-input-completed');
+      $(this).parent().removeClass('error');
+      $(this).next('span.help.error').remove();
     }
   });
 
