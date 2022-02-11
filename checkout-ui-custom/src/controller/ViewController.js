@@ -4,7 +4,8 @@ import {
   FurnitureForm,
   TVorRICAMsg,
   TVIDForm,
-  RICAMsg
+  RICAMsg,
+  MixedProducts
 } from '../templates';
 import CartController from './CartController';
 
@@ -14,7 +15,7 @@ const ViewController = (() => {
     showTVIDForm: false,
     showRICAMsg: false,
     showTVorRICAMsg: false,
-    showMixedCategoriesMsg: false
+    showMixedProductsMsg: false
   };
 
   const config = {
@@ -41,7 +42,7 @@ const ViewController = (() => {
     state.showTVIDForm = allCategoriesIds.includes(config.tvId);
     state.showRICAMsg = allCategoriesIds.includes(config.simCardId);
     state.showTVorRICAMsg = state.showTVIDForm || state.showRICAMsg;
-    state.showMixedCategoriesMsg = (
+    state.showMixedProductsMsg = (
       allCategoriesIds.includes(config.furnitureId)
       && !allCategoriesIds.every((value) => value === config.furnitureId)
     );
@@ -58,6 +59,7 @@ const ViewController = (() => {
     const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
     const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
+    const mixedProductsMsgExits = ($('#tfg-custom-tvrica-msg').length > 0);
 
     if (state.showRICAMsg && !tvRICAStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAMsg());
@@ -75,6 +77,10 @@ const ViewController = (() => {
       $('#shipping-option-delivery').trigger('click');
       $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
       $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
+    }
+
+    if (state.showMixedProductsMsg && !mixedProductsMsgExits) {
+      $('.vtex-omnishipping-1-x-addressFormPart1').prepend(MixedProducts(config.MixedProductsMsg));
     }
 
     addBorderTop();

@@ -117,7 +117,7 @@
   left: -10px;
 }
 
-#tfg-custom-tvrica-msg {
+.tfg-custom-msg {
   font-family: Inter;
   font-style: normal;
   font-weight: normal;
@@ -126,17 +126,17 @@
   border-radius: 4px;
   background: #F7EFF9;
 }
-#tfg-custom-tvrica-msg .tfg-custom-text {
+.tfg-custom-msg .tfg-custom-text {
   font-size: 13px;
   line-height: 140%;
   margin-bottom: 0;
   color: #222222;
 }
 @media (min-width: 1024px) {
-  #tfg-custom-tvrica-msg {
+  .tfg-custom-msg {
     padding: 8px 16px;
   }
-  #tfg-custom-tvrica-msg .tfg-custom-text {
+  .tfg-custom-msg .tfg-custom-text {
     font-size: 12px;
   }
 }

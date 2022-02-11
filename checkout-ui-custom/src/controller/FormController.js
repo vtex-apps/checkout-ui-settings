@@ -5,6 +5,7 @@ import {
   CUSTOM_FIELDS_APP
 } from '../utils/const';
 import { getCustomShippingData } from '../utils/functions';
+import { InputError } from '../templates';
 import ViewController from './ViewController';
 
 const FormController = (() => {
@@ -12,7 +13,21 @@ const FormController = (() => {
     validForm: true
   };
 
-  const errorSpan = '<span class="help error">This field is required.</span>';
+  const checkField = (field) => {
+    if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
+      $(`.${field}`).addClass('error');
+      $(`.${field}`).append(InputError);
+      state.validForm = false;
+    } else {
+      $(`.${field}`).removeClass('error');
+    }
+  };
+
+  const checkFields = (fields) => {
+    fields.forEach((field) => {
+      checkField(field);
+    });
+  };
 
   const checkNativeForm = () => {
     const nativeFields = [
@@ -22,15 +37,7 @@ const FormController = (() => {
       'ship-receiverName'
     ];
 
-    nativeFields.forEach((field) => {
-      if ($(`#${field}`).length > 0 && !$(`#${field}`).val()) {
-        $(`.${field}`).addClass('error');
-        $(`.${field}`).append(errorSpan);
-        state.validForm = false;
-      } else {
-        $(`.${field}`).removeClass('error');
-      }
-    });
+    checkFields(nativeFields);
   };
 
   const checkFurnitureForm = () => {
@@ -41,28 +48,10 @@ const FormController = (() => {
       'tfg-lift-stairs'
     ];
 
-    furnitureFields.forEach((field) => {
-      if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
-        $(`.${field}`).addClass('error');
-        $(`.${field}`).append(errorSpan);
-        state.validForm = false;
-      } else {
-        $(`.${field}`).removeClass('error');
-      }
-    });
+    checkFields(furnitureFields);
   };
 
-  const checkTVForm = () => {
-    if ($('#tfg-tv-licence').length > 0 && !$('#tfg-tv-licence').val()) {
-      $('.tfg-tv-licence').addClass('error');
-      $('.tfg-tv-licence').append(errorSpan);
-      state.validForm = false;
-    } else {
-      $('.tfg-tv-licence').removeClass('error');
-    }
-  };
-
-  const checkFields = () => {
+  const checkForms = () => {
     const { showFurnitureForm, showTVIDForm } = ViewController.state;
 
     // Reset state & clear errors
@@ -76,7 +65,7 @@ const FormController = (() => {
     }
 
     if (showTVIDForm) {
-      checkTVForm();
+      checkField('tfg-tv-licence');
     }
   };
 
@@ -123,7 +112,7 @@ const FormController = (() => {
   const checkShippingFields = () => {
     const { showFurnitureForm, showTVIDForm } = ViewController.state;
 
-    checkFields();
+    checkForms();
 
     if (state.validForm) {
       if (showFurnitureForm) {
