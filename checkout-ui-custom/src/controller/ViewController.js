@@ -50,7 +50,8 @@ const ViewController = (() => {
 
   const addBorderTop = () => {
     if ($('.tfg-custom-step').length > 1) {
-      $('.tfg-custom-step, .vtex-omnishipping-1-x-shippingSectionTitle').addClass('custom-step-border');
+      $('.tfg-custom-step').addClass('custom-step-border');
+      $('.tfg-custom-step').first().addClass('tfg-mtop-25');
     }
   };
 
@@ -61,16 +62,16 @@ const ViewController = (() => {
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
     const mixedProductsMsgExits = ($('#tfg-custom-tvrica-msg').length > 0);
 
-    if (state.showRICAMsg && !tvRICAStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAMsg());
+    if (state.showFurnitureForm && !furnitureStepExists) {
+      $('.vtex-omnishipping-1-x-address').append(FurnitureForm(config.furnitureForm));
     }
 
     if (state.showTVIDForm && !tvIDStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(TVIDForm());
+      $('.vtex-omnishipping-1-x-address').append(TVIDForm());
     }
 
-    if (state.showFurnitureForm && !furnitureStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
+    if (state.showRICAMsg && !tvRICAStepExists) {
+      $('.vtex-omnishipping-1-x-address').append(RICAMsg());
     }
 
     if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
@@ -131,10 +132,12 @@ const ViewController = (() => {
 
   // EVENTS SUBSCRIPTION
   $(document).ready(() => {
+    console.log('viewController - ready');
     runCustomization();
   });
 
-  $(window).on('hashchange orderFormUpdated.vtex', () => {
+  $(window).on('hashchange orderFormUpdated.vtex', (e) => {
+    console.log('viewController', e);
     runCustomization();
   });
 
