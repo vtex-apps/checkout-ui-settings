@@ -106,7 +106,10 @@ const FormController = (() => {
   };
 
   function saveShippingAddress() {
-    $('#btn-go-to-payment').trigger('click');
+    // waiting a few ms for save custom data
+    setTimeout(() => {
+      $('#btn-go-to-payment').trigger('click');
+    }, 300);
   }
 
   const checkShippingFields = () => {
@@ -179,7 +182,7 @@ const FormController = (() => {
   };
 
   // INPUT EVENT SUBSCRIPTION
-  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
+  $(document).on('change', '.vtex-omnishipping-1-x-address #tfg-delivery-floor', function () {
     if ($(this).val() === 'Ground') {
       $('#tfg-lift-stairs').val('');
       $('#tfg-lift-stairs').attr('disabled', 'disabled');
@@ -191,7 +194,7 @@ const FormController = (() => {
   });
 
   $(document).on('change',
-    '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector, .vtex-omnishipping-1-x-deliveryGroup .tfg-input',
+    '.vtex-omnishipping-1-x-address .tfg-custom-selector, .vtex-omnishipping-1-x-address .tfg-input',
     function () {
       if ($(this).val()) {
         $(this).parent().removeClass('error');
