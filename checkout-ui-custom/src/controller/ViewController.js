@@ -60,7 +60,7 @@ const ViewController = (() => {
     const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
     const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
-    const mixedProductsMsgExits = ($('#tfg-custom-tvrica-msg').length > 0);
+    const mixedProductsMsgExits = ($('#tfg-custom-mixed-msg').length > 0);
 
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-address').append(FurnitureForm(config.furnitureForm));
@@ -74,14 +74,17 @@ const ViewController = (() => {
       $('.vtex-omnishipping-1-x-address').append(RICAMsg());
     }
 
-    if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
+    if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
       $('#shipping-option-delivery').trigger('click');
       $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
-      $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
-    }
 
-    if (state.showMixedProductsMsg && !mixedProductsMsgExits) {
-      $('.vtex-omnishipping-1-x-addressFormPart1').prepend(MixedProducts(config.MixedProductsMsg));
+      if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
+        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
+      }
+
+      if (state.showMixedProductsMsg && !mixedProductsMsgExits) {
+        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(MixedProducts(config.MixedProductsMsg));
+      }
     }
 
     addBorderTop();
