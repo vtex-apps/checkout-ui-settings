@@ -7,10 +7,8 @@
 }
 
 .vtex-omnishipping-1-x-address {
-  margin-top: 10px !important;
-
   .tfg-custom-step {
-    margin-bottom: 25px;
+    margin-top: 25px;
 
     &.custom-step-border {
       padding-top: 25px;
@@ -159,19 +157,20 @@
 .tfg-custom-msg {
   font-family: Inter;
   font-style: normal;
-  font-weight: normal;
+  font-weight: 500;
 
   padding: 8px;
   margin: 10px 0px;
   border-radius: 4px;
-  background: #F7EFF9;
+  background: #F1EFFE;
 
   .tfg-custom-text {
-    font-size: 13px;
-    line-height: 140%;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.25px;
     margin-bottom: 0;
 
-    color: #222222;
+    color: #250EB9;
   }
 
   @media (min-width: 1024px) {
