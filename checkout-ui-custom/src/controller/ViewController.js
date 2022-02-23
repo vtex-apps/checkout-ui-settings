@@ -119,6 +119,11 @@ const ViewController = (() => {
 
         if (window.location.hash === STEPS.SHIPPING) {
           showCustomSections();
+
+          // This button has a bug an needs to be clicked in two times; I trigger one click for UX
+          if ($('button.vtex-omnishipping-1-x-btnDelivery').length > 0) {
+            $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
+          }
         } else if (window.location.hash === STEPS.PAYMENT) {
           setTimeout(() => {
             if ((state.showFurnitureForm || state.showTVIDForm) && !shippingCustomDataCompleted()) {
