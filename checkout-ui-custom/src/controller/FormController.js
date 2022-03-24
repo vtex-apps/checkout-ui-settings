@@ -2,9 +2,12 @@
 import {
   STEPS,
   ORDERFORM_TIMEOUT,
-  CUSTOM_FIELDS_APP
+  /* CUSTOM_FIELDS_APP */
 } from '../utils/const';
-import { getCustomShippingData } from '../utils/functions';
+import {
+  getCustomShippingData,
+  getCustomShippingDataFromLS
+} from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
 
@@ -69,6 +72,8 @@ const FormController = (() => {
     }
   };
 
+  // TODO: LEFT HERE FOR RICA FIELDS
+  /*
   const checkoutSendCustomData = (appId, customData) => {
     const { orderFormId } = vtexjs.checkout.orderForm;
 
@@ -81,6 +86,7 @@ const FormController = (() => {
       data: JSON.stringify(customData)
     });
   };
+  */
 
   const saveFurnitureForm = () => {
     const furnitureFields = {};
@@ -94,7 +100,7 @@ const FormController = (() => {
     furnitureFields.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked');
     furnitureFields.assembleFurniture = $('#tfg-assemble-furniture').is(':checked');
 
-    checkoutSendCustomData(CUSTOM_FIELDS_APP, furnitureFields);
+    localStorage.setItem('furnitureFields', JSON.stringify(furnitureFields));
   };
 
   const saveTVForm = () => {
@@ -102,14 +108,38 @@ const FormController = (() => {
       tvID: $('#tfg-tv-licence').val()
     };
 
-    checkoutSendCustomData(CUSTOM_FIELDS_APP, TVFields);
+    localStorage.setItem('TVFields', JSON.stringify(TVFields));
   };
 
+  // TODO: here @josue :)
   function saveShippingAddress() {
+    console.log('hi');
+
+    const { orderFormId } = vtexjs.checkout.orderForm;
+    const params = {
+      method: 'PATCH',
+      headers: {
+        VtexIdclientAutCookie: ''
+      },
+      body: JSON.stringify({
+        complement: 'teeeest',
+        companyBuilding: 'test'
+      })
+    };
+
+    console.log(params);
+
+    fetch(`safedata/AD/documents?_orderFormId=${orderFormId}`, params)
+      .then((response) => response.json())
+      .catch((error) => console.log(error))
+      .then((data) => data);
+
+    /*
     // waiting a few ms for save custom data
     setTimeout(() => {
       $('#btn-go-to-payment').trigger('click');
     }, 300);
+    */
   }
 
   const checkShippingFields = () => {
@@ -118,6 +148,8 @@ const FormController = (() => {
     checkForms();
 
     if (state.validForm) {
+      saveShippingAddress();
+
       if (showFurnitureForm) {
         saveFurnitureForm();
       }
@@ -125,8 +157,6 @@ const FormController = (() => {
       if (showTVIDForm) {
         saveTVForm();
       }
-
-      saveShippingAddress();
     }
   };
 
@@ -149,7 +179,13 @@ const FormController = (() => {
   const setValues = () => {
     if (vtexjs.checkout.orderForm) {
       const { showFurnitureForm, showTVIDForm } = ViewController.state;
-      const customShippingInfo = getCustomShippingData();
+      let customShippingInfo = getCustomShippingData();
+
+      if (!customShippingInfo) {
+        customShippingInfo = getCustomShippingDataFromLS();
+      }
+
+      console.log('-- customShippingInfo', customShippingInfo);
 
       if (customShippingInfo) {
         if (showFurnitureForm) {

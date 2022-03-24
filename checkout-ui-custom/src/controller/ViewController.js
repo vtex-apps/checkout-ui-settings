@@ -1,5 +1,9 @@
 import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
-import { getCustomShippingData } from '../utils/functions';
+import {
+  getCustomShippingData,
+  getCustomShippingDataFromLS,
+  addBorderTop
+} from '../utils/functions';
 import {
   FurnitureForm,
   TVorRICAMsg,
@@ -48,13 +52,6 @@ const ViewController = (() => {
     );
   };
 
-  const addBorderTop = () => {
-    if ($('.tfg-custom-step').length > 1) {
-      $('.tfg-custom-step').addClass('custom-step-border');
-      $('.tfg-custom-step').first().addClass('tfg-mtop-25');
-    }
-  };
-
   const showCustomSections = () => {
     const tvRICAStepExists = ($('#tfg-custom-rica-msg').length > 0);
     const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
@@ -87,24 +84,41 @@ const ViewController = (() => {
       }
     }
 
-    addBorderTop();
+    addBorderTop('.tfg-custom-step');
   };
 
   const shippingCustomDataCompleted = () => {
     let validData = false;
-    const customShippingInfo = getCustomShippingData();
 
-    if (state.showFurnitureForm
-      && customShippingInfo.assembleFurniture
-      && customShippingInfo.buildingType
-      && customShippingInfo.deliveryFloor
-      && customShippingInfo.hasSufficientSpace
-      && customShippingInfo.parkingDistance) {
-      validData = true;
+    let customShippingInfo = getCustomShippingData();
+    if (!customShippingInfo) {
+      customShippingInfo = getCustomShippingDataFromLS();
     }
 
-    if (state.showTVIDForm && customShippingInfo.tvID) {
-      validData = true;
+    console.log('customShippingInfo', customShippingInfo);
+
+    if (customShippingInfo) {
+      let furnitureCompleted = false;
+      let tvCompleted = false;
+
+      if (state.showFurnitureForm
+        && customShippingInfo.assembleFurniture
+        && customShippingInfo.buildingType
+        && customShippingInfo.deliveryFloor
+        && customShippingInfo.hasSufficientSpace
+        && customShippingInfo.parkingDistance) {
+        furnitureCompleted = true;
+        validData = true;
+      }
+
+      if (state.showTVIDForm && customShippingInfo.tvID) {
+        tvCompleted = true;
+        validData = true;
+      }
+
+      if (state.showFurnitureForm && state.showTVIDForm && (!furnitureCompleted || !tvCompleted)) {
+        validData = false;
+      }
     }
 
     return validData;
@@ -140,12 +154,10 @@ const ViewController = (() => {
 
   // EVENTS SUBSCRIPTION
   $(document).ready(() => {
-    console.log('viewController - ready');
     runCustomization();
   });
 
-  $(window).on('hashchange orderFormUpdated.vtex', (e) => {
-    console.log('viewController', e);
+  $(window).on('hashchange orderFormUpdated.vtex', () => {
     runCustomization();
   });
 
