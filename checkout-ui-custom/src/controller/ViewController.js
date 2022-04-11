@@ -151,7 +151,7 @@ const ViewController = (() => {
               if ((state.showFurnitureForm || state.showTVIDForm) && !isDataCompleted) {
                 window.location.hash = STEPS.SHIPPING;
               }
-            }, 1000);
+            }, 750);
           } else {
             waitAndResetLocalStorage();
           }
