@@ -1,12 +1,12 @@
 /* eslint-disable func-names */
 import {
   STEPS,
-  ORDERFORM_TIMEOUT,
+  ORDERFORM_TIMEOUT
   /* CUSTOM_FIELDS_APP */
 } from '../utils/const';
 import {
-  getCustomShippingData,
-  getCustomShippingDataFromLS
+  getShippingData,
+  saveAddress
 } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
@@ -36,9 +36,17 @@ const FormController = (() => {
     const nativeFields = [
       'ship-street',
       'ship-city',
-      'ship-state',
       'ship-receiverName'
     ];
+
+    /* When the list of addresses appears,
+    it does not complete ship-state correctly in the native process so,
+    if it has already been reported, it is not validated. */
+    const { address } = vtexjs.checkout.orderForm.shippingData;
+
+    if (!address.state) {
+      nativeFields.push('ship-state');
+    }
 
     checkFields(nativeFields);
   };
@@ -72,23 +80,7 @@ const FormController = (() => {
     }
   };
 
-  // TODO: LEFT HERE FOR RICA FIELDS
-  /*
-  const checkoutSendCustomData = (appId, customData) => {
-    const { orderFormId } = vtexjs.checkout.orderForm;
-
-    return $.ajax({
-      type: 'PUT',
-      url:
-        `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,
-      dataType: 'json',
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(customData)
-    });
-  };
-  */
-
-  const saveFurnitureForm = () => {
+  const getFurnitureFormFields = () => {
     const furnitureFields = {};
 
     furnitureFields.buildingType = $('#tfg-building-type').val();
@@ -100,63 +92,32 @@ const FormController = (() => {
     furnitureFields.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked');
     furnitureFields.assembleFurniture = $('#tfg-assemble-furniture').is(':checked');
 
-    localStorage.setItem('furnitureFields', JSON.stringify(furnitureFields));
+    return furnitureFields;
   };
 
-  const saveTVForm = () => {
-    const TVFields = {
-      tvID: $('#tfg-tv-licence').val()
-    };
+  const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
-    localStorage.setItem('TVFields', JSON.stringify(TVFields));
-  };
-
-  // TODO: here @josue :)
-  function saveShippingAddress() {
-    console.log('hi');
-
-    const { orderFormId } = vtexjs.checkout.orderForm;
-    const params = {
-      method: 'PATCH',
-      headers: {
-        VtexIdclientAutCookie: ''
-      },
-      body: JSON.stringify({
-        complement: 'teeeest',
-        companyBuilding: 'test'
-      })
-    };
-
-    console.log(params);
-
-    fetch(`safedata/AD/documents?_orderFormId=${orderFormId}`, params)
-      .then((response) => response.json())
-      .catch((error) => console.log(error))
-      .then((data) => data);
-
-    /*
-    // waiting a few ms for save custom data
-    setTimeout(() => {
-      $('#btn-go-to-payment').trigger('click');
-    }, 300);
-    */
-  }
-
-  const checkShippingFields = () => {
+  const saveShippingForm = () => {
     const { showFurnitureForm, showTVIDForm } = ViewController.state;
 
     checkForms();
 
     if (state.validForm) {
-      saveShippingAddress();
+      let fields;
 
       if (showFurnitureForm) {
-        saveFurnitureForm();
+        fields = { ...getFurnitureFormFields() };
       }
 
       if (showTVIDForm) {
-        saveTVForm();
+        fields = { ...getTVFormFields() };
       }
+
+      saveAddress(fields);
+
+      setTimeout(() => {
+        $('#btn-go-to-payment').trigger('click');
+      }, 800);
     }
   };
 
@@ -172,20 +133,18 @@ const FormController = (() => {
       $(customPaymentBtn).css('display', 'block');
 
       $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);
-      $(customPaymentBtn).on('click', checkShippingFields);
+      $(customPaymentBtn).on('click', saveShippingForm);
     }
   };
 
-  const setValues = () => {
+  const setCustomFieldsValue = async () => {
     if (vtexjs.checkout.orderForm) {
       const { showFurnitureForm, showTVIDForm } = ViewController.state;
-      let customShippingInfo = getCustomShippingData();
+      const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
+      const fields = '?_fields=companyBuilding,furnitureReady,buildingType,'
+        + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
 
-      if (!customShippingInfo) {
-        customShippingInfo = getCustomShippingDataFromLS();
-      }
-
-      console.log('-- customShippingInfo', customShippingInfo);
+      const customShippingInfo = await getShippingData(addressId, fields);
 
       if (customShippingInfo) {
         if (showFurnitureForm) {
@@ -210,15 +169,15 @@ const FormController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
-      setTimeout(() => {
+      setTimeout(async () => {
         addCustomBtnPayment();
-        setValues();
+        await setCustomFieldsValue();
       }, ORDERFORM_TIMEOUT);
     }
   };
 
   // INPUT EVENT SUBSCRIPTION
-  $(document).on('change', '.vtex-omnishipping-1-x-address #tfg-delivery-floor', function () {
+  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
     if ($(this).val() === 'Ground') {
       $('#tfg-lift-stairs').val('');
       $('#tfg-lift-stairs').attr('disabled', 'disabled');
@@ -230,7 +189,7 @@ const FormController = (() => {
   });
 
   $(document).on('change',
-    '.vtex-omnishipping-1-x-address .tfg-custom-selector, .vtex-omnishipping-1-x-address .tfg-input',
+    '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector, .vtex-omnishipping-1-x-deliveryGroup .tfg-input',
     function () {
       if ($(this).val()) {
         $(this).parent().removeClass('error');
@@ -257,9 +216,7 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {
-    window.FormController = this;
-  };
+  const publicInit = () => { };
 
   return {
     init: publicInit,

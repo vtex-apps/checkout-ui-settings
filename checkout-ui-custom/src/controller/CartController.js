@@ -38,9 +38,7 @@ const CartController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {
-    window.CartController = this;
-  };
+  const publicInit = () => { };
 
   return {
     init: publicInit,

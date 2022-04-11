@@ -1,8 +1,8 @@
 import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
 import {
-  getCustomShippingData,
-  getCustomShippingDataFromLS,
-  addBorderTop
+  getShippingData,
+  addBorderTop,
+  waitAndResetLocalStorage
 } from '../utils/functions';
 import {
   FurnitureForm,
@@ -59,16 +59,16 @@ const ViewController = (() => {
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
     const mixedProductsMsgExits = ($('#tfg-custom-mixed-msg').length > 0);
 
-    if (state.showFurnitureForm && !furnitureStepExists) {
-      $('.vtex-omnishipping-1-x-address').append(FurnitureForm(config.furnitureForm));
+    if (state.showRICAMsg && !tvRICAStepExists) {
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAMsg());
     }
 
     if (state.showTVIDForm && !tvIDStepExists) {
-      $('.vtex-omnishipping-1-x-address').append(TVIDForm());
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(TVIDForm());
     }
 
-    if (state.showRICAMsg && !tvRICAStepExists) {
-      $('.vtex-omnishipping-1-x-address').append(RICAMsg());
+    if (state.showFurnitureForm && !furnitureStepExists) {
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
     }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
@@ -87,37 +87,38 @@ const ViewController = (() => {
     addBorderTop('.tfg-custom-step');
   };
 
-  const shippingCustomDataCompleted = () => {
+  const shippingCustomDataCompleted = async () => {
     let validData = false;
 
-    let customShippingInfo = getCustomShippingData();
-    if (!customShippingInfo) {
-      customShippingInfo = getCustomShippingDataFromLS();
-    }
+    if (vtexjs.checkout.orderForm && vtexjs.checkout.orderForm.shippingData.address) {
+      const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
+      const fields = '?_fields=companyBuilding,furnitureReady,buildingType,parkingDistance,'
+        + 'deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
 
-    console.log('customShippingInfo', customShippingInfo);
+      const customShippingInfo = await getShippingData(addressId, fields);
 
-    if (customShippingInfo) {
-      let furnitureCompleted = false;
-      let tvCompleted = false;
+      if (customShippingInfo) {
+        let furnitureCompleted = false;
+        let tvCompleted = false;
 
-      if (state.showFurnitureForm
-        && customShippingInfo.assembleFurniture
-        && customShippingInfo.buildingType
-        && customShippingInfo.deliveryFloor
-        && customShippingInfo.hasSufficientSpace
-        && customShippingInfo.parkingDistance) {
-        furnitureCompleted = true;
-        validData = true;
-      }
+        if (state.showFurnitureForm
+          && customShippingInfo.assembleFurniture
+          && customShippingInfo.buildingType
+          && customShippingInfo.deliveryFloor
+          && customShippingInfo.hasSufficientSpace
+          && customShippingInfo.parkingDistance) {
+          furnitureCompleted = true;
+          validData = true;
+        }
 
-      if (state.showTVIDForm && customShippingInfo.tvID) {
-        tvCompleted = true;
-        validData = true;
-      }
+        if (state.showTVIDForm && customShippingInfo.tvID) {
+          tvCompleted = true;
+          validData = true;
+        }
 
-      if (state.showFurnitureForm && state.showTVIDForm && (!furnitureCompleted || !tvCompleted)) {
-        validData = false;
+        if (state.showFurnitureForm && state.showTVIDForm && (!furnitureCompleted || !tvCompleted)) {
+          validData = false;
+        }
       }
     }
 
@@ -137,16 +138,23 @@ const ViewController = (() => {
         if (window.location.hash === STEPS.SHIPPING) {
           showCustomSections();
 
-          // This button has a bug an needs to be clicked in two times; I trigger one click for UX
+          // This button has a bug an needs to be clicked in two times; I trigger once to improve UX
           if ($('button.vtex-omnishipping-1-x-btnDelivery').length > 0) {
             $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
           }
         } else if (window.location.hash === STEPS.PAYMENT) {
-          setTimeout(() => {
-            if ((state.showFurnitureForm || state.showTVIDForm) && !shippingCustomDataCompleted()) {
-              window.location.hash = STEPS.SHIPPING;
-            }
-          }, 600);
+          let isDataCompleted = localStorage.getItem('shippingDataCompleted');
+
+          if (!isDataCompleted) {
+            setTimeout(async () => {
+              isDataCompleted = await shippingCustomDataCompleted();
+              if ((state.showFurnitureForm || state.showTVIDForm) && !isDataCompleted) {
+                window.location.hash = STEPS.SHIPPING;
+              }
+            }, 1000);
+          } else {
+            waitAndResetLocalStorage();
+          }
         }
       }, ORDERFORM_TIMEOUT);
     }
@@ -161,9 +169,7 @@ const ViewController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {
-    window.ViewController = this;
-  };
+  const publicInit = () => { };
 
   return {
     init: publicInit,

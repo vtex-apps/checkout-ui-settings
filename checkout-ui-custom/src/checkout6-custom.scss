@@ -1,20 +1,16 @@
-.tfg-mtop-25 {
-  margin-top: 25px;
-}
+// TODO: trasladar a vtex components?
 
-.vtex-omnishipping-1-x-address {
+.vtex-omnishipping-1-x-deliveryGroup {
   .tfg-custom-step {
-    margin-top: 25px;
-
     &.custom-step-border {
       padding-top: 25px;
       border-top: 1px solid #B2B2B2;
+    }
 
-      &:last-child {
-        margin-bottom: 0;
-        padding-bottom: 25px;
-        border-bottom: 1px solid #B2B2B2;
-      }
+    &.last-custom-step-border {
+      margin-bottom: 20px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #B2B2B2;
     }
 
     .tfg-custom-title {
@@ -68,6 +64,10 @@
         color: #222222 !important;
         border: 1px solid #3B3B3B !important;
       }
+    }
+
+    &#tfg-custom-tvid-step {
+      padding-bottom: 20px;
     }
 
     &#tfg-custom-furniture-step {
