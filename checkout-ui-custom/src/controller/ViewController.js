@@ -8,7 +8,7 @@ import {
   FurnitureForm,
   TVorRICAMsg,
   TVIDForm,
-  RICAMsg,
+  RICAForm,
   MixedProducts
 } from '../templates';
 import CartController from './CartController';
@@ -17,7 +17,7 @@ const ViewController = (() => {
   const state = {
     showFurnitureForm: false,
     showTVIDForm: false,
-    showRICAMsg: false,
+    showRICAForm: false,
     showTVorRICAMsg: false,
     showMixedProductsMsg: false
   };
@@ -44,8 +44,8 @@ const ViewController = (() => {
 
     state.showFurnitureForm = allCategoriesIds.includes(config.furnitureId);
     state.showTVIDForm = allCategoriesIds.includes(config.tvId);
-    state.showRICAMsg = allCategoriesIds.includes(config.simCardId);
-    state.showTVorRICAMsg = state.showTVIDForm || state.showRICAMsg;
+    state.showRICAForm = allCategoriesIds.includes(config.simCardId);
+    state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
     state.showMixedProductsMsg = (
       allCategoriesIds.includes(config.furnitureId)
       && !allCategoriesIds.every((value) => value === config.furnitureId)
@@ -59,8 +59,8 @@ const ViewController = (() => {
     const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
     const mixedProductsMsgExits = ($('#tfg-custom-mixed-msg').length > 0);
 
-    if (state.showRICAMsg && !tvRICAStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAMsg());
+    if (state.showRICAForm && !tvRICAStepExists) {
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAForm());
     }
 
     if (state.showTVIDForm && !tvIDStepExists) {

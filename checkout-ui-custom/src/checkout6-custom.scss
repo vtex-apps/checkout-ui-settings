@@ -2,6 +2,12 @@
 
 .vtex-omnishipping-1-x-deliveryGroup {
   .tfg-custom-step {
+    margin-bottom: 20px;
+
+    .tfg-mtop10 {
+      margin-top: 10px;
+    }
+
     &.custom-step-border {
       padding-top: 25px;
       border-top: 1px solid #B2B2B2;
@@ -66,85 +72,83 @@
       }
     }
 
-    &#tfg-custom-tvid-step {
-      padding-bottom: 20px;
+    .tfg-custom-selector {
+      font-size: 14px !important;
+      color: #848484 !important;
+      line-height: 20px !important;
+      letter-spacing: -0.25px !important;
+      padding: 12px 16px !important;
+      box-shadow: none !important;
+
+      border: 1px solid #B2B2B2;
+      border-radius: 4px !important;
+
+      // Hiding native arrow
+      -webkit-appearance: none;
+      appearance: none;
+
+      background: white url("data:image/svg+xml;utf8,<svg viewBox='0 0 140 140' width='12' height='12' xmlns='http://www.w3.org/2000/svg'><g><path d='m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z' fill='%23222222'/></g></svg>") no-repeat;
+      background-position: right 12px top 50%;
+
+      option {
+        color: #222222;
+      }
     }
 
-    &#tfg-custom-furniture-step {
-      .tfg-custom-selector {
-        font-size: 14px !important;
-        color: #848484 !important;
-        line-height: 20px !important;
-        letter-spacing: -0.25px !important;
-        padding: 12px 16px !important;
-        box-shadow: none !important;
+    .tfg-custom-checkbox {
+      margin: 20px 0px;
 
-        border: 1px solid #B2B2B2;
-        border-radius: 4px !important;
+      .tfg-checkbox-text {
+        padding-left: 17px;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: -0.25px;
 
-        // Hiding native arrow
-        -webkit-appearance: none;
-        appearance: none;
-
-        background: white url("data:image/svg+xml;utf8,<svg viewBox='0 0 140 140' width='12' height='12' xmlns='http://www.w3.org/2000/svg'><g><path d='m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z' fill='%23222222'/></g></svg>") no-repeat;
-        background-position: right 12px top 50%;
-
-        option {
-          color: #222222;
-        }
+        color: #222222;
       }
 
-      .tfg-custom-checkbox {
-        margin: 20px 0px;
-
-        .tfg-checkbox-text {
-          padding-left: 17px;
-          font-size: 14px;
-          line-height: 20px;
-          letter-spacing: -0.25px;
-
-          color: #222222;
-        }
-
-        input[type="checkbox"] {
-          visibility: hidden;
-        }
-
-        input[type="checkbox"]+span {
-          position: relative;
-        }
-
-        input[type="checkbox"]+span::before {
-          content: "";
-          background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17 1H3C1.89543 1 1 1.89543 1 3V17C1 18.1046 1.89543 19 3 19H17C18.1046 19 19 18.1046 19 17V3C19 1.89543 18.1046 1 17 1Z' stroke='%23222222' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
-          background-repeat: no-repeat;
-          background-size: contain;
-          width: 20px;
-          height: 20px;
-          display: block;
-          position: absolute;
-          visibility: visible;
-          top: -2px;
-          left: -10px;
-        }
-
-        input[type="checkbox"]:checked+span::before {
-          content: "";
-          background-image: url("data:image/svg+xml,%3Csvg width='16' height='13' viewBox='0 0 16 13' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15.7992 0.218694C16.0669 0.510285 16.0669 0.983048 15.7992 1.27464L5.74202 12.2257C5.47423 12.5173 5.04006 12.5173 4.77227 12.2257L0.200841 7.24797C-0.066947 6.95638 -0.066947 6.48362 0.200841 6.19203C0.468629 5.90043 0.902799 5.90043 1.17059 6.19203L5.25714 10.6418L14.8294 0.218694C15.0972 -0.0728979 15.5314 -0.0728979 15.7992 0.218694Z' fill='white'/%3E%3C/svg%3E%0A");
-          background-color: #813992;
-          border-radius: 2.5px;
-          background-repeat: no-repeat;
-          background-size: auto;
-          background-position: center;
-          width: 20px;
-          height: 20px;
-          display: block;
-          position: absolute;
-          visibility: visible;
-          top: -2px;
-          left: -10px;
-        }
+      input[type="checkbox"] {
+        visibility: hidden;
       }
+
+      input[type="checkbox"]+span {
+        position: relative;
+      }
+
+      input[type="checkbox"]+span::before {
+        content: "";
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17 1H3C1.89543 1 1 1.89543 1 3V17C1 18.1046 1.89543 19 3 19H17C18.1046 19 19 18.1046 19 17V3C19 1.89543 18.1046 1 17 1Z' stroke='%23222222' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+        background-repeat: no-repeat;
+        background-size: contain;
+        width: 20px;
+        height: 20px;
+        display: block;
+        position: absolute;
+        visibility: visible;
+        top: -2px;
+        left: -10px;
+      }
+
+      input[type="checkbox"]:checked+span::before {
+        content: "";
+        background-image: url("data:image/svg+xml,%3Csvg width='16' height='13' viewBox='0 0 16 13' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15.7992 0.218694C16.0669 0.510285 16.0669 0.983048 15.7992 1.27464L5.74202 12.2257C5.47423 12.5173 5.04006 12.5173 4.77227 12.2257L0.200841 7.24797C-0.066947 6.95638 -0.066947 6.48362 0.200841 6.19203C0.468629 5.90043 0.902799 5.90043 1.17059 6.19203L5.25714 10.6418L14.8294 0.218694C15.0972 -0.0728979 15.5314 -0.0728979 15.7992 0.218694Z' fill='white'/%3E%3C/svg%3E%0A");
+        background-color: #813992;
+        border-radius: 2.5px;
+        background-repeat: no-repeat;
+        background-size: auto;
+        background-position: center;
+        width: 20px;
+        height: 20px;
+        display: block;
+        position: absolute;
+        visibility: visible;
+        top: -2px;
+        left: -10px;
+      }
+    }
+
+    &#tfg-custom-tvid-step {
+      padding-bottom: 20px;
     }
   }
 }
