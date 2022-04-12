@@ -1,12 +1,14 @@
 /* eslint-disable func-names */
 import {
   STEPS,
-  ORDERFORM_TIMEOUT
-  /* CUSTOM_FIELDS_APP */
+  ORDERFORM_TIMEOUT,
+  RICA_APP
 } from '../utils/const';
 import {
   getShippingData,
-  saveAddress
+  saveAddress,
+  checkoutGetCustomData,
+  checkoutSendCustomData
 } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
@@ -62,8 +64,22 @@ const FormController = (() => {
     checkFields(furnitureFields);
   };
 
+  const checkRICAForm = () => {
+    const ricaFields = [
+      'tfg-rica-id-passport',
+      'tfg-rica-fullname',
+      'tfg-rica-street',
+      'tfg-rica-suburb',
+      'tfg-rica-city',
+      'tfg-rica-postal-code',
+      'tfg-rica-province'
+    ];
+
+    checkFields(ricaFields);
+  };
+
   const checkForms = () => {
-    const { showFurnitureForm, showTVIDForm } = ViewController.state;
+    const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
     // Reset state & clear errors
     $('span.help.error').remove();
@@ -73,6 +89,10 @@ const FormController = (() => {
 
     if (showFurnitureForm) {
       checkFurnitureForm();
+    }
+
+    if (showRICAForm) {
+      checkRICAForm();
     }
 
     if (showTVIDForm) {
@@ -95,25 +115,48 @@ const FormController = (() => {
     return furnitureFields;
   };
 
+  const getRICAFields = () => {
+    const ricaFields = {};
+
+    ricaFields.idOrPassport = $('#tfg-rica-id-passport').val();
+    ricaFields.fullName = $('#tfg-rica-fullname').val();
+    ricaFields.streetAddress = $('#tfg-rica-street').val();
+    ricaFields.suburb = $('#tfg-rica-suburb').val();
+    ricaFields.city = $('#tfg-rica-city').val();
+    ricaFields.postalCode = $('#tfg-rica-postal-code').val();
+    ricaFields.province = $('#tfg-rica-province').val();
+    ricaFields.country = $('#tfg-rica-country').val();
+
+    return ricaFields;
+  };
+
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
   const saveShippingForm = () => {
-    const { showFurnitureForm, showTVIDForm } = ViewController.state;
+    const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
     checkForms();
 
     if (state.validForm) {
-      let fields;
+      // Fields saved in orderForm
+      if (showRICAForm) {
+        const ricaFields = getRICAFields();
+
+        checkoutSendCustomData(RICA_APP, ricaFields);
+      }
+
+      // Fields saved in Masterdata
+      let masterdataFields;
 
       if (showFurnitureForm) {
-        fields = { ...getFurnitureFormFields() };
+        masterdataFields = { ...getFurnitureFormFields() };
       }
 
       if (showTVIDForm) {
-        fields = { ...getTVFormFields() };
+        masterdataFields = { ...getTVFormFields() };
       }
 
-      saveAddress(fields);
+      saveAddress(masterdataFields);
 
       setTimeout(() => {
         $('#btn-go-to-payment').trigger('click');

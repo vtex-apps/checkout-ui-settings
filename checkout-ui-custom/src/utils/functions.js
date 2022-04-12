@@ -61,41 +61,14 @@ const saveAddress = async (fields) => {
     .catch((error) => console.log(error));
 };
 
-// Random Functions
-const addBorderTop = (elementClass) => {
-  if ($(elementClass).length > 1) {
-    $(elementClass).addClass('custom-step-border');
-    $(elementClass).last().addClass('last-custom-step-border');
-  }
-};
-
-const waitAndResetLocalStorage = () => {
-  setTimeout(() => {
-    console.log('Borra localstorage');
-    localStorage.removeItem('shippingDataCompleted');
-  }, 5000);
-};
-
-export {
-  getShippingData,
-  saveAddress,
-  addBorderTop,
-  waitAndResetLocalStorage
-};
-
-// TODO: LEFT HERE FOR RICA FIELDS
-/*
-import {
-  CUSTOM_FIELDS_APP
-} from './const';
-
-const getShippingData = () => {
+// Functions to manage CustomData
+const checkoutGetCustomData = (appId) => {
   const { customData } = vtexjs.checkout.orderForm;
   let fields = {};
 
   if (customData && customData.customApps && customData.customApps.length > 0) {
     customData.customApps.forEach((app) => {
-      if (app.id === CUSTOM_FIELDS_APP) {
+      if (app.id === appId) {
         fields = app.fields;
       }
     });
@@ -116,4 +89,27 @@ const checkoutSendCustomData = (appId, customData) => {
     data: JSON.stringify(customData)
   });
 };
-*/
+
+// Random Functions
+const addBorderTop = (elementClass) => {
+  if ($(elementClass).length > 1) {
+    $(elementClass).addClass('custom-step-border');
+    $(elementClass).last().addClass('last-custom-step-border');
+  }
+};
+
+const waitAndResetLocalStorage = () => {
+  setTimeout(() => {
+    console.log('Borra localstorage');
+    localStorage.removeItem('shippingDataCompleted');
+  }, 5000);
+};
+
+export {
+  getShippingData,
+  saveAddress,
+  addBorderTop,
+  waitAndResetLocalStorage,
+  checkoutGetCustomData,
+  checkoutSendCustomData
+};

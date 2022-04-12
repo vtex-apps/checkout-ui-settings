@@ -9,11 +9,10 @@ const STEPS = {
 // OrderForm timeout
 const ORDERFORM_TIMEOUT = 500;
 
-// TODO: [deprecated] OrderForm configuration app-name
-const CUSTOM_FIELDS_APP = 'customshippinginfo';
+const RICA_APP = 'ricafields';
 
 export {
   STEPS,
   ORDERFORM_TIMEOUT,
-  CUSTOM_FIELDS_APP
+  RICA_APP
 };

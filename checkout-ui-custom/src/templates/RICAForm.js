@@ -5,9 +5,9 @@ const RICAForm = () => `
       To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as
       it appears on a valid proof of residence.
     </p>
-    <p class="input tfg-custom-input tfg-id-passport">
+    <p class="input tfg-custom-input tfg-rica-id-passport">
       <label>ID or passport number</label>
-      <input id="tfg-id-passport" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-id-passport" type="text" class="input-xlarge tfg-input">
     </p>
     <label class="tfg-mtop10">Proof of residential address</label>
     <p class="tfg-custom-checkbox">
@@ -54,7 +54,7 @@ const RICAForm = () => `
     <p class="input tfg-rica-country tfg-custom-input">
       <label>Country</label>
       <select class="input-xlarge tfg-custom-selector" id="tfg-rica-country" disabled>
-        <option value="ZAF" disabled selected>South Africa</option>
+        <option value="ZAF" selected>South Africa</option>
       </select>
     </p>
   </div>
