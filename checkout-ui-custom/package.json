@@ -1,39 +1,39 @@
 {
-    "name": "custom-shipping-step-by-items",
-    "version": "0.1.0",
-    "description": "[TFG] custom-shipping-step-by-items app",
-    "main": "index.js",
-    "scripts": {
-        "build": "cross-env NODE_ENV=production webpack",
-        "watch": "npm run build && webpack --watch",
-        "app": "cross-env NODE_ENV=production webpack --config webpack.prod.js"
-    },
-    "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
-    "license": "VTEX",
-    "dependencies": {
-        "git": "^0.1.5"
-    },
-    "devDependencies": {
-        "@babel/core": "^7.0.0",
-        "@babel/runtime-corejs2": "^7.0.0",
-        "babel-loader": "^8.0.0",
-        "cross-env": "^5.2.0",
-        "css-loader": "^1.0.1",
-        "eslint": "^7.29.0",
-        "eslint-config-airbnb-base": "^14.2.1",
-        "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-import": "^2.23.4",
-        "eslint-plugin-prettier": "^3.4.0",
-        "extract-loader": "^2.0.1",
-        "file-loader": "^2.0.0",
-        "node-sass": "^6.0.1",
-        "postcss-cli": "^8.3.1",
-        "postcss-loader": "^6.1.0",
-        "prettier": "^2.3.2",
-        "sass": "^1.35.1",
-        "sass-loader": "^12.1.0",
-        "webpack": "^5.41.1",
-        "webpack-cli": "^4.7.2"
-    },
-    "keywords": []
+  "name": "custom-shipping-step-by-items",
+  "version": "0.1.0",
+  "description": "[TFG] custom-shipping-step-by-items app",
+  "main": "index.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "watch": "npm run build && webpack --watch",
+    "app": "cross-env NODE_ENV=production webpack --config webpack.prod.js"
+  },
+  "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
+  "license": "VTEX",
+  "dependencies": {
+    "git": "^0.1.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/runtime-corejs2": "^7.0.0",
+    "babel-loader": "^8.0.0",
+    "cross-env": "^5.2.0",
+    "css-loader": "^1.0.1",
+    "eslint": "^7.29.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "extract-loader": "^2.0.1",
+    "file-loader": "^2.0.0",
+    "node-sass": "^6.0.1",
+    "postcss-cli": "^8.3.1",
+    "postcss-loader": "^6.1.0",
+    "prettier": "^2.3.2",
+    "sass": "^1.35.1",
+    "sass-loader": "^12.1.0",
+    "webpack": "^5.41.1",
+    "webpack-cli": "^4.7.2"
+  },
+  "keywords": []
 }
