@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 
 // API Functions
-const getShippingData = async (addressName, fields) => {
+const getShippingData = async (addressName, fields, tryAgain = true) => {
   let data = {};
 
   const options = {
@@ -15,6 +15,8 @@ const getShippingData = async (addressName, fields) => {
 
   if (response && !response.error && response.data.length > 0) {
     [data] = response.data;
+  } else if (tryAgain) {
+    setTimeout(() => getShippingData(addressName, fields, false), 1000);
   }
 
   return data;
@@ -71,9 +73,8 @@ const addBorderTop = (elementClass) => {
 
 const waitAndResetLocalStorage = () => {
   setTimeout(() => {
-    console.log('Borra localstorage');
     localStorage.removeItem('shippingDataCompleted');
-  }, 5000);
+  }, 3000);
 };
 
 export {
