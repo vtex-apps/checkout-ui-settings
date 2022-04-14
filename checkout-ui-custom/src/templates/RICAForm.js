@@ -7,7 +7,7 @@ const RICAForm = () => `
     </p>
     <p class="input tfg-custom-input tfg-rica-id-passport">
       <label>ID or passport number</label>
-      <input id="tfg-rica-id-passport" type="text" class="input-xlarge tfg-input rica-field">
+      <input id="tfg-rica-id-passport" type="text" class="input-xlarge tfg-input">
     </p>
     <label class="tfg-mtop10">Proof of residential address</label>
     <p class="tfg-custom-checkbox">

@@ -138,8 +138,10 @@ const setRicaFields = (getDataFrom = 'customApps') => {
   }
 
   if (ricaFields && !jQuery.isEmptyObject(ricaFields)) {
-    $('#tfg-rica-id-passport').val(ricaFields.idOrPassport);
-    $('#tfg-rica-same-address').prop('checked', (ricaFields.sameAddress === 'true'));
+    if (getDataFrom === 'customApps') {
+      $('#tfg-rica-id-passport').val(ricaFields.idOrPassport);
+      $('#tfg-rica-same-address').prop('checked', (ricaFields.sameAddress === 'true'));
+    }
     $('#tfg-rica-fullname').val(ricaFields.fullName);
     $('#tfg-rica-street').val(ricaFields.streetAddress);
     $('#tfg-rica-suburb').val(ricaFields.suburb);

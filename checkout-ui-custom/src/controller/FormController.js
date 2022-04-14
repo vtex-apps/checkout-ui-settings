@@ -241,7 +241,6 @@ const FormController = (() => {
       setRicaFields('shippingAddress');
     } else {
       $('.rica-field').val('');
-      setRicaFields();
     }
   });
 
