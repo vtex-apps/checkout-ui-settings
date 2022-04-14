@@ -1,8 +1,13 @@
-import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
+import {
+  STEPS,
+  ORDERFORM_TIMEOUT,
+  RICA_APP
+} from '../utils/const';
 import {
   getShippingData,
   addBorderTop,
-  waitAndResetLocalStorage
+  waitAndResetLocalStorage,
+  checkoutGetCustomData
 } from '../utils/functions';
 import {
   FurnitureForm,
@@ -125,6 +130,25 @@ const ViewController = (() => {
     return validData;
   };
 
+  const ricaFieldsCompleted = () => {
+    let validData = false;
+
+    const ricaFields = checkoutGetCustomData(RICA_APP);
+
+    if (ricaFields
+      && ricaFields.idOrPassport
+      && ricaFields.fullName
+      && ricaFields.streetAddress
+      && ricaFields.suburb
+      && ricaFields.city
+      && ricaFields.postalCode
+      && ricaFields.province) {
+      validData = true;
+    }
+
+    return validData;
+  };
+
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
       if (typeof (setAppConfiguration) !== 'undefined') {
@@ -143,17 +167,26 @@ const ViewController = (() => {
             $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
           }
         } else if (window.location.hash === STEPS.PAYMENT) {
-          let isDataCompleted = localStorage.getItem('shippingDataCompleted');
+          if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
+            let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 
-          if (!isDataCompleted) {
-            setTimeout(async () => {
-              isDataCompleted = await shippingCustomDataCompleted();
-              if ((state.showFurnitureForm || state.showTVIDForm) && !isDataCompleted) {
-                window.location.hash = STEPS.SHIPPING;
-              }
-            }, 750);
-          } else {
-            waitAndResetLocalStorage();
+            if (!isDataCompleted) {
+              setTimeout(async () => {
+                if (state.showRICAForm) {
+                  isDataCompleted = ricaFieldsCompleted();
+                }
+
+                if (state.showFurnitureForm || state.showTVIDForm) {
+                  isDataCompleted = await shippingCustomDataCompleted();
+                }
+
+                if (!isDataCompleted) {
+                  window.location.hash = STEPS.SHIPPING;
+                }
+              }, 750);
+            } else {
+              waitAndResetLocalStorage();
+            }
           }
         }
       }, ORDERFORM_TIMEOUT);

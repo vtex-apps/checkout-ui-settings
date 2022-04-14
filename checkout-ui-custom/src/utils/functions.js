@@ -26,8 +26,7 @@ const saveAddress = async (fields) => {
   const { address } = vtexjs.checkout.orderForm.shippingData;
 
   // AD already exists (?)
-  const searchFields = '?_fields=id';
-  const savedAddress = await getShippingData(address.addressId, searchFields);
+  const savedAddress = await getShippingData(address.addressId, '?_fields=id');
 
   if (savedAddress.id) {
     path = `/custom-api/masterdata/address/${savedAddress.id}`;
@@ -100,7 +99,6 @@ const addBorderTop = (elementClass) => {
 
 const waitAndResetLocalStorage = () => {
   setTimeout(() => {
-    console.log('Borra localstorage');
     localStorage.removeItem('shippingDataCompleted');
   }, 5000);
 };

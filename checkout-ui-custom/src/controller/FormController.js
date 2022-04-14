@@ -182,29 +182,46 @@ const FormController = (() => {
 
   const setCustomFieldsValue = async () => {
     if (vtexjs.checkout.orderForm) {
-      const { showFurnitureForm, showTVIDForm } = ViewController.state;
-      const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
-      const fields = '?_fields=companyBuilding,furnitureReady,buildingType,'
-        + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+      const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
-      const customShippingInfo = await getShippingData(addressId, fields);
+      if (showRICAForm) {
+        const ricaFields = await checkoutGetCustomData(RICA_APP);
 
-      if (customShippingInfo) {
-        if (showFurnitureForm) {
-          $('#tfg-building-type').val(customShippingInfo.buildingType);
-          $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
-          $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
-          if ($('#tfg-delivery-floor').val() === 'Ground') {
-            $('#tfg-lift-stairs').attr('disabled', 'disabled');
-          } else {
-            $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
-          }
-          $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
-          $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
+        if (ricaFields) {
+          $('#tfg-rica-id-passport').val(ricaFields.idOrPassport);
+          $('#tfg-rica-fullname').val(ricaFields.fullName);
+          $('#tfg-rica-street').val(ricaFields.streetAddress);
+          $('#tfg-rica-suburb').val(ricaFields.suburb);
+          $('#tfg-rica-city').val(ricaFields.city);
+          $('#tfg-rica-postal-code').val(ricaFields.postalCode);
+          $('#tfg-rica-province').val(ricaFields.province);
         }
+      }
 
-        if (showTVIDForm) {
-          $('#tfg-tv-licence').val(customShippingInfo.tvID);
+      if (showFurnitureForm || showTVIDForm) {
+        const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
+        const fields = '?_fields=companyBuilding,furnitureReady,buildingType,'
+          + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+
+        const customShippingInfo = await getShippingData(addressId, fields);
+
+        if (customShippingInfo) {
+          if (showFurnitureForm) {
+            $('#tfg-building-type').val(customShippingInfo.buildingType);
+            $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
+            $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
+            if ($('#tfg-delivery-floor').val() === 'Ground') {
+              $('#tfg-lift-stairs').attr('disabled', 'disabled');
+            } else {
+              $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
+            }
+            $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
+            $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
+          }
+
+          if (showTVIDForm) {
+            $('#tfg-tv-licence').val(customShippingInfo.tvID);
+          }
         }
       }
     }
