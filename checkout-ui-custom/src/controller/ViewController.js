@@ -1,6 +1,7 @@
 import {
   STEPS,
-  ORDERFORM_TIMEOUT,
+  TIMEOUT_500,
+  TIMEOUT_750,
   RICA_APP
 } from '../utils/const';
 import {
@@ -66,6 +67,7 @@ const ViewController = (() => {
 
     if (state.showRICAForm && !tvRICAStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAForm());
+      $('#tfg-rica-same-address').trigger('change');
     }
 
     if (state.showTVIDForm && !tvIDStepExists) {
@@ -183,13 +185,13 @@ const ViewController = (() => {
                 if (!isDataCompleted) {
                   window.location.hash = STEPS.SHIPPING;
                 }
-              }, 750);
+              }, TIMEOUT_750);
             } else {
               waitAndResetLocalStorage();
             }
           }
         }
-      }, ORDERFORM_TIMEOUT);
+      }, TIMEOUT_500);
     }
   };
 

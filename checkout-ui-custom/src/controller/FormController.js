@@ -1,14 +1,15 @@
 /* eslint-disable func-names */
 import {
   STEPS,
-  ORDERFORM_TIMEOUT,
+  TIMEOUT_500,
+  TIMEOUT_750,
   RICA_APP
 } from '../utils/const';
 import {
-  getShippingData,
   saveAddress,
-  checkoutGetCustomData,
-  checkoutSendCustomData
+  checkoutSendCustomData,
+  setRicaFields,
+  setMasterdataFields
 } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
@@ -119,6 +120,7 @@ const FormController = (() => {
     const ricaFields = {};
 
     ricaFields.idOrPassport = $('#tfg-rica-id-passport').val();
+    ricaFields.sameAddress = $('#tfg-rica-same-address').is(':checked');
     ricaFields.fullName = $('#tfg-rica-fullname').val();
     ricaFields.streetAddress = $('#tfg-rica-street').val();
     ricaFields.suburb = $('#tfg-rica-suburb').val();
@@ -160,7 +162,7 @@ const FormController = (() => {
 
       setTimeout(() => {
         $('#btn-go-to-payment').trigger('click');
-      }, 800);
+      }, TIMEOUT_750);
     }
   };
 
@@ -180,49 +182,16 @@ const FormController = (() => {
     }
   };
 
-  const setCustomFieldsValue = async () => {
+  const setDataInCustomFields = async () => {
     if (vtexjs.checkout.orderForm) {
       const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
       if (showRICAForm) {
-        const ricaFields = await checkoutGetCustomData(RICA_APP);
-
-        if (ricaFields) {
-          $('#tfg-rica-id-passport').val(ricaFields.idOrPassport);
-          $('#tfg-rica-fullname').val(ricaFields.fullName);
-          $('#tfg-rica-street').val(ricaFields.streetAddress);
-          $('#tfg-rica-suburb').val(ricaFields.suburb);
-          $('#tfg-rica-city').val(ricaFields.city);
-          $('#tfg-rica-postal-code').val(ricaFields.postalCode);
-          $('#tfg-rica-province').val(ricaFields.province);
-        }
+        setRicaFields();
       }
 
       if (showFurnitureForm || showTVIDForm) {
-        const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
-        const fields = '?_fields=companyBuilding,furnitureReady,buildingType,'
-          + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
-
-        const customShippingInfo = await getShippingData(addressId, fields);
-
-        if (customShippingInfo) {
-          if (showFurnitureForm) {
-            $('#tfg-building-type').val(customShippingInfo.buildingType);
-            $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
-            $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
-            if ($('#tfg-delivery-floor').val() === 'Ground') {
-              $('#tfg-lift-stairs').attr('disabled', 'disabled');
-            } else {
-              $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
-            }
-            $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
-            $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
-          }
-
-          if (showTVIDForm) {
-            $('#tfg-tv-licence').val(customShippingInfo.tvID);
-          }
-        }
+        setMasterdataFields(showFurnitureForm, showTVIDForm);
       }
     }
   };
@@ -231,8 +200,8 @@ const FormController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(async () => {
         addCustomBtnPayment();
-        await setCustomFieldsValue();
-      }, ORDERFORM_TIMEOUT);
+        await setDataInCustomFields();
+      }, TIMEOUT_500);
     }
   };
 
@@ -264,6 +233,15 @@ const FormController = (() => {
     if ($(this).val()) {
       $(this).parent().removeClass('error');
       $(this).next('span.help.error').remove();
+    }
+  });
+
+  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-rica-same-address', function () {
+    if ($(this).is(':checked')) {
+      setRicaFields('shippingAddress');
+    } else {
+      $('.rica-field').val('');
+      setRicaFields();
     }
   });
 

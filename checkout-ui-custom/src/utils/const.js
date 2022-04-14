@@ -6,13 +6,15 @@ const STEPS = {
   PAYMENT: '#/payment'
 };
 
-// OrderForm timeout
-const ORDERFORM_TIMEOUT = 500;
+// TIMEOUT
+const TIMEOUT_500 = 500;
+const TIMEOUT_750 = 750;
 
 const RICA_APP = 'ricafields';
 
 export {
   STEPS,
-  ORDERFORM_TIMEOUT,
+  TIMEOUT_500,
+  TIMEOUT_750,
   RICA_APP
 };

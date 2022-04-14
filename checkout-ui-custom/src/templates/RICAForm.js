@@ -7,38 +7,38 @@ const RICAForm = () => `
     </p>
     <p class="input tfg-custom-input tfg-rica-id-passport">
       <label>ID or passport number</label>
-      <input id="tfg-rica-id-passport" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-id-passport" type="text" class="input-xlarge tfg-input rica-field">
     </p>
     <label class="tfg-mtop10">Proof of residential address</label>
     <p class="tfg-custom-checkbox">
       <label class="tfg-checkbox-label">
-        <input type='checkbox' id="tfg-rica-same-address"/>
+        <input type='checkbox' id="tfg-rica-same-address" checked/>
         <span class="tfg-checkbox-text">Residential address the same as Delivery address</span>
       </label>
     </p>
     <p class="input tfg-custom-input tfg-rica-fullname">
       <label>Full name and surname</label>
-      <input id="tfg-rica-fullname" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-fullname" type="text" class="input-xlarge tfg-input rica-field">
     </p>
     <p class="input tfg-custom-input tfg-rica-street">
       <label>Street address</label>
-      <input id="tfg-rica-street" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-street" type="text" class="input-xlarge tfg-input rica-field">
     </p>
     <p class="input tfg-custom-input tfg-rica-suburb">
       <label>Suburb</label>
-      <input id="tfg-rica-suburb" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-suburb" type="text" class="input-xlarge tfg-input rica-field">
     </p>
     <p class="input tfg-custom-input tfg-rica-city">
       <label>City</label>
-      <input id="tfg-rica-city" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-city" type="text" class="input-xlarge tfg-input rica-field">
     </p>
     <p class="input tfg-custom-input tfg-rica-postal-code">
       <label>Postal code</label>
-      <input id="tfg-rica-postal-code" type="text" class="input-xlarge tfg-input">
+      <input id="tfg-rica-postal-code" type="text" class="input-xlarge tfg-input rica-field">
     </p>
     <p class="input tfg-rica-province tfg-custom-input">
       <label>Province</label>
-      <select class="input-xlarge tfg-custom-selector" id="tfg-rica-province">
+      <select class="input-xlarge tfg-custom-selector rica-field" id="tfg-rica-province">
         <option value="" disabled selected>State</option>
         <option value="EC">Eastern Cape</option>
         <option value="FS">Free State</option>
