@@ -1,5 +1,4 @@
 ### What problem is this solving?
-Show current order details
 
 #### How it works
 
