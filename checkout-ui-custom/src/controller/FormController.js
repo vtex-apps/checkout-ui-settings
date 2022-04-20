@@ -137,7 +137,7 @@ const FormController = (() => {
     }
   };
 
-  const setCustomFieldsValue = async () => {
+  const setCustomFieldsValue = async (tries = 0) => {
     if (vtexjs.checkout.orderForm) {
       const { showFurnitureForm, showTVIDForm } = ViewController.state;
       const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
@@ -146,7 +146,7 @@ const FormController = (() => {
 
       const customShippingInfo = await getShippingData(addressId, fields);
 
-      if (customShippingInfo) {
+      if (customShippingInfo && !jQuery.isEmptyObject(customShippingInfo)) {
         if (showFurnitureForm) {
           $('#tfg-building-type').val(customShippingInfo.buildingType);
           $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
@@ -163,6 +163,10 @@ const FormController = (() => {
         if (showTVIDForm) {
           $('#tfg-tv-licence').val(customShippingInfo.tvID);
         }
+      } else if (tries <= 5) {
+        setTimeout(() => {
+          setCustomFieldsValue(tries += 1);
+        }, 3000);
       }
     }
   };

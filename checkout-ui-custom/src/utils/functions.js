@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 
 // API Functions
-const getShippingData = async (addressName, fields, tryAgain = true) => {
+const getShippingData = async (addressName, fields) => {
   let data = {};
 
   const options = {
@@ -13,10 +13,8 @@ const getShippingData = async (addressName, fields, tryAgain = true) => {
     .then((res) => res.json())
     .catch((err) => console.error(err));
 
-  if (response && !response.error && response.data.length > 0) {
+  if (response && !response.error && response.data && response.data.length > 0) {
     [data] = response.data;
-  } else if (tryAgain) {
-    setTimeout(() => getShippingData(addressName, fields, false), 1000);
   }
 
   return data;
