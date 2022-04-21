@@ -1,4 +1,8 @@
-import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
+import {
+  STEPS,
+  ORDERFORM_TIMEOUT,
+  FURNITURE_FEES
+} from '../utils/const';
 import {
   getShippingData,
   addBorderTop,
@@ -12,6 +16,9 @@ import {
   MixedProducts
 } from '../templates';
 import CartController from './CartController';
+
+const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"`
+  + 'target="_blank">Furniture delivery costs</a>';
 
 const ViewController = (() => {
   const state = {
@@ -69,6 +76,7 @@ const ViewController = (() => {
 
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
+      $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
     }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {

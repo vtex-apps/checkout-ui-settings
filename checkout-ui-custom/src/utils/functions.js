@@ -53,8 +53,8 @@ const saveAddress = async (fields) => {
 
   await fetch(path, options)
     .then((res) => {
+      localStorage.setItem('shippingDataCompleted', true);
       if (res.status !== 204) {
-        localStorage.setItem('shippingDataCompleted', true);
         res.json();
       }
     })

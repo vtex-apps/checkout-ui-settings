@@ -18,3 +18,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Initial version of the project created.
 - Functionality associated with TV licence
 - Functionality associated with RICA
+- Functionality associated with Furniture products
