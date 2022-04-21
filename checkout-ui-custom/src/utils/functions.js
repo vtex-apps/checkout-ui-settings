@@ -72,7 +72,7 @@ const addBorderTop = (elementClass) => {
 const waitAndResetLocalStorage = () => {
   setTimeout(() => {
     localStorage.removeItem('shippingDataCompleted');
-  }, 3000);
+  }, 5000);
 };
 
 export {
