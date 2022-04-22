@@ -14,7 +14,7 @@ const getShippingData = async (addressName, fields) => {
     .then((res) => res.json())
     .catch((err) => console.error(err));
 
-  if (response && !response.error && response.data.length > 0) {
+  if (response && !response.error && response.data && response.data.length > 0) {
     [data] = response.data;
   }
 
@@ -61,7 +61,7 @@ const saveAddress = async (fields) => {
     .catch((error) => console.log(error));
 };
 
-const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm) => {
+const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 0) => {
   const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
   const fields = '?_fields=companyBuilding,furnitureReady,buildingType,'
     + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
@@ -85,6 +85,10 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm) => {
     if (completeTVIDForm) {
       $('#tfg-tv-licence').val(customShippingInfo.tvID);
     }
+  } else if (tries <= 5) {
+    setTimeout(() => {
+      setMasterdataFields(completeFurnitureForm, completeTVIDForm, tries += 1);
+    }, 3000);
   }
 };
 
