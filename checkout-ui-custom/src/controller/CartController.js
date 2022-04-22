@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { STEPS, ORDERFORM_TIMEOUT } from '../utils/const';
+import { STEPS, TIMEOUT_500 } from '../utils/const';
 
 const CartController = (() => {
   const state = {
@@ -25,7 +25,7 @@ const CartController = (() => {
             ...getCategories(items)
           };
         }
-      }, ORDERFORM_TIMEOUT);
+      }, TIMEOUT_500);
     }
   };
 
@@ -38,9 +38,7 @@ const CartController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {
-    window.CartController = this;
-  };
+  const publicInit = () => { };
 
   return {
     init: publicInit,
