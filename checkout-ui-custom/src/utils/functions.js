@@ -78,8 +78,8 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
       } else {
         $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
       }
-      $('#tfg-sufficient-space').prop('checked', (customShippingInfo.hasSufficientSpace === 'true'));
-      $('#tfg-assemble-furniture').prop('checked', (customShippingInfo.assembleFurniture === 'true'));
+      $('#tfg-sufficient-space').prop('checked', customShippingInfo.hasSufficientSpace);
+      $('#tfg-assemble-furniture').prop('checked', customShippingInfo.assembleFurniture);
     }
 
     if (completeTVIDForm) {

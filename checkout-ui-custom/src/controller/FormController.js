@@ -148,14 +148,14 @@ const FormController = (() => {
       }
 
       // Fields saved in Masterdata
-      let masterdataFields;
+      const masterdataFields = {};
 
       if (showFurnitureForm) {
-        masterdataFields = { ...getFurnitureFormFields() };
+        Object.assign(masterdataFields, getFurnitureFormFields());
       }
 
       if (showTVIDForm) {
-        masterdataFields = { ...getTVFormFields() };
+        Object.assign(masterdataFields, getTVFormFields());
       }
 
       saveAddress(masterdataFields);

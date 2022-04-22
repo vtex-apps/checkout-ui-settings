@@ -33,25 +33,27 @@ const ViewController = (() => {
   };
 
   const checkCartCategories = () => {
-    const { items } = vtexjs.checkout.orderForm;
-    const { categories } = CartController.state;
-    const { config } = CartController;
+    if (vtexjs.checkout.orderForm) {
+      const { items } = vtexjs.checkout.orderForm;
+      const { categories } = CartController.state;
+      const { config } = CartController;
 
-    state.showFurnitureForm = categories.includes(config.furnitureId);
-    state.showTVIDForm = categories.includes(config.tvId);
-    state.showRICAForm = categories.includes(config.simCardId);
-    state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
-    /**
-      Conditions to show mixed products alert:
-      - more than one item
-      - after filter categories, this array includes at least one furniture id
-      - there are only one category OR not all the categories in the array are furniture
-    */
-    state.showMixedProductsMsg = (
-      items.length > 1
-      && categories.includes(config.furnitureId)
-      && (categories.length === 1 || !categories.every((value) => value === config.furnitureId))
-    );
+      state.showFurnitureForm = categories.includes(config.furnitureId);
+      state.showTVIDForm = categories.includes(config.tvId);
+      state.showRICAForm = categories.includes(config.simCardId);
+      state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
+      /**
+        Conditions to show mixed products alert:
+        - more than one item
+        - after filter categories, this array includes at least one furniture id
+        - there are only one category OR not all the categories in the array are furniture
+      */
+      state.showMixedProductsMsg = (
+        items.length > 1
+        && categories.includes(config.furnitureId)
+        && (categories.length === 1 || !categories.every((value) => value === config.furnitureId))
+      );
+    }
   };
 
   const showCustomSections = () => {
