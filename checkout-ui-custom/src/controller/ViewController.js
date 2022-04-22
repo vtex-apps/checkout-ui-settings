@@ -2,7 +2,8 @@ import {
   STEPS,
   TIMEOUT_500,
   TIMEOUT_750,
-  RICA_APP
+  RICA_APP,
+  FURNITURE_FEES
 } from '../utils/const';
 import {
   getShippingData,
@@ -19,6 +20,9 @@ import {
 } from '../templates';
 import CartController from './CartController';
 
+const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"`
+  + 'target="_blank">Furniture delivery costs</a>';
+
 const ViewController = (() => {
   const state = {
     showFurnitureForm: false,
@@ -28,37 +32,31 @@ const ViewController = (() => {
     showMixedProductsMsg: false
   };
 
-  const config = {
-    furnitureId: '0',
-    tvId: '0',
-    simCardId: '0',
-    furnitureForm: {
-      buildingType: ['Free standing', 'House in complex', 'Townhouse', 'Apartment'],
-      parkingDistance: [15, 25, 50, 100],
-      deliveryFloor: ['Ground', '1', '2', '3+'],
-      liftStairs: ['Lift', 'Stairs']
-    },
-    TVorRICAMsg: 'You can\'t collect this order in store because your cart contains items which '
-      + 'require either RICA or TV License validation.',
-    MixedProductsMsg: 'We\'ll ship your furniture and other items in your cart to the selected address. '
-      + 'Only the furniture delivery fee will apply.'
-  };
-
   const checkCartCategories = () => {
+    const { items } = vtexjs.checkout.orderForm;
     const { categories } = CartController.state;
-    const allCategoriesIds = Object.keys(categories);
+    const { config } = CartController;
 
-    state.showFurnitureForm = allCategoriesIds.includes(config.furnitureId);
-    state.showTVIDForm = allCategoriesIds.includes(config.tvId);
-    state.showRICAForm = allCategoriesIds.includes(config.simCardId);
+    state.showFurnitureForm = categories.includes(config.furnitureId);
+    state.showTVIDForm = categories.includes(config.tvId);
+    state.showRICAForm = categories.includes(config.simCardId);
     state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
+    /**
+      Conditions to show mixed products alert:
+      - more than one item
+      - after filter categories, this array includes at least one furniture id
+      - there are only one category OR not all the categories in the array are furniture
+    */
     state.showMixedProductsMsg = (
-      allCategoriesIds.includes(config.furnitureId)
-      && !allCategoriesIds.every((value) => value === config.furnitureId)
+      items.length > 1
+      && categories.includes(config.furnitureId)
+      && (categories.length === 1 || !categories.every((value) => value === config.furnitureId))
     );
   };
 
   const showCustomSections = () => {
+    const { config } = CartController;
+
     const tvRICAStepExists = ($('#tfg-custom-rica-msg').length > 0);
     const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
     const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
@@ -76,6 +74,7 @@ const ViewController = (() => {
 
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
+      $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
     }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
@@ -109,10 +108,8 @@ const ViewController = (() => {
         let tvCompleted = false;
 
         if (state.showFurnitureForm
-          && customShippingInfo.assembleFurniture
           && customShippingInfo.buildingType
           && customShippingInfo.deliveryFloor
-          && customShippingInfo.hasSufficientSpace
           && customShippingInfo.parkingDistance) {
           furnitureCompleted = true;
           validData = true;
@@ -153,11 +150,6 @@ const ViewController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
-      if (typeof (setAppConfiguration) !== 'undefined') {
-        // eslint-disable-next-line no-undef
-        setAppConfiguration(config);
-      }
-
       setTimeout(() => {
         checkCartCategories();
 

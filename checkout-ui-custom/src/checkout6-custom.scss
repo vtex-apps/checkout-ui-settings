@@ -151,6 +151,25 @@
       padding-bottom: 20px;
     }
   }
+
+  p.vtex-omnishipping-1-x-shippingSectionTitle {
+    grid-template-columns: 50% 50%;
+    display: grid;
+
+    .furniture-fees-link {
+      text-align: right;
+
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: -0.25px;
+      text-decoration-line: underline;
+
+      color: #813992;
+    }
+  }
 }
 
 // ALERTS
