@@ -16,6 +16,8 @@ You will then install this application from the command console:
 vtex install custom-shipping-step-by-items@x.x.x
 ```
 
+**This application only works with Checkout Custom and Google address form integration.**
+
 ### Set the configuration
 
 Once installed, the configuration of the application must be included in the Javascript tab inside the ui custom checkout manager (/admin/vtex-checkout-ui-custom/) and enable the flag below.

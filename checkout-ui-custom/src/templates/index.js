@@ -1,7 +1,7 @@
 import FurnitureForm from './FurnitureForm';
 import TVorRICAMsg from './TVorRICAMsg';
 import TVIDForm from './TVIDForm';
-import RICAMsg from './RICAMsg';
+import RICAForm from './RICAForm';
 import InputError from './InputError';
 import MixedProducts from './MixedProducts';
 
@@ -9,7 +9,7 @@ export {
   FurnitureForm,
   TVorRICAMsg,
   TVIDForm,
-  RICAMsg,
+  RICAForm,
   InputError,
   MixedProducts
 };
