@@ -1,27 +1,12 @@
-import {
-  STEPS,
-  TIMEOUT_500,
-  TIMEOUT_750,
-  RICA_APP,
-  FURNITURE_FEES
-} from '../utils/const';
-import {
-  getShippingData,
-  addBorderTop,
-  waitAndResetLocalStorage,
-  checkoutGetCustomData
-} from '../utils/functions';
-import {
-  FurnitureForm,
-  TVorRICAMsg,
-  TVIDForm,
-  RICAForm,
-  MixedProducts
-} from '../templates';
+import intlTelInput from 'intl-tel-input';
+import utilsScript from 'intl-tel-input/build/js/utils';
+import { STEPS, TIMEOUT_500, TIMEOUT_750, RICA_APP, FURNITURE_FEES } from '../utils/const';
+import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
+import { FurnitureForm, TVorRICAMsg, TVIDForm, RICAForm, MixedProducts, AddressForm, SuburbField } from '../templates';
 import CartController from './CartController';
+import 'intl-tel-input/build/css/intlTelInput.css';
 
-const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"`
-  + 'target="_blank">Furniture delivery costs</a>';
+const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
 
 const ViewController = (() => {
   const state = {
@@ -29,7 +14,8 @@ const ViewController = (() => {
     showTVIDForm: false,
     showRICAForm: false,
     showTVorRICAMsg: false,
-    showMixedProductsMsg: false
+    showMixedProductsMsg: false,
+    iti: {}
   };
 
   const checkCartCategories = () => {
@@ -48,22 +34,20 @@ const ViewController = (() => {
         - after filter categories, this array includes at least one furniture id
         - there are only one category OR not all the categories in the array are furniture
       */
-      state.showMixedProductsMsg = (
-        items.length > 1
+      state.showMixedProductsMsg = items.length > 1
         && categories.includes(config.furnitureId)
-        && (categories.length === 1 || !categories.every((value) => value === config.furnitureId))
-      );
+        && (categories.length === 1 || !categories.every((value) => value === config.furnitureId));
     }
   };
 
   const showCustomSections = () => {
     const { config } = CartController;
 
-    const tvRICAStepExists = ($('#tfg-custom-rica-msg').length > 0);
-    const tvIDStepExists = ($('#tfg-custom-tvid-step').length > 0);
-    const furnitureStepExists = ($('#tfg-custom-furniture-step').length > 0);
-    const tvOrRICAMsgStepExists = ($('#tfg-custom-tvrica-msg').length > 0);
-    const mixedProductsMsgExits = ($('#tfg-custom-mixed-msg').length > 0);
+    const tvRICAStepExists = $('#tfg-custom-rica-msg').length > 0;
+    const tvIDStepExists = $('#tfg-custom-tvid-step').length > 0;
+    const furnitureStepExists = $('#tfg-custom-furniture-step').length > 0;
+    const tvOrRICAMsgStepExists = $('#tfg-custom-tvrica-msg').length > 0;
+    const mixedProductsMsgExits = $('#tfg-custom-mixed-msg').length > 0;
 
     if (state.showRICAForm && !tvRICAStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAForm());
@@ -98,8 +82,8 @@ const ViewController = (() => {
   const shippingCustomDataCompleted = async () => {
     let validData = false;
 
-    if (vtexjs.checkout.orderForm && vtexjs.checkout.orderForm.shippingData.address) {
-      const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
+    if (window.vtexjs.checkout.orderForm && window.vtexjs.checkout.orderForm.shippingData.address) {
+      const { addressId } = window.vtexjs.checkout.orderForm.shippingData.address;
       const fields = '?_fields=companyBuilding,furnitureReady,buildingType,parkingDistance,'
         + 'deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
 
@@ -109,10 +93,12 @@ const ViewController = (() => {
         let furnitureCompleted = false;
         let tvCompleted = false;
 
-        if (state.showFurnitureForm
+        if (
+          state.showFurnitureForm
           && customShippingInfo.buildingType
           && customShippingInfo.deliveryFloor
-          && customShippingInfo.parkingDistance) {
+          && customShippingInfo.parkingDistance
+        ) {
           furnitureCompleted = true;
           validData = true;
         }
@@ -136,18 +122,121 @@ const ViewController = (() => {
 
     const ricaFields = checkoutGetCustomData(RICA_APP);
 
-    if (ricaFields
+    if (
+      ricaFields
       && ricaFields.idOrPassport
       && ricaFields.fullName
       && ricaFields.streetAddress
       && ricaFields.suburb
       && ricaFields.city
       && ricaFields.postalCode
-      && ricaFields.province) {
+      && ricaFields.province
+    ) {
       validData = true;
     }
 
     return validData;
+  };
+
+  const addAddressFormFields = () => {
+    const setValuesOnGoToShipping = () => {
+      const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+      const observer = new MutationObserver(() => {
+        const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {
+          complement: '',
+          receiverName: '',
+          neighborhood: '',
+          companyBuilding: ''
+        };
+        window.vtexjs.checkout.orderForm.shippingData.address = {
+          ...window.vtexjs.checkout.orderForm.shippingData.address,
+          ...fields
+        };
+        $('.ship-complement input').val(fields.complement).attr('value', fields.complement);
+        $('#custom-field-complement').val(fields.complement).attr('value', fields.complement);
+        $('.ship-receiverName input').val(fields.receiverName).attr('value', fields.receiverName);
+        $('#custom-field-receiverName').val(fields.receiverName).attr('value', fields.receiverName);
+        $('#custom-field-companyBuilding').val(fields.companyBuilding).attr('value', fields.companyBuilding);
+        $('#custom-field-neighborhood').val(fields.neighborhood).attr('value', fields.neighborhood);
+      });
+      const observerConfig = { attributes: false, childList: true, characterData: false };
+      if (elementToObserveChange) {
+        observer.observe(elementToObserveChange, observerConfig);
+      }
+    };
+    setValuesOnGoToShipping();
+
+    const setInputPhone = () => {
+      const phoneInput = document.querySelector('.custom-field-complement input');
+
+      const customPlaceholder = (defaultPlaceHolder, selectedCountryData) => {
+        if (selectedCountryData.iso2 === 'za') {
+          const zaPlaceholder = '(+27)';
+          $('.iti--allow-dropdown').attr('data-content', zaPlaceholder);
+          return '';
+        }
+        return defaultPlaceHolder;
+      };
+
+      const iti = intlTelInput(phoneInput, {
+        initialCountry: 'za',
+        onlyCountries: ['za'],
+        formatOnDisplay: true,
+        utilsScript, // just for formatting/placeholders etc
+        customPlaceholder
+      });
+      state.iti = iti;
+    };
+
+    const saveCustomFieldAddress = () => {
+      $('.tfg-custom-addressForm input').change((event) => {
+        const field = event.target;
+        const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
+        fields[field.getAttribute('field')] = field.value;
+        localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
+      });
+    };
+
+    // Insert elements
+    const isAddressFormFieldsAdded = !!$('.tfg-custom-addressForm').length;
+    if (!isAddressFormFieldsAdded) {
+      $('.vcustom--vtex-omnishipping-1-x-address form').prepend(AddressForm());
+      $('.vcustom--vtex-omnishipping-1-x-address__state').prepend(SuburbField());
+      setInputPhone();
+      saveCustomFieldAddress();
+    }
+  };
+
+  const setValueToReceiverAndComplementByDefault = () => {
+    const { firstName, lastName, phone } = window.vtexjs.checkout.orderForm.clientProfileData;
+    const receiverName = `${firstName} ${lastName}`;
+    $('#custom-field-receiverName').val(receiverName).attr('value', receiverName);
+    $('#custom-field-complement').val(phone).attr('value', phone);
+  };
+  const toggleGoogleInput = () => {
+    if (!$('#v-custom-ship-street').val()) {
+      $(
+        // eslint-disable-next-line max-len
+        '.custom-field-receiverName, .custom-field-complement, .custom-field-companyBuilding, .vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info, .btn-go-to-shipping-wrapper '
+      ).hide();
+      $('.v-custom-ship-street label').text('Add a new delivery address');
+      $('#v-custom-ship-street').attr('placeholder', 'Search for address');
+      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
+
+      $('#v-custom-ship-street').one('change', () => {
+        $(
+          // eslint-disable-next-line max-len
+          '.custom-field-receiverName, .custom-field-complement, .custom-field-companyBuilding, .vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info, .btn-go-to-shipping-wrapper '
+        ).show();
+        $('.v-custom-ship-street label').text('Street address');
+        $('#v-custom-ship-street').attr(
+          'placeholder',
+          'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
+        );
+        $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
+        setValueToReceiverAndComplementByDefault();
+      });
+    }
   };
 
   const runCustomization = () => {
@@ -157,6 +246,8 @@ const ViewController = (() => {
 
         if (window.location.hash === STEPS.SHIPPING) {
           showCustomSections();
+          addAddressFormFields();
+          toggleGoogleInput();
 
           // This button has a bug an needs to be clicked in two times; I trigger once to improve UX
           if ($('button.vtex-omnishipping-1-x-btnDelivery').length > 0) {
@@ -198,7 +289,7 @@ const ViewController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => { };
+  const publicInit = () => {};
 
   return {
     init: publicInit,

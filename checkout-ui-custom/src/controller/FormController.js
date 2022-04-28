@@ -1,16 +1,8 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable func-names */
-import {
-  STEPS,
-  TIMEOUT_500,
-  TIMEOUT_750,
-  RICA_APP
-} from '../utils/const';
-import {
-  saveAddress,
-  checkoutSendCustomData,
-  setRicaFields,
-  setMasterdataFields
-} from '../utils/functions';
+import { STEPS, TIMEOUT_500, TIMEOUT_750, RICA_APP } from '../utils/const';
+import { saveAddress, checkoutSendCustomData, setRicaFields, setMasterdataFields } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
 
@@ -23,6 +15,7 @@ const FormController = (() => {
     if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
       $(`.${field}`).addClass('error');
       $(`.${field}`).append(InputError);
+      $(`.${field} span.error`).show();
       state.validForm = false;
     } else {
       $(`.${field}`).removeClass('error');
@@ -36,11 +29,7 @@ const FormController = (() => {
   };
 
   const checkNativeForm = () => {
-    const nativeFields = [
-      'ship-street',
-      'ship-city',
-      'ship-receiverName'
-    ];
+    const nativeFields = ['ship-street', 'ship-city', 'ship-receiverName'];
 
     /* When the list of addresses appears,
     it does not complete ship-state correctly in the native process so,
@@ -55,12 +44,7 @@ const FormController = (() => {
   };
 
   const checkFurnitureForm = () => {
-    const furnitureFields = [
-      'tfg-building-type',
-      'tfg-parking-distance',
-      'tfg-delivery-floor',
-      'tfg-lift-stairs'
-    ];
+    const furnitureFields = ['tfg-building-type', 'tfg-parking-distance', 'tfg-delivery-floor', 'tfg-lift-stairs'];
 
     checkFields(furnitureFields);
   };
@@ -134,10 +118,35 @@ const FormController = (() => {
 
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
+  const checkPhoneField = () => {
+    if (!ViewController.state.iti) return;
+    if (typeof ViewController.state.iti.isValidNumber !== 'function') return;
+
+    const isValidNumber = ViewController.state.iti.isValidNumber();
+    if (!isValidNumber) {
+      $('.custom-field-complement').append(InputError());
+      $('.custom-field-complement span.error').show();
+
+      state.validForm = false;
+    }
+
+    state.validForm = true;
+  };
+
+  const isValidAddressForm = () => {
+    // Reset state & clear errors
+    $('span.help.error').remove();
+    state.validForm = true;
+    checkField('custom-field-receiverName');
+    checkPhoneField();
+    checkField('custom-field-neighborhood');
+  };
+
   const saveShippingForm = () => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
     checkForms();
+    isValidAddressForm();
 
     if (state.validForm) {
       // Fields saved in orderForm
@@ -148,7 +157,8 @@ const FormController = (() => {
       }
 
       // Fields saved in Masterdata
-      const masterdataFields = {};
+      const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
+      const masterdataFields = { ...addressFormFields };
 
       if (showFurnitureForm) {
         Object.assign(masterdataFields, getFurnitureFormFields());
@@ -178,7 +188,36 @@ const FormController = (() => {
       $(customPaymentBtn).css('display', 'block');
 
       $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);
+
       $(customPaymentBtn).on('click', saveShippingForm);
+    }
+  };
+
+  const goToShipping = (event) => {
+    event.preventDefault();
+    isValidAddressForm();
+    if (state.validForm) {
+      setTimeout(() => {
+        $('#btn-go-to-shippping-method').trigger('click');
+      }, TIMEOUT_750);
+    }
+  };
+
+  const addCustomGoToShippingBtn = () => {
+    if ($('#custom-btn-go-to-shippping-method').length <= 0) {
+      const nativeGoToShippingBtn = $('#btn-go-to-shippping-method');
+      const customGoToShippingBtn = nativeGoToShippingBtn.clone(false);
+
+      $(nativeGoToShippingBtn).hide();
+      $(customGoToShippingBtn).data('bind', '');
+      $(customGoToShippingBtn).removeAttr('id').attr('id', 'btn-go-to-shippping-method');
+      $(customGoToShippingBtn).removeAttr('data-bind');
+      $(customGoToShippingBtn).attr('id', 'custom-btn-go-to-shippping-method');
+      $(customGoToShippingBtn).css('display', 'block');
+
+      $('p.btn-go-to-shipping-wrapper').append(customGoToShippingBtn);
+
+      $(customGoToShippingBtn).on('click', goToShipping);
     }
   };
 
@@ -190,7 +229,8 @@ const FormController = (() => {
         setRicaFields();
       }
 
-      if (showFurnitureForm || showTVIDForm) {
+      const isExistsAddress = vtexjs.checkout.orderForm.shippingData.address;
+      if ((showFurnitureForm || showTVIDForm) && isExistsAddress) {
         setMasterdataFields(showFurnitureForm, showTVIDForm);
       }
     }
@@ -200,6 +240,7 @@ const FormController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(async () => {
         addCustomBtnPayment();
+        addCustomGoToShippingBtn();
         await setDataInCustomFields();
       }, TIMEOUT_500);
     }
@@ -217,7 +258,8 @@ const FormController = (() => {
     }
   });
 
-  $(document).on('change',
+  $(document).on(
+    'change',
     '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector, .vtex-omnishipping-1-x-deliveryGroup .tfg-input',
     function () {
       if ($(this).val()) {
@@ -227,7 +269,8 @@ const FormController = (() => {
       } else {
         $(this).removeClass('tfg-input-completed');
       }
-    });
+    }
+  );
 
   $(document).on('change', '.vtex-omnishipping-1-x-addressForm input', function () {
     if ($(this).val()) {
@@ -253,7 +296,7 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => { };
+  const publicInit = () => {};
 
   return {
     init: publicInit,

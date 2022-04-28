@@ -1,7 +1,7 @@
 {
-  "name": "custom-shipping-step-by-items",
+  "name": "tfg-custom-checkout",
   "version": "0.1.0",
-  "description": "[TFG] custom-shipping-step-by-items app",
+  "description": "[TFG] tfg-custom-checkout app",
   "main": "index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
@@ -11,7 +11,8 @@
   "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
   "license": "VTEX",
   "dependencies": {
-    "git": "^0.1.5"
+    "git": "^0.1.5",
+    "intl-tel-input": "^17.0.15"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -32,6 +33,8 @@
     "prettier": "^2.3.2",
     "sass": "^1.35.1",
     "sass-loader": "^12.1.0",
+    "style-loader": "^3.3.1",
+    "url-loader": "^4.1.1",
     "webpack": "^5.41.1",
     "webpack-cli": "^4.7.2"
   },
