@@ -1,6 +1,14 @@
 import intlTelInput from 'intl-tel-input';
 import utilsScript from 'intl-tel-input/build/js/utils';
-import { STEPS, TIMEOUT_500, TIMEOUT_750, RICA_APP, FURNITURE_FEES } from '../utils/const';
+import {
+  STEPS,
+  TIMEOUT_500,
+  TIMEOUT_750,
+  RICA_APP,
+  FURNITURE_FEES,
+  COUNTRIES_AVAILABLES,
+  COUNTRIES
+} from '../utils/const';
 import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
 import { FurnitureForm, TVorRICAMsg, TVIDForm, RICAForm, MixedProducts, AddressForm, SuburbField } from '../templates';
 import CartController from './CartController';
@@ -15,7 +23,7 @@ const ViewController = (() => {
     showRICAForm: false,
     showTVorRICAMsg: false,
     showMixedProductsMsg: false,
-    iti: {}
+    intTelInput: {}
   };
 
   const checkCartCategories = () => {
@@ -169,23 +177,18 @@ const ViewController = (() => {
     const setInputPhone = () => {
       const phoneInput = document.querySelector('.custom-field-complement input');
 
-      const customPlaceholder = (defaultPlaceHolder, selectedCountryData) => {
-        if (selectedCountryData.iso2 === 'za') {
-          const zaPlaceholder = '(+27)';
-          $('.iti--allow-dropdown').attr('data-content', zaPlaceholder);
-          return '';
-        }
-        return defaultPlaceHolder;
+      const customPlaceholder = (_, selectedCountryData) => {
+        $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
       };
 
       const iti = intlTelInput(phoneInput, {
-        initialCountry: 'za',
-        onlyCountries: ['za'],
+        initialCountry: COUNTRIES.za.code,
+        onlyCountries: COUNTRIES_AVAILABLES,
         formatOnDisplay: true,
         utilsScript, // just for formatting/placeholders etc
         customPlaceholder
       });
-      state.iti = iti;
+      state.intTelInput = iti;
     };
 
     const saveCustomFieldAddress = () => {
@@ -215,19 +218,17 @@ const ViewController = (() => {
   };
   const toggleGoogleInput = () => {
     if (!$('#v-custom-ship-street').val()) {
-      $(
-        // eslint-disable-next-line max-len
-        '.custom-field-receiverName, .custom-field-complement, .custom-field-companyBuilding, .vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info, .btn-go-to-shipping-wrapper '
-      ).hide();
+      const selector = `.custom-field-receiverName,
+       .custom-field-complement, .custom-field-companyBuilding,
+        .vcustom--vtex-omnishipping-1-x-address__state,
+         .v-custom-ship-info, .btn-go-to-shipping-wrapper`;
+      $(selector).hide();
       $('.v-custom-ship-street label').text('Add a new delivery address');
       $('#v-custom-ship-street').attr('placeholder', 'Search for address');
       $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
 
       $('#v-custom-ship-street').one('change', () => {
-        $(
-          // eslint-disable-next-line max-len
-          '.custom-field-receiverName, .custom-field-complement, .custom-field-companyBuilding, .vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info, .btn-go-to-shipping-wrapper '
-        ).show();
+        $(selector).show();
         $('.v-custom-ship-street label').text('Street address');
         $('#v-custom-ship-street').attr(
           'placeholder',

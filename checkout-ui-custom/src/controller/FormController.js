@@ -119,10 +119,10 @@ const FormController = (() => {
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
   const checkPhoneField = () => {
-    if (!ViewController.state.iti) return;
-    if (typeof ViewController.state.iti.isValidNumber !== 'function') return;
+    if (!ViewController.state.intTelInput) return;
+    if (typeof ViewController.state.intTelInput.isValidNumber !== 'function') return;
 
-    const isValidNumber = ViewController.state.iti.isValidNumber();
+    const isValidNumber = ViewController.state.intTelInput.isValidNumber();
     if (!isValidNumber) {
       $('.custom-field-complement').append(InputError());
       $('.custom-field-complement span.error').show();
