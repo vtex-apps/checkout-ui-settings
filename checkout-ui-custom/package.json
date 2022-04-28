@@ -1,7 +1,7 @@
 {
-  "name": "tfg-custom-checkout",
+  "name": "custom-shipping-step-by-items",
   "version": "0.1.0",
-  "description": "[TFG] tfg-custom-checkout app",
+  "description": "[TFG] custom-shipping-step-by-items app",
   "main": "index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
