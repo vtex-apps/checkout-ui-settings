@@ -1,20 +1,18 @@
 const path = require('path');
-const webpack = require("webpack");
+// const webpack = require('webpack');
 
-var config = {
+const config = {
   // TODO: Add common Configuration
-  module: {},
+  module: {}
 };
 
-var defaultConfig = Object.assign({}, config, {
+const defaultConfig = {
+  ...config,
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  entry: [
-    './src/checkout6-custom.js',
-    './src/checkout6-custom.scss'
-  ],
+  entry: ['./src/checkout6-custom.js', './src/checkout6-custom.scss'],
   output: {
     filename: 'checkout6-custom.js',
-    path: path.resolve(__dirname, './'),
+    path: path.resolve(__dirname, './')
   },
   module: {
     rules: [
@@ -24,7 +22,7 @@ var defaultConfig = Object.assign({}, config, {
           {
             loader: 'file-loader',
             options: {
-              name: '[name].css',
+              name: '[name].css'
             }
           },
           {
@@ -37,19 +35,37 @@ var defaultConfig = Object.assign({}, config, {
             loader: 'sass-loader'
           }
         ]
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: false
+            }
+          }
+        ]
       }
     ]
   }
-});
-var appConfig = Object.assign({}, config,{
+};
+const appConfig = {
+  ...config,
   mode: 'production',
-  entry: [
-    './src/app.checkout6-custom.js',
-    './src/app.checkout6-custom.scss'
-  ],
+  entry: ['./src/app.checkout6-custom.js', './src/app.checkout6-custom.scss'],
   output: {
     filename: 'checkout6-custom.js',
-    path: path.resolve(__dirname, '../node/templates'),
+    path: path.resolve(__dirname, '../node/templates')
   },
   module: {
     rules: [
@@ -59,7 +75,7 @@ var appConfig = Object.assign({}, config,{
           {
             loader: 'file-loader',
             options: {
-              name: 'checkout6-custom.css',
+              name: 'checkout6-custom.css'
             }
           },
           {
@@ -72,14 +88,30 @@ var appConfig = Object.assign({}, config,{
             loader: 'sass-loader'
           }
         ]
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: false
+            }
+          }
+        ]
       }
     ]
   }
-});
+};
 
 // Return Array of Configurations
-module.exports = [
-  defaultConfig, appConfig
-];
-
-
+module.exports = [defaultConfig, appConfig];
