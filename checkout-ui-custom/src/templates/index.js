@@ -4,12 +4,14 @@ import TVIDForm from './TVIDForm';
 import RICAForm from './RICAForm';
 import InputError from './InputError';
 import MixedProducts from './MixedProducts';
+import AddressForm, { SuburbField } from './AddressForm';
 
 export {
   FurnitureForm,
   TVorRICAMsg,
-  TVIDForm,
-  RICAForm,
+  TVIDForm, RICAForm,
   InputError,
-  MixedProducts
+  MixedProducts,
+  AddressForm,
+  SuburbField
 };

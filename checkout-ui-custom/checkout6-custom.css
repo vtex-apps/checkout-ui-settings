@@ -184,3 +184,48 @@ p.error input,
 p.error select {
   border: 1px solid #9D1414 !important;
 }
+
+.ship-receiverName, .ship-complement {
+  display: none;
+}
+
+.custom-field-complement input {
+  padding: 0 100px !important;
+}
+
+.custom-field-companyBuilding {
+  position: relative;
+}
+.custom-field-companyBuilding::after {
+  content: "Optional";
+  font-family: Inter;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+  text-align: right;
+  color: #848484;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+#custom-btn-go-to-shippping-method {
+  background: #813992;
+  border-color: #813992;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  width: 100%;
+}
+
+.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form.google::before {
+  content: "";
+}

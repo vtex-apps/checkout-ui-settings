@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- added receiver, complement and suburb with validation and save
+- added google autocomplete view
+- added complement with intl-tel-input
+
 ## [0.1.0] - 2022-XX-XX
 
 ### Changed
