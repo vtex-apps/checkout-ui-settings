@@ -9,8 +9,10 @@ const getShippingData = async (addressName, fields) => {
     headers: { 'Cache-Control': 'no-cache' }
   };
 
-  const response = await fetch('/custom-api/masterdata/addresses/'
-    + `${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`, options)
+  const response = await fetch(
+    '/custom-api/masterdata/addresses/' + `${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
+    options
+  )
     .then((res) => res.json())
     .catch((err) => console.error(err));
 
@@ -35,10 +37,11 @@ const saveAddress = async (fields) => {
     path = '/custom-api/masterdata/addresses';
   }
 
+  // Importante respetar el order de address para no sobreescribir receiver, complement y neighborhood
   const body = {
     userId: email,
-    ...fields,
-    ...address
+    ...address,
+    ...fields
   };
 
   if (!savedAddress.id) {
@@ -87,7 +90,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     }
   } else if (tries <= 5) {
     setTimeout(() => {
-      setMasterdataFields(completeFurnitureForm, completeTVIDForm, tries += 1);
+      setMasterdataFields(completeFurnitureForm, completeTVIDForm, (tries += 1));
     }, 3000);
   }
 };
@@ -113,8 +116,7 @@ const checkoutSendCustomData = (appId, customData) => {
 
   return $.ajax({
     type: 'PUT',
-    url:
-      `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,
+    url: `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,
     dataType: 'json',
     contentType: 'application/json; charset=utf-8',
     data: JSON.stringify(customData)
@@ -144,7 +146,7 @@ const setRicaFields = (getDataFrom = 'customApps') => {
   if (ricaFields && !jQuery.isEmptyObject(ricaFields)) {
     if (getDataFrom === 'customApps') {
       $('#tfg-rica-id-passport').val(ricaFields.idOrPassport);
-      $('#tfg-rica-same-address').prop('checked', (ricaFields.sameAddress === 'true'));
+      $('#tfg-rica-same-address').prop('checked', ricaFields.sameAddress === 'true');
     }
     $('#tfg-rica-fullname').val(ricaFields.fullName);
     $('#tfg-rica-street').val(ricaFields.streetAddress);
