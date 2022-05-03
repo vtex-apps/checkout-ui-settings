@@ -213,11 +213,16 @@ const ViewController = (() => {
   const setValueToReceiverAndComplementByDefault = () => {
     const { firstName, lastName, phone } = window.vtexjs.checkout.orderForm.clientProfileData;
     const receiverName = `${firstName} ${lastName}`;
+    const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
     $('#custom-field-receiverName').val(receiverName).attr('value', receiverName);
+    fields.receiverName = receiverName;
     $('#custom-field-complement').val(phone).attr('value', phone);
+    fields.complement = phone;
+    localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
   };
   const toggleGoogleInput = () => {
     if (!$('#v-custom-ship-street').val()) {
+      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
       const selector = `.custom-field-receiverName,
        .custom-field-complement, .custom-field-companyBuilding,
         .vcustom--vtex-omnishipping-1-x-address__state,
@@ -225,16 +230,15 @@ const ViewController = (() => {
       $(selector).hide();
       $('.v-custom-ship-street label').text('Add a new delivery address');
       $('#v-custom-ship-street').attr('placeholder', 'Search for address');
-      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
 
       $('#v-custom-ship-street').one('change', () => {
+        $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
         $(selector).show();
         $('.v-custom-ship-street label').text('Street address');
         $('#v-custom-ship-street').attr(
           'placeholder',
           'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
         );
-        $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
         setValueToReceiverAndComplementByDefault();
       });
     }
