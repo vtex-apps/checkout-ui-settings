@@ -146,6 +146,12 @@ const ViewController = (() => {
     return validData;
   };
 
+  const isAddressFormCompleted = () => {
+    const fields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
+    const validData = fields?.complement && fields?.receiverName && fields?.neighborhood;
+    return validData;
+  };
+
   const addAddressFormFields = () => {
     const setValuesOnGoToShipping = () => {
       const elementToObserveChange = document.querySelector('.shipping-container .box-step');
@@ -179,6 +185,7 @@ const ViewController = (() => {
 
       const customPlaceholder = (_, selectedCountryData) => {
         $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
+        return '';
       };
 
       const iti = intlTelInput(phoneInput, {
@@ -217,6 +224,9 @@ const ViewController = (() => {
     $('#custom-field-receiverName').val(receiverName).attr('value', receiverName);
     fields.receiverName = receiverName;
     $('#custom-field-complement').val(phone).attr('value', phone);
+    $('#custom-field-complement')
+      .val(phone)
+      .attr('placeholder', phone || '');
     fields.complement = phone;
     localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
   };
@@ -259,6 +269,21 @@ const ViewController = (() => {
             $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
           }
         } else if (window.location.hash === STEPS.PAYMENT) {
+          const isAddressCompleted = isAddressFormCompleted();
+
+          if (!isAddressCompleted) {
+            window.location.hash = STEPS.SHIPPING;
+            setTimeout(() => {
+              const addressListEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress');
+              const addressItemEditSelector = $('.vtex-omnishipping-1-x-linkEdit');
+              if (addressListEditSelector.length) {
+                addressListEditSelector.trigger('click');
+              } else {
+                addressItemEditSelector.trigger('click');
+              }
+            }, TIMEOUT_500);
+          }
+
           if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
             let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 

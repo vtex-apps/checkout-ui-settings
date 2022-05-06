@@ -140,6 +140,15 @@ const FormController = (() => {
     checkField('custom-field-receiverName');
     checkPhoneField();
     checkField('custom-field-neighborhood');
+    if (!state.validForm) {
+      const addressListEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress');
+      const addressItemEditSelector = $('.vtex-omnishipping-1-x-linkEdit');
+      if (addressListEditSelector.length) {
+        addressListEditSelector.trigger('click');
+      } else {
+        addressItemEditSelector.trigger('click');
+      }
+    }
   };
 
   const saveShippingForm = () => {

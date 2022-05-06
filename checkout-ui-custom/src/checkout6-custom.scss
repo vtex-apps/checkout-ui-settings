@@ -237,8 +237,8 @@ p.error {
 }
 
 
-.ship-receiverName, .ship-complement {
-  display: none;
+.ship-receiverName, .ship-complement, .ship-notApplicable {
+  display: none!important;
 }
 
 // Input phone

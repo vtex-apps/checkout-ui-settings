@@ -185,8 +185,8 @@ p.error select {
   border: 1px solid #9D1414 !important;
 }
 
-.ship-receiverName, .ship-complement {
-  display: none;
+.ship-receiverName, .ship-complement, .ship-notApplicable {
+  display: none !important;
 }
 
 .custom-field-complement input {
