@@ -29,7 +29,13 @@ const FormController = (() => {
   };
 
   const checkNativeForm = () => {
-    const nativeFields = ['ship-street', 'ship-city', 'ship-receiverName'];
+    const nativeFields = [
+      'ship-street',
+      'ship-city',
+      'ship-receiverName',
+      'custom-field-receiverName',
+      'custom-field-neighborhood'
+    ];
 
     /* When the list of addresses appears,
     it does not complete ship-state correctly in the native process so,
@@ -62,6 +68,32 @@ const FormController = (() => {
 
     checkFields(ricaFields);
   };
+  const checkPhoneField = () => {
+    if (!ViewController.state.intTelInput) return;
+    if (typeof ViewController.state.intTelInput.isValidNumber !== 'function') return;
+
+    const isValidNumber = ViewController.state.intTelInput.isValidNumber();
+    if (!isValidNumber) {
+      $('.custom-field-complement').append(InputError());
+      $('.custom-field-complement span.error').show();
+
+      state.validForm = false;
+    }
+  };
+
+  const isValidAddressForm = () => {
+    if (!state.validForm) {
+      const addressListEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress');
+      const addressItemEditSelector = $('.vtex-omnishipping-1-x-linkEdit');
+      if (addressListEditSelector.length) {
+        addressListEditSelector.trigger('click');
+      } else {
+        addressItemEditSelector.trigger('click');
+      }
+      return false;
+    }
+    return true;
+  };
 
   const checkForms = () => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
@@ -71,6 +103,8 @@ const FormController = (() => {
     state.validForm = true;
 
     checkNativeForm();
+    checkPhoneField();
+    if (!isValidAddressForm()) return;
 
     if (showFurnitureForm) {
       checkFurnitureForm();
@@ -118,45 +152,10 @@ const FormController = (() => {
 
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
-  const checkPhoneField = () => {
-    if (!ViewController.state.intTelInput) return;
-    if (typeof ViewController.state.intTelInput.isValidNumber !== 'function') return;
-
-    const isValidNumber = ViewController.state.intTelInput.isValidNumber();
-    if (!isValidNumber) {
-      $('.custom-field-complement').append(InputError());
-      $('.custom-field-complement span.error').show();
-
-      state.validForm = false;
-    }
-
-    state.validForm = true;
-  };
-
-  const isValidAddressForm = () => {
-    // Reset state & clear errors
-    $('span.help.error').remove();
-    state.validForm = true;
-    checkField('custom-field-receiverName');
-    checkPhoneField();
-    checkField('custom-field-neighborhood');
-    if (!state.validForm) {
-      const addressListEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress');
-      const addressItemEditSelector = $('.vtex-omnishipping-1-x-linkEdit');
-      if (addressListEditSelector.length) {
-        addressListEditSelector.trigger('click');
-      } else {
-        addressItemEditSelector.trigger('click');
-      }
-    }
-  };
-
   const saveShippingForm = () => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
     checkForms();
-    isValidAddressForm();
-
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
@@ -204,7 +203,7 @@ const FormController = (() => {
 
   const goToShipping = (event) => {
     event.preventDefault();
-    isValidAddressForm();
+    checkForms();
     if (state.validForm) {
       setTimeout(() => {
         $('#btn-go-to-shippping-method').trigger('click');
