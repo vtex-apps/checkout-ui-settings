@@ -185,7 +185,7 @@ p.error select {
   border: 1px solid #9D1414 !important;
 }
 
-.ship-receiverName, .ship-complement, .ship-notApplicable {
+.ship-receiverName, .ship-complement, .ship-notApplicable, .ship-street, .ship-complement, .ship-city, .ship-state {
   display: none !important;
 }
 

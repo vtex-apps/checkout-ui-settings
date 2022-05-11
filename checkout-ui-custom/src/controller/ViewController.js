@@ -23,7 +23,9 @@ const ViewController = (() => {
     showRICAForm: false,
     showTVorRICAMsg: false,
     showMixedProductsMsg: false,
-    intTelInput: {}
+    intTelInput: {},
+    captureGoogleInputOnChange: false,
+    captureAddressListOnChange: false
   };
 
   const checkCartCategories = () => {
@@ -153,56 +155,32 @@ const ViewController = (() => {
   };
 
   const addAddressFormFields = () => {
-    const setValuesOnGoToShipping = () => {
-      const elementToObserveChange = document.querySelector('.shipping-container .box-step');
-      const observer = new MutationObserver(() => {
-        const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {
-          complement: '',
-          receiverName: '',
-          neighborhood: '',
-          companyBuilding: ''
-        };
-        window.vtexjs.checkout.orderForm.shippingData.address = {
-          ...window.vtexjs.checkout.orderForm.shippingData.address,
-          ...fields
-        };
-        $('.ship-complement input').val(fields.complement).attr('value', fields.complement);
-        $('#custom-field-complement').val(fields.complement).attr('value', fields.complement);
-        $('.ship-receiverName input').val(fields.receiverName).attr('value', fields.receiverName);
-        $('#custom-field-receiverName').val(fields.receiverName).attr('value', fields.receiverName);
-        $('#custom-field-companyBuilding').val(fields.companyBuilding).attr('value', fields.companyBuilding);
-        $('#custom-field-neighborhood').val(fields.neighborhood).attr('value', fields.neighborhood);
-      });
-      const observerConfig = { attributes: false, childList: true, characterData: false };
-      if (elementToObserveChange) {
-        observer.observe(elementToObserveChange, observerConfig);
-      }
-    };
-    setValuesOnGoToShipping();
-
     const setInputPhone = () => {
-      const phoneInput = document.querySelector('.custom-field-complement input');
-
       const customPlaceholder = (_, selectedCountryData) => {
         $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
         return '';
       };
 
-      const iti = intlTelInput(phoneInput, {
-        initialCountry: COUNTRIES.za.code,
-        onlyCountries: COUNTRIES_AVAILABLES,
-        formatOnDisplay: true,
-        utilsScript, // just for formatting/placeholders etc
-        customPlaceholder
-      });
-      state.intTelInput = iti;
+      const phoneInput = document.querySelector('.custom-field-complement input');
+      if (phoneInput) {
+        console.log('setting phone');
+        const iti = intlTelInput(phoneInput, {
+          initialCountry: COUNTRIES.za.code,
+          onlyCountries: COUNTRIES_AVAILABLES,
+          formatOnDisplay: true,
+          utilsScript, // just for formatting/placeholders etc
+          customPlaceholder
+        });
+        state.intTelInput = iti;
+      }
     };
 
     const saveCustomFieldAddress = () => {
       $('.tfg-custom-addressForm input').change((event) => {
         const field = event.target;
+        const fieldName = field.getAttribute('field');
         const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
-        fields[field.getAttribute('field')] = field.value;
+        fields[fieldName] = field.value;
         localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
       });
     };
@@ -230,6 +208,7 @@ const ViewController = (() => {
     fields.complement = phone;
     localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
   };
+
   const toggleGoogleInput = () => {
     if (!$('#v-custom-ship-street').val()) {
       $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');

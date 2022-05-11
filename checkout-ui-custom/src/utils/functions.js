@@ -23,7 +23,7 @@ const getShippingData = async (addressName, fields) => {
   return data;
 };
 
-const saveAddress = async (fields) => {
+const saveAddress = async (fields = {}) => {
   let path;
   const { email } = vtexjs.checkout.orderForm.clientProfileData;
   const { address } = vtexjs.checkout.orderForm.shippingData;
@@ -54,6 +54,7 @@ const saveAddress = async (fields) => {
     body: JSON.stringify(body)
   };
 
+  console.log('saving...');
   await fetch(path, options)
     .then((res) => {
       localStorage.setItem('shippingDataCompleted', true);

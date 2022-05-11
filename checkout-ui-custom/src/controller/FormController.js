@@ -42,7 +42,7 @@ const FormController = (() => {
     if it has already been reported, it is not validated. */
     const { address } = vtexjs.checkout.orderForm.shippingData;
 
-    if (!address.state) {
+    if (!address?.state) {
       nativeFields.push('ship-state');
     }
 
@@ -201,12 +201,34 @@ const FormController = (() => {
     }
   };
 
+  const completeNativeFieldsAfterGoToShipping = () => {
+    const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {
+      complement: '',
+      receiverName: '',
+      neighborhood: '',
+      companyBuilding: ''
+    };
+    window.vtexjs.checkout.orderForm.shippingData.address = {
+      ...window.vtexjs.checkout.orderForm.shippingData.address,
+      ...fields
+    };
+    $('.ship-complement input').val(fields.complement).attr('value', fields.complement);
+    $('#custom-field-complement').val(fields.complement).attr('value', fields.complement);
+    $('.ship-receiverName input').val(fields.receiverName).attr('value', fields.receiverName);
+    $('#custom-field-receiverName').val(fields.receiverName).attr('value', fields.receiverName);
+    $('#custom-field-companyBuilding').val(fields.companyBuilding).attr('value', fields.companyBuilding);
+    $('#custom-field-neighborhood').val(fields.neighborhood).attr('value', fields.neighborhood);
+  };
+
   const goToShipping = (event) => {
     event.preventDefault();
     checkForms();
     if (state.validForm) {
       setTimeout(() => {
         $('#btn-go-to-shippping-method').trigger('click');
+        setTimeout(() => {
+          completeNativeFieldsAfterGoToShipping();
+        }, TIMEOUT_750);
       }, TIMEOUT_750);
     }
   };
@@ -237,7 +259,7 @@ const FormController = (() => {
         setRicaFields();
       }
 
-      const isExistsAddress = vtexjs.checkout.orderForm.shippingData.address;
+      const isExistsAddress = vtexjs.checkout.orderForm.shippingData?.address;
       if ((showFurnitureForm || showTVIDForm) && isExistsAddress) {
         setMasterdataFields(showFurnitureForm, showTVIDForm);
       }
