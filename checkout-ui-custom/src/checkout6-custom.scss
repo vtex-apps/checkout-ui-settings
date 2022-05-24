@@ -237,20 +237,26 @@ p.error {
 }
 
 
-.ship-receiverName, .ship-complement, .ship-notApplicable, .ship-street, .ship-complement, .ship-city, .ship-state {
-  display: none!important;
+.ship-receiverName,
+.ship-complement,
+.ship-notApplicable,
+.ship-street,
+.ship-complement,
+.ship-city {
+  display: none !important;
 }
 
 // Input phone
 .custom-field-complement {
   input {
-    padding: 0 100px!important;
+    padding: 0 100px !important;
   }
 }
 
 // Optional field
 .custom-field-companyBuilding {
   position: relative;
+
   &::after {
     content: "Optional";
     font-family: Inter;
@@ -282,6 +288,6 @@ p.error {
   width: 100%;
 }
 
-.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form.google::before {
+.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address>div>form.google::before {
   content: ""
 }

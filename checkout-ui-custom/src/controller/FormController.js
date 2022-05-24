@@ -1,8 +1,11 @@
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
 /* eslint-disable func-names */
 import { STEPS, TIMEOUT_500, TIMEOUT_750, RICA_APP } from '../utils/const';
-import { saveAddress, checkoutSendCustomData, setRicaFields, setMasterdataFields } from '../utils/functions';
+import {
+  saveAddress,
+  checkoutSendCustomData,
+  setRicaFields,
+  setMasterdataFields
+} from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
 
@@ -40,7 +43,7 @@ const FormController = (() => {
     /* When the list of addresses appears,
     it does not complete ship-state correctly in the native process so,
     if it has already been reported, it is not validated. */
-    const { address } = vtexjs.checkout.orderForm.shippingData;
+    const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     if (!address?.state) {
       nativeFields.push('ship-state');
@@ -68,6 +71,7 @@ const FormController = (() => {
 
     checkFields(ricaFields);
   };
+
   const checkPhoneField = () => {
     if (!ViewController.state.intTelInput) return;
     if (typeof ViewController.state.intTelInput.isValidNumber !== 'function') return;
@@ -165,8 +169,7 @@ const FormController = (() => {
       }
 
       // Fields saved in Masterdata
-      const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
-      const masterdataFields = { ...addressFormFields };
+      const masterdataFields = {};
 
       if (showFurnitureForm) {
         Object.assign(masterdataFields, getFurnitureFormFields());
@@ -201,34 +204,18 @@ const FormController = (() => {
     }
   };
 
-  const completeNativeFieldsAfterGoToShipping = () => {
-    const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {
-      complement: '',
-      receiverName: '',
-      neighborhood: '',
-      companyBuilding: ''
-    };
-    window.vtexjs.checkout.orderForm.shippingData.address = {
-      ...window.vtexjs.checkout.orderForm.shippingData.address,
-      ...fields
-    };
-    $('.ship-complement input').val(fields.complement).attr('value', fields.complement);
-    $('#custom-field-complement').val(fields.complement).attr('value', fields.complement);
-    $('.ship-receiverName input').val(fields.receiverName).attr('value', fields.receiverName);
-    $('#custom-field-receiverName').val(fields.receiverName).attr('value', fields.receiverName);
-    $('#custom-field-companyBuilding').val(fields.companyBuilding).attr('value', fields.companyBuilding);
-    $('#custom-field-neighborhood').val(fields.neighborhood).attr('value', fields.neighborhood);
-  };
-
   const goToShipping = (event) => {
     event.preventDefault();
     checkForms();
+
     if (state.validForm) {
       setTimeout(() => {
         $('#btn-go-to-shippping-method').trigger('click');
-        setTimeout(() => {
-          completeNativeFieldsAfterGoToShipping();
-        }, TIMEOUT_750);
+
+        setTimeout(async () => {
+          const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
+          saveAddress(addressFormFields);
+        }, 3500);
       }, TIMEOUT_750);
     }
   };
@@ -252,16 +239,16 @@ const FormController = (() => {
   };
 
   const setDataInCustomFields = async () => {
-    if (vtexjs.checkout.orderForm) {
+    if (window.vtexjs.checkout.orderForm) {
+      const { address } = window.vtexjs.checkout.orderForm.shippingData;
       const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
       if (showRICAForm) {
         setRicaFields();
       }
 
-      const isExistsAddress = vtexjs.checkout.orderForm.shippingData?.address;
-      if ((showFurnitureForm || showTVIDForm) && isExistsAddress) {
-        setMasterdataFields(showFurnitureForm, showTVIDForm);
+      if (address) {
+        await setMasterdataFields(showFurnitureForm, showTVIDForm);
       }
     }
   };
@@ -317,6 +304,10 @@ const FormController = (() => {
     }
   });
 
+  $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
+    setDataInCustomFields();
+  });
+
   // EVENTS SUBSCRIPTION
   $(document).ready(() => {
     runCustomization();
@@ -326,7 +317,7 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {};
+  const publicInit = () => { };
 
   return {
     init: publicInit,

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { STEPS, TIMEOUT_500 } from '../utils/const';
 
 const CartController = (() => {
@@ -46,8 +45,8 @@ const CartController = (() => {
       }
 
       setTimeout(() => {
-        if (vtexjs.checkout.orderForm) {
-          const { items } = vtexjs.checkout.orderForm;
+        if (window.vtexjs.checkout.orderForm) {
+          const { items } = window.vtexjs.checkout.orderForm;
           getCategories(items);
         }
       }, TIMEOUT_500);

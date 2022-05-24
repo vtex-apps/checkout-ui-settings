@@ -10,7 +10,7 @@ const getShippingData = async (addressName, fields) => {
   };
 
   const response = await fetch(
-    '/custom-api/masterdata/addresses/' + `${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
+    `/custom-api/masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
     options
   )
     .then((res) => res.json())
@@ -25,8 +25,8 @@ const getShippingData = async (addressName, fields) => {
 
 const saveAddress = async (fields = {}) => {
   let path;
-  const { email } = vtexjs.checkout.orderForm.clientProfileData;
-  const { address } = vtexjs.checkout.orderForm.shippingData;
+  const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
+  const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
   // AD already exists (?)
   const savedAddress = await getShippingData(address.addressId, '?_fields=id');
@@ -37,27 +37,34 @@ const saveAddress = async (fields = {}) => {
     path = '/custom-api/masterdata/addresses';
   }
 
-  // Importante respetar el order de address para no sobreescribir receiver, complement y neighborhood
-  const body = {
+  // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood
+  const newAddress = {
     userId: email,
     ...address,
     ...fields
   };
 
   if (!savedAddress.id) {
-    body.addressName = address.addressId;
+    newAddress.addressName = address.addressId;
   }
+
+  console.log('!! save Address - newAddress', newAddress);
 
   const options = {
     method: 'PATCH',
     headers: { 'Cache-Control': 'no-cache' },
-    body: JSON.stringify(body)
+    body: JSON.stringify(newAddress)
   };
 
-  console.log('saving...');
   await fetch(path, options)
     .then((res) => {
       localStorage.setItem('shippingDataCompleted', true);
+      if (localStorage.getItem('custom-address-form-fields')) {
+        localStorage.removeItem('custom-address-form-fields');
+      }
+      /* Update orderForm.shippingData */
+      window.vtexjs.checkout.calculateShipping(newAddress);
+
       if (res.status !== 204) {
         res.json();
       }
@@ -65,40 +72,73 @@ const saveAddress = async (fields = {}) => {
     .catch((error) => console.log(error));
 };
 
-const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 0) => {
-  const { addressId } = vtexjs.checkout.orderForm.shippingData.address;
-  const fields = '?_fields=companyBuilding,furnitureReady,buildingType,'
-    + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {
+  /* Data will only be searched and set if any of the custom fields for TFG are displayed. */
+  if ($('#custom-field-companyBuilding').length > 0 || completeFurnitureForm || completeTVIDForm) {
+    const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
-  const customShippingInfo = await getShippingData(addressId, fields);
+    /* Setting Masterdata custom fields */
+    const fields = '?_fields=receiverName,complement,companyBuilding,neighborhood,furnitureReady,buildingType,'
+      + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
 
-  if (customShippingInfo && !jQuery.isEmptyObject(customShippingInfo)) {
-    if (completeFurnitureForm) {
-      $('#tfg-building-type').val(customShippingInfo.buildingType);
-      $('#tfg-parking-distance').val(customShippingInfo.parkingDistance);
-      $('#tfg-delivery-floor').val(customShippingInfo.deliveryFloor);
-      if ($('#tfg-delivery-floor').val() === 'Ground') {
-        $('#tfg-lift-stairs').attr('disabled', 'disabled');
-      } else {
-        $('#tfg-lift-stairs').val(customShippingInfo.liftOrStairs);
+    const shippingData = await getShippingData(address.addressId, fields);
+
+    if (shippingData && !jQuery.isEmptyObject(shippingData)) {
+      $('#custom-field-receiverName')
+        .val(shippingData.receiverName)
+        .attr('value', shippingData.receiverName);
+
+      $('#custom-field-complement')
+        .val(shippingData.complement)
+        .attr('value', shippingData.complement);
+
+      $('#custom-field-companyBuilding')
+        .val(shippingData.companyBuilding)
+        .attr('value', shippingData.companyBuilding);
+
+      $('#custom-field-neighborhood')
+        .val(shippingData.neighborhood)
+        .attr('value', shippingData.neighborhood);
+
+      /* Adding correct data to localStorage */
+      const customFields = {
+        receiverName: shippingData.receiverName,
+        complement: shippingData.complement,
+        companyBuilding: shippingData.companyBuilding,
+        neighborhood: shippingData.neighborhood
+      };
+
+      localStorage.setItem('custom-address-form-fields', JSON.stringify(customFields));
+
+      /* Setting furniture form values */
+      if (completeFurnitureForm) {
+        $('#tfg-building-type').val(shippingData.buildingType);
+        $('#tfg-parking-distance').val(shippingData.parkingDistance);
+        $('#tfg-delivery-floor').val(shippingData.deliveryFloor);
+        if ($('#tfg-delivery-floor').val() === 'Ground') {
+          $('#tfg-lift-stairs').attr('disabled', 'disabled');
+        } else {
+          $('#tfg-lift-stairs').val(shippingData.liftOrStairs);
+        }
+        $('#tfg-sufficient-space').prop('checked', shippingData.hasSufficientSpace);
+        $('#tfg-assemble-furniture').prop('checked', shippingData.assembleFurniture);
       }
-      $('#tfg-sufficient-space').prop('checked', customShippingInfo.hasSufficientSpace);
-      $('#tfg-assemble-furniture').prop('checked', customShippingInfo.assembleFurniture);
-    }
 
-    if (completeTVIDForm) {
-      $('#tfg-tv-licence').val(customShippingInfo.tvID);
+      /* Setting TV form values */
+      if (completeTVIDForm) {
+        $('#tfg-tv-licence').val(shippingData.tvID);
+      }
+    } else if (tries <= 5) {
+      setTimeout(() => {
+        setMasterdataFields(completeFurnitureForm, completeTVIDForm, (tries += 1));
+      }, 3000);
     }
-  } else if (tries <= 5) {
-    setTimeout(() => {
-      setMasterdataFields(completeFurnitureForm, completeTVIDForm, (tries += 1));
-    }, 3000);
   }
 };
 
 // Functions to manage CustomData
 const checkoutGetCustomData = (appId) => {
-  const { customData } = vtexjs.checkout.orderForm;
+  const { customData } = window.vtexjs.checkout.orderForm;
   let fields = {};
 
   if (customData && customData.customApps && customData.customApps.length > 0) {
@@ -113,7 +153,7 @@ const checkoutGetCustomData = (appId) => {
 };
 
 const checkoutSendCustomData = (appId, customData) => {
-  const { orderFormId } = vtexjs.checkout.orderForm;
+  const { orderFormId } = window.vtexjs.checkout.orderForm;
 
   return $.ajax({
     type: 'PUT',
@@ -130,7 +170,7 @@ const setRicaFields = (getDataFrom = 'customApps') => {
   if (getDataFrom === 'customApps') {
     ricaFields = checkoutGetCustomData(RICA_APP);
   } else if (getDataFrom === 'shippingAddress') {
-    const { address } = vtexjs.checkout.orderForm.shippingData;
+    const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     ricaFields = {
       idOrPassport: '',
