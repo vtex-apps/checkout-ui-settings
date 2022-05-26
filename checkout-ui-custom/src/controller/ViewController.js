@@ -10,7 +10,15 @@ import {
   COUNTRIES
 } from '../utils/const';
 import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
-import { FurnitureForm, TVorRICAMsg, TVIDForm, RICAForm, MixedProducts, AddressForm, SuburbField } from '../templates';
+import {
+  FurnitureForm,
+  TVorRICAMsg,
+  TVIDForm,
+  RICAForm,
+  MixedProducts,
+  AddressForm,
+  SuburbField
+} from '../templates';
 import CartController from './CartController';
 import 'intl-tel-input/build/css/intlTelInput.css';
 
@@ -72,6 +80,7 @@ const ViewController = (() => {
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
       $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
+      $('div.subheader').css('display', 'none');
     }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
@@ -150,7 +159,7 @@ const ViewController = (() => {
   };
 
   const isAddressFormCompleted = () => {
-    const { address } = window.vtexjs.checkout.orderForm.shippingData;
+    const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
     return (address?.complement && address?.receiverName && address?.neighborhood);
   };
 
@@ -166,10 +175,9 @@ const ViewController = (() => {
         const iti = intlTelInput(phoneInput, {
           initialCountry: COUNTRIES.za.code,
           onlyCountries: COUNTRIES_AVAILABLES,
-          formatOnDisplay: true,
-          utilsScript, // just for formatting/placeholders etc
           customPlaceholder
         });
+
         state.intTelInput = iti;
       }
     };
@@ -235,11 +243,22 @@ const ViewController = (() => {
   };
 
   const runCustomization = () => {
+    /* Hiding subheader when there is furniture in cart */
+    setTimeout(() => {
+      checkCartCategories();
+
+      if (state.showFurnitureForm) {
+        $('div.subheader').css('display', 'none');
+      } else {
+        $('div.subheader').css('display', 'block');
+      }
+    }, TIMEOUT_500);
+
+    /* Adding custom sections */
     if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
       setTimeout(() => {
-        checkCartCategories();
-
         if (window.location.hash === STEPS.SHIPPING) {
+          console.log('!! SHIPPING STEP - STATE', state);
           showCustomSections();
           addAddressFormFields();
           toggleGoogleInput();
@@ -251,6 +270,8 @@ const ViewController = (() => {
         } else if (window.location.hash === STEPS.PAYMENT) {
           const isAddressCompleted = isAddressFormCompleted();
 
+          console.log('!! isAddressCompleted', isAddressCompleted);
+
           if (!isAddressCompleted) {
             window.location.hash = STEPS.SHIPPING;
             setTimeout(() => {
@@ -258,12 +279,21 @@ const ViewController = (() => {
                 ? $('.vtex-omnishipping-1-x-buttonEditAddress')
                 : $('.vtex-omnishipping-1-x-linkEdit');
               addressEditSelector.trigger('click');
-              $('#custom-btn-go-to-shippping-method').trigger('click');
+              /* Hay que dar un tiempo a VTEX para completar los campos y que estos no aparezcan con error */
+              setTimeout(() => {
+                $('#custom-btn-go-to-shippping-method').trigger('click');
+              }, TIMEOUT_750);
             }, TIMEOUT_750);
           }
 
+          console.log('!! state.showFurnitureForm', state.showFurnitureForm);
+          console.log('!! state.showRICAForm', state.showRICAForm);
+          console.log('!! state.showTVIDForm', state.showTVIDForm);
+
           if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
             let isDataCompleted = localStorage.getItem('shippingDataCompleted');
+
+            console.log('!! isDataCompleted', isDataCompleted);
 
             if (!isDataCompleted) {
               setTimeout(async () => {
@@ -274,6 +304,8 @@ const ViewController = (() => {
                 if (state.showFurnitureForm || state.showTVIDForm) {
                   isDataCompleted = await shippingCustomDataCompleted();
                 }
+
+                console.log('!! isDataCompleted', isDataCompleted);
 
                 if (!isDataCompleted) {
                   window.location.hash = STEPS.SHIPPING;

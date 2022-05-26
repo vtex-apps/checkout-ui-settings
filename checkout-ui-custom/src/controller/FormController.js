@@ -6,7 +6,7 @@ import {
   setRicaFields,
   setMasterdataFields
 } from '../utils/functions';
-import { InputError } from '../templates';
+import { InputError, AlertBox } from '../templates';
 import ViewController from './ViewController';
 
 const FormController = (() => {
@@ -15,6 +15,9 @@ const FormController = (() => {
   };
 
   const checkField = (field) => {
+    console.log('!! valida campo:', field);
+    console.log('!! valor:', $(`#${field}`).val());
+
     if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
       $(`.${field}`).addClass('error');
       $(`.${field}`).append(InputError);
@@ -33,11 +36,13 @@ const FormController = (() => {
 
   const checkNativeForm = () => {
     const nativeFields = [
-      'ship-street',
+      'v-custom-ship-street',
       'ship-city',
-      'ship-receiverName',
+      'ship-number',
       'custom-field-receiverName',
-      'custom-field-neighborhood'
+      'custom-field-neighborhood',
+      'ship-postalCode',
+      'ship-state'
     ];
 
     /* When the list of addresses appears,
@@ -126,6 +131,7 @@ const FormController = (() => {
   const getFurnitureFormFields = () => {
     const furnitureFields = {};
 
+    furnitureFields.furnitureReady = true;
     furnitureFields.buildingType = $('#tfg-building-type').val();
     furnitureFields.parkingDistance = $('#tfg-parking-distance').val();
     furnitureFields.deliveryFloor = $('#tfg-delivery-floor').val();
@@ -212,9 +218,16 @@ const FormController = (() => {
       setTimeout(() => {
         $('#btn-go-to-shippping-method').trigger('click');
 
-        setTimeout(async () => {
+        setTimeout(() => {
+          /* Show success msg */
+          $('p.delivery-address-title').prepend(AlertBox('Address added', 'success'));
           const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
           saveAddress(addressFormFields);
+
+          /* Hide success msg */
+          setTimeout(() => {
+            $('p.delivery-address-title .tfg-custom-msg').fadeOut();
+          }, 2000);
         }, 3500);
       }, TIMEOUT_750);
     }

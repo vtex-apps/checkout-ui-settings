@@ -7,10 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-### Fixed
+### Added
+- Message when address is saved
+- Hide subheader on furniture case
+- Icons on custom messages
 
+### Changed
+- New CI: moved styles to "tfg-custom-checkout" repository
+- Validation fields
+
+### Fixed
 - Fixed bug saving custom fields in Masterdata (receiver, complement, neighborhood, company/building)
 - Not continue to payment when mandatory fields are empty and redirect to form
+- Error on lift or stairs label
 
 ## [0.1.2] - 2022-XX-XX
 

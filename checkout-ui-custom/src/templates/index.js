@@ -5,6 +5,7 @@ import RICAForm from './RICAForm';
 import InputError from './InputError';
 import MixedProducts from './MixedProducts';
 import AddressForm, { SuburbField } from './AddressForm';
+import AlertBox from './AlertBox';
 
 export {
   FurnitureForm,
@@ -13,5 +14,6 @@ export {
   InputError,
   MixedProducts,
   AddressForm,
-  SuburbField
+  SuburbField,
+  AlertBox
 };

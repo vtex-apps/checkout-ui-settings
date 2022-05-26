@@ -44,11 +44,11 @@ const saveAddress = async (fields = {}) => {
     ...fields
   };
 
+  console.log('!! newAddress', newAddress);
+
   if (!savedAddress.id) {
     newAddress.addressName = address.addressId;
   }
-
-  console.log('!! save Address - newAddress', newAddress);
 
   const options = {
     method: 'PATCH',
@@ -78,7 +78,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
-    const fields = '?_fields=receiverName,complement,companyBuilding,neighborhood,furnitureReady,buildingType,'
+    const fields = '?_fields=receiverName,complement,companyBuilding,neighborhood,buildingType,'
       + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
 
     const shippingData = await getShippingData(address.addressId, fields);

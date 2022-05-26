@@ -53,7 +53,7 @@ const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStair
   // Lift/Stairs selector
   let liftStairsInput = `
   <p class="input tfg-custom-input tfg-lift-stairs">
-    <label>Lift or staris</label>
+    <label>Lift or stairs</label>
     <select class="input-xlarge tfg-custom-selector" id="tfg-lift-stairs">
       <option disabled selected value="">Please select</option>
   `;

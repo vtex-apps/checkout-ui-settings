@@ -38,19 +38,17 @@ const CartController = (() => {
   };
 
   const runCustomization = () => {
-    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
-      if (typeof (setAppConfiguration) !== 'undefined') {
-        // eslint-disable-next-line no-undef
-        setAppConfiguration(config);
-      }
-
-      setTimeout(() => {
-        if (window.vtexjs.checkout.orderForm) {
-          const { items } = window.vtexjs.checkout.orderForm;
-          getCategories(items);
-        }
-      }, TIMEOUT_500);
+    if (typeof (setAppConfiguration) !== 'undefined') {
+      // eslint-disable-next-line no-undef
+      setAppConfiguration(config);
     }
+
+    setTimeout(() => {
+      if (window.vtexjs.checkout.orderForm) {
+        const { items } = window.vtexjs.checkout.orderForm;
+        getCategories(items);
+      }
+    }, TIMEOUT_500);
   };
 
   // EVENTS SUBSCRIPTION
