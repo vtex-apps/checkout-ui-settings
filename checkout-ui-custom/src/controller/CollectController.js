@@ -1,9 +1,9 @@
 import intlTelInput from 'intl-tel-input';
 import 'intl-tel-input/build/css/intlTelInput.css';
-import { STEPS, COUNTRIES, COUNTRIES_AVAILABLES, AD_TYPE } from '../utils/const';
+import { STEPS, COUNTRIES, COUNTRIES_AVAILABLES, AD_TYPE, TIMEOUT_750 } from '../utils/const';
 import { PickupComplementField, InputError } from '../templates';
 
-const CartController = (() => {
+const CollectController = (() => {
   const state = {
     inCollect: false,
     pickupSelected: false,
@@ -14,7 +14,8 @@ const CartController = (() => {
   const changeTranslations = () => {
     $('p.vtex-omnishipping-1-x-shippingSectionTitle').text('Collect options');
     $('#change-pickup-button').text('Available pickup points');
-    $('h2.vtex-omnishipping-1-x-geolocationTitle.ask-for-geolocation-title').text('Find nearby Click & Collect points');
+    $('h2.vtex-omnishipping-1-x-geolocationTitle.ask-for-geolocation-title')
+      .text('Find nearby Click & Collect points');
     $('h3.vtex-omnishipping-1-x-subtitle.ask-for-geolocation-subtitle')
       .text('Search for addresses that you frequently use and we\'ll locate stores nearby.');
 
@@ -77,16 +78,22 @@ const CartController = (() => {
     checkForm();
 
     if (state.validForm) {
-      window.vtexjs.checkout.getOrderForm()
-        .then((orderForm) => {
-          const { address } = orderForm.shippingData;
-          address.receiverName = $('#pickup-receiver').val();
-          address.complement = $('#custom-pickup-complement').val();
+      const complement = $('#custom-pickup-complement').val();
 
-          return window.vtexjs.checkout.calculateShipping(address);
-        }).done(() => {
-          window.location.hash = STEPS.PAYMENT;
-        });
+      localStorage.setItem('saving-shipping-collect', true);
+      $('#btn-go-to-payment').trigger('click');
+
+      setTimeout(() => {
+        window.vtexjs.checkout.getOrderForm()
+          .then((orderForm) => {
+            const { address } = orderForm.shippingData;
+            address.complement = complement;
+
+            return window.vtexjs.checkout.calculateShipping(address);
+          }).done(() => {
+            localStorage.removeItem('saving-shipping-collect');
+          });
+      }, TIMEOUT_750);
     }
   };
 
@@ -115,10 +122,18 @@ const CartController = (() => {
       setInputPhone();
 
       /* Set orderForm value if exists */
-      const address = window.vtexjs.checkout.orderForm?.shippingData?.address;
+      const selectedAddress = window.vtexjs.checkout.orderForm?.shippingData?.address;
 
-      if (address && address.complement) {
-        $('input#custom-pickup-complement').val(address.complement).attr('value', address.complement);
+      if (selectedAddress) {
+        let { complement } = selectedAddress;
+
+        if (!complement) {
+          const availableAddressInfo = window.vtexjs.checkout.orderForm.shippingData
+            .availableAddresses.find((address) => address.addressId === selectedAddress.addressId);
+          complement = availableAddressInfo.complement;
+        }
+
+        $('input#custom-pickup-complement').val(complement).attr('value', complement);
       }
     }
   };
@@ -173,14 +188,35 @@ const CartController = (() => {
       $('#box-pickup-complement').remove();
 
       if (window.location.hash === STEPS.PAYMENT) {
-        const address = window.vtexjs.checkout.orderForm?.shippingData?.address;
+        setTimeout(() => {
+          const address = window.vtexjs.checkout.orderForm?.shippingData?.address;
+          const savingCollect = localStorage.getItem('saving-shipping-collect');
 
-        /* Redirect to shipping if required fields are empty */
-        if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !address.complement)) {
-          window.location.hash = STEPS.SHIPPING;
-          localStorage.setItem('shipping-incomplete-values', true);
-        }
+          if (!savingCollect) {
+            /* Redirect to shipping if required fields are empty */
+            if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !address.complement)) {
+              window.location.hash = STEPS.SHIPPING;
+              localStorage.setItem('shipping-incomplete-values', true);
+            }
+          }
+        }, 1000);
       }
+    }
+
+    // eslint-disable-next-line no-use-before-define
+    runCollectObserver();
+  };
+
+  /* We need this observer to detect the change in the deliver and collect buttons */
+  const runCollectObserver = () => {
+    const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+    const observerConfig = { attributes: false, childList: true, characterData: false };
+    const observer = new MutationObserver(() => {
+      runCustomization();
+    });
+
+    if (elementToObserveChange) {
+      observer.observe(elementToObserveChange, observerConfig);
     }
   };
 
@@ -201,4 +237,4 @@ const CartController = (() => {
   };
 })();
 
-export default CartController;
+export default CollectController;
