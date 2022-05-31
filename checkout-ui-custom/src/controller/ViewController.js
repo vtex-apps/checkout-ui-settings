@@ -7,7 +7,8 @@ import {
   RICA_APP,
   FURNITURE_FEES,
   COUNTRIES_AVAILABLES,
-  COUNTRIES
+  COUNTRIES,
+  AD_TYPE
 } from '../utils/const';
 import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
 import { FurnitureForm, TVorRICAMsg, TVIDForm, RICAForm, MixedProducts, AddressForm, SuburbField } from '../templates';
@@ -181,14 +182,16 @@ const ViewController = (() => {
         $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
       };
 
-      const iti = intlTelInput(phoneInput, {
-        initialCountry: COUNTRIES.za.code,
-        onlyCountries: COUNTRIES_AVAILABLES,
-        formatOnDisplay: true,
-        utilsScript, // just for formatting/placeholders etc
-        customPlaceholder
-      });
-      state.intTelInput = iti;
+      if (phoneInput) {
+        const iti = intlTelInput(phoneInput, {
+          initialCountry: COUNTRIES.za.code,
+          onlyCountries: COUNTRIES_AVAILABLES,
+          formatOnDisplay: true,
+          utilsScript, // just for formatting/placeholders etc
+          customPlaceholder
+        });
+        state.intTelInput = iti;
+      }
     };
 
     const saveCustomFieldAddress = () => {
@@ -245,8 +248,12 @@ const ViewController = (() => {
   };
 
   const runCustomization = () => {
-    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
-      setTimeout(() => {
+    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
+
+    if ((window.location.hash === STEPS.SHIPPING && shippingLoaded) || window.location.hash === STEPS.PAYMENT) {
+      const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
+
+      if (!address || (address && address.addressType === AD_TYPE.RESIDENTIAL)) {
         checkCartCategories();
 
         if (window.location.hash === STEPS.SHIPPING) {
@@ -259,29 +266,31 @@ const ViewController = (() => {
             $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
           }
         } else if (window.location.hash === STEPS.PAYMENT) {
-          if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
-            let isDataCompleted = localStorage.getItem('shippingDataCompleted');
+          setTimeout(() => {
+            if ((state.showFurnitureForm || state.showRICAForm || state.showTVIDForm)) {
+              let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 
-            if (!isDataCompleted) {
-              setTimeout(async () => {
-                if (state.showRICAForm) {
-                  isDataCompleted = ricaFieldsCompleted();
-                }
+              if (!isDataCompleted) {
+                setTimeout(async () => {
+                  if (state.showRICAForm) {
+                    isDataCompleted = ricaFieldsCompleted();
+                  }
 
-                if (state.showFurnitureForm || state.showTVIDForm) {
-                  isDataCompleted = await shippingCustomDataCompleted();
-                }
+                  if (state.showFurnitureForm || state.showTVIDForm) {
+                    isDataCompleted = await shippingCustomDataCompleted();
+                  }
 
-                if (!isDataCompleted) {
-                  window.location.hash = STEPS.SHIPPING;
-                }
-              }, TIMEOUT_750);
-            } else {
-              waitAndResetLocalStorage();
+                  if (!isDataCompleted) {
+                    window.location.hash = STEPS.SHIPPING;
+                  }
+                }, TIMEOUT_750);
+              } else {
+                waitAndResetLocalStorage();
+              }
             }
-          }
+          }, TIMEOUT_500);
         }
-      }, TIMEOUT_500);
+      }
     }
   };
 
@@ -294,7 +303,7 @@ const ViewController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {};
+  const publicInit = () => { };
 
   return {
     init: publicInit,
