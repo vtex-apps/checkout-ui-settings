@@ -6,6 +6,12 @@ const STEPS = {
   PAYMENT: '#/payment'
 };
 
+// Address types
+const AD_TYPE = {
+  PICKUP: 'search',
+  DELIVERY: 'residential'
+};
+
 // TIMEOUT
 const TIMEOUT_500 = 500;
 const TIMEOUT_750 = 750;
@@ -28,5 +34,6 @@ export {
   RICA_APP,
   FURNITURE_FEES,
   COUNTRIES,
-  COUNTRIES_AVAILABLES
+  COUNTRIES_AVAILABLES,
+  AD_TYPE
 };

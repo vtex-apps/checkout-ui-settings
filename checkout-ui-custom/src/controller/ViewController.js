@@ -1,5 +1,4 @@
 import intlTelInput from 'intl-tel-input';
-import utilsScript from 'intl-tel-input/build/js/utils';
 import {
   STEPS,
   TIMEOUT_500,
@@ -7,7 +6,8 @@ import {
   RICA_APP,
   FURNITURE_FEES,
   COUNTRIES_AVAILABLES,
-  COUNTRIES
+  COUNTRIES,
+  AD_TYPE
 } from '../utils/const';
 import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
 import {
@@ -261,9 +261,13 @@ const ViewController = (() => {
       }
     }, TIMEOUT_500);
 
+    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
+
     /* Adding custom sections */
-    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
-      setTimeout(() => {
+    if ((window.location.hash === STEPS.SHIPPING && shippingLoaded) || window.location.hash === STEPS.PAYMENT) {
+      const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
+
+      if (!address || (address && address.addressType === AD_TYPE.RESIDENTIAL)) {
         if (window.location.hash === STEPS.SHIPPING) {
           console.log('!! SHIPPING STEP - STATE', state);
           showCustomSections();
@@ -323,7 +327,7 @@ const ViewController = (() => {
             }
           }
         }
-      }, TIMEOUT_500);
+      }
     }
   };
 

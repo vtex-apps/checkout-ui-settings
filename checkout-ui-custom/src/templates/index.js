@@ -4,7 +4,7 @@ import TVIDForm from './TVIDForm';
 import RICAForm from './RICAForm';
 import InputError from './InputError';
 import MixedProducts from './MixedProducts';
-import AddressForm, { SuburbField } from './AddressForm';
+import AddressForm, { SuburbField, PickupComplementField } from './AddressForm';
 import AlertBox from './AlertBox';
 
 export {
@@ -15,5 +15,6 @@ export {
   MixedProducts,
   AddressForm,
   SuburbField,
-  AlertBox
+  AlertBox,
+  PickupComplementField
 };
