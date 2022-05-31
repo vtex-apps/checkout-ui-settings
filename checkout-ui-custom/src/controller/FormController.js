@@ -1,7 +1,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable func-names */
-import { STEPS, TIMEOUT_500, TIMEOUT_750, RICA_APP } from '../utils/const';
+import { STEPS, TIMEOUT_750, RICA_APP } from '../utils/const';
 import { saveAddress, checkoutSendCustomData, setRicaFields, setMasterdataFields } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
@@ -236,13 +236,17 @@ const FormController = (() => {
     }
   };
 
-  const runCustomization = () => {
-    if (window.location.hash === STEPS.SHIPPING) {
-      setTimeout(async () => {
+  const runCustomization = async () => {
+    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
+
+    if (window.location.hash === STEPS.SHIPPING && shippingLoaded) {
+      const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
+
+      if (selectedDelivery) {
         addCustomBtnPayment();
         addCustomGoToShippingBtn();
         await setDataInCustomFields();
-      }, TIMEOUT_500);
+      }
     }
   };
 
@@ -296,7 +300,7 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {};
+  const publicInit = () => { };
 
   return {
     init: publicInit,
