@@ -23,7 +23,7 @@ const getShippingData = async (addressName, fields) => {
   return data;
 };
 
-const saveAddress = async (fields = {}) => {
+const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
   let path;
   const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
@@ -58,10 +58,15 @@ const saveAddress = async (fields = {}) => {
 
   await fetch(path, options)
     .then((res) => {
-      localStorage.setItem('shippingDataCompleted', true);
+      if (shippingDataCompleted) {
+        localStorage.setItem('shippingDataCompleted', true);
+      }
+
+      /*  The field created to control the "Address correctly saved" message is removed */
       if (localStorage.getItem('custom-address-form-fields')) {
         localStorage.removeItem('custom-address-form-fields');
       }
+
       /* Update orderForm.shippingData */
       window.vtexjs.checkout.calculateShipping(newAddress);
 

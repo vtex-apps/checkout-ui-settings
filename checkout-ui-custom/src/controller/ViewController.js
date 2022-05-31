@@ -109,6 +109,8 @@ const ViewController = (() => {
 
       const customShippingInfo = await getShippingData(addressId, fields);
 
+      console.log('!! shippingCustomDataCompleted - customShippingInfo', customShippingInfo);
+
       if (customShippingInfo) {
         let furnitureCompleted = false;
         let tvCompleted = false;
@@ -142,6 +144,8 @@ const ViewController = (() => {
 
     const ricaFields = checkoutGetCustomData(RICA_APP);
 
+    console.log('!! ricaFieldsCompleted', ricaFields);
+
     if (
       ricaFields
       && ricaFields.idOrPassport
@@ -160,6 +164,9 @@ const ViewController = (() => {
 
   const isAddressFormCompleted = () => {
     const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
+    console.log('!! isAddressFormCompleted - complement', address?.complement);
+    console.log('!! isAddressFormCompleted - receiverName', address?.receiverName);
+    console.log('!! isAddressFormCompleted - neighborhood', address?.neighborhood);
     return (address?.complement && address?.receiverName && address?.neighborhood);
   };
 
