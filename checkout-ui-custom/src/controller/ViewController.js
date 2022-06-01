@@ -1,12 +1,9 @@
-import intlTelInput from 'intl-tel-input';
 import {
   STEPS,
   TIMEOUT_500,
   TIMEOUT_750,
   RICA_APP,
   FURNITURE_FEES,
-  COUNTRIES_AVAILABLES,
-  COUNTRIES,
   AD_TYPE
 } from '../utils/const';
 import {
@@ -22,9 +19,7 @@ import {
   TVorRICAMsg,
   TVIDForm,
   RICAForm,
-  MixedProducts,
-  AddressForm,
-  SuburbField
+  MixedProducts
 } from '../templates';
 import CartController from './CartController';
 import 'intl-tel-input/build/css/intlTelInput.css';
@@ -111,8 +106,8 @@ const ViewController = (() => {
 
     if (window.vtexjs.checkout.orderForm && window.vtexjs.checkout.orderForm.shippingData.address) {
       const { addressId } = window.vtexjs.checkout.orderForm.shippingData.address;
-      const fields = '?_fields=companyBuilding,furnitureReady,buildingType,parkingDistance,'
-        + 'deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+      const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace'
+        + ',assembleFurniture,tvID';
 
       const customShippingInfo = await getShippingData(addressId, fields);
 
@@ -165,88 +160,9 @@ const ViewController = (() => {
     return validData;
   };
 
-  const isAddressFormCompleted = () => {
-    const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
-    return (address?.complement && address?.receiverName && address?.neighborhood);
-  };
-
-  const addAddressFormFields = () => {
-    const setInputPhone = () => {
-      const customPlaceholder = (_, selectedCountryData) => {
-        $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
-        return '';
-      };
-
-      const phoneInput = document.querySelector('.custom-field-complement input');
-      if (phoneInput) {
-        const iti = intlTelInput(phoneInput, {
-          initialCountry: COUNTRIES.za.code,
-          onlyCountries: COUNTRIES_AVAILABLES,
-          customPlaceholder
-        });
-
-        state.intTelInput = iti;
-      }
-    };
-
-    const saveCustomFieldAddress = () => {
-      $('.tfg-custom-addressForm input').change((event) => {
-        const field = event.target;
-        const fieldName = field.getAttribute('field');
-        const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
-
-        fields[fieldName] = field.value;
-
-        localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
-      });
-    };
-
-    // Insert elements
-    const isAddressFormFieldsAdded = !!$('.tfg-custom-addressForm').length;
-    if (!isAddressFormFieldsAdded) {
-      $('.vcustom--vtex-omnishipping-1-x-address form').prepend(AddressForm());
-      $('.vcustom--vtex-omnishipping-1-x-address__state').prepend(SuburbField());
-      setInputPhone();
-      saveCustomFieldAddress();
-    }
-  };
-
-  const setValueToReceiverAndComplement = () => {
-    const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
-    const { firstName, lastName, phone } = window.vtexjs.checkout.orderForm.clientProfileData;
-
-    fields.receiverName = `${firstName} ${lastName}`;
-    fields.complement = phone;
-
-    $('#custom-field-receiverName').val(fields.receiverName).attr('value', fields.receiverName);
-    $('#custom-field-complement').val(fields.complement).attr('value', fields.complement);
-    $('#custom-field-complement').attr('placeholder', fields.complement || '');
-
-    localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
-  };
-
-  const toggleGoogleInput = () => {
-    if (!$('#v-custom-ship-street').val()) {
-      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-      const selector = `.custom-field-receiverName,
-        .custom-field-complement, .custom-field-companyBuilding,
-        .vcustom--vtex-omnishipping-1-x-address__state,
-          .v-custom-ship-info, .btn-go-to-shipping-wrapper`;
-      $(selector).hide();
-      $('.v-custom-ship-street label').text('Add a new delivery address');
-      $('#v-custom-ship-street').attr('placeholder', 'Search for address');
-
-      $('#v-custom-ship-street').one('change', () => {
-        $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-        $(selector).show();
-        $('.v-custom-ship-street label').text('Street address');
-        $('#v-custom-ship-street').attr(
-          'placeholder',
-          'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
-        );
-        setValueToReceiverAndComplement();
-      });
-    }
+  const isAddressFormCompleted = (address) => {
+    console.log('!! address', address);
+    return (address.complement && address.receiverName && address.neighborhood);
   };
 
   const setDataInCustomFields = async () => {
@@ -281,28 +197,18 @@ const ViewController = (() => {
       setTimeout(() => {
         const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
 
-        if (!address || (address && address.addressType === AD_TYPE.DELIVERY)) {
+        if (address && address.addressType === AD_TYPE.DELIVERY) {
           if (window.location.hash === STEPS.SHIPPING) {
-            addAddressFormFields();
-            toggleGoogleInput();
-
-            if (address) {
-              setTimeout(() => {
-                showCustomSections();
-                setDataInCustomFields();
-              }, TIMEOUT_500);
-            }
+            setTimeout(() => {
+              showCustomSections();
+              setDataInCustomFields();
+            }, TIMEOUT_750);
           } else if (window.location.hash === STEPS.PAYMENT) {
-            const isAddressCompleted = isAddressFormCompleted();
+            const isAddressCompleted = isAddressFormCompleted(address);
 
             if (!isAddressCompleted) {
               window.location.hash = STEPS.SHIPPING;
-              setTimeout(() => {
-                const addressEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress').length > 0
-                  ? $('.vtex-omnishipping-1-x-buttonEditAddress')
-                  : $('.vtex-omnishipping-1-x-linkEdit');
-                addressEditSelector.trigger('click');
-              }, TIMEOUT_750);
+              return;
             }
 
             if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
@@ -328,7 +234,7 @@ const ViewController = (() => {
             }
           }
         }
-      }, 1000);
+      }, TIMEOUT_750);
     }
   };
 
@@ -339,12 +245,6 @@ const ViewController = (() => {
 
   $(window).on('hashchange orderFormUpdated.vtex', () => {
     runCustomization();
-  });
-
-  $(document).on('click', '.vtex-omnishipping-1-x-addressList #new-address-button', () => {
-    /* Empty custom fields for new address & set default values */
-    $('.tfg-custom-addressForm input').val('').attr('value', '');
-    setValueToReceiverAndComplement();
   });
 
   $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
