@@ -9,7 +9,14 @@ import {
   COUNTRIES,
   AD_TYPE
 } from '../utils/const';
-import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
+import {
+  getShippingData,
+  addBorderTop,
+  waitAndResetLocalStorage,
+  checkoutGetCustomData,
+  setMasterdataFields,
+  setRicaFields
+} from '../utils/functions';
 import {
   FurnitureForm,
   TVorRICAMsg,
@@ -109,8 +116,6 @@ const ViewController = (() => {
 
       const customShippingInfo = await getShippingData(addressId, fields);
 
-      console.log('!! shippingCustomDataCompleted - customShippingInfo', customShippingInfo);
-
       if (customShippingInfo) {
         let furnitureCompleted = false;
         let tvCompleted = false;
@@ -144,8 +149,6 @@ const ViewController = (() => {
 
     const ricaFields = checkoutGetCustomData(RICA_APP);
 
-    console.log('!! ricaFieldsCompleted', ricaFields);
-
     if (
       ricaFields
       && ricaFields.idOrPassport
@@ -164,9 +167,6 @@ const ViewController = (() => {
 
   const isAddressFormCompleted = () => {
     const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
-    console.log('!! isAddressFormCompleted - complement', address?.complement);
-    console.log('!! isAddressFormCompleted - receiverName', address?.receiverName);
-    console.log('!! isAddressFormCompleted - neighborhood', address?.neighborhood);
     return (address?.complement && address?.receiverName && address?.neighborhood);
   };
 
@@ -249,6 +249,21 @@ const ViewController = (() => {
     }
   };
 
+  const setDataInCustomFields = async () => {
+    if (window.vtexjs.checkout.orderForm) {
+      const { address } = window.vtexjs.checkout.orderForm.shippingData;
+      const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
+
+      if (showRICAForm) {
+        setRicaFields();
+      }
+
+      if (address) {
+        await setMasterdataFields(showFurnitureForm, showTVIDForm);
+      }
+    }
+  };
+
   const runCustomization = () => {
     /* Hiding subheader when there is furniture in cart */
     setTimeout(() => {
@@ -261,73 +276,59 @@ const ViewController = (() => {
       }
     }, TIMEOUT_500);
 
-    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
-
     /* Adding custom sections */
-    if ((window.location.hash === STEPS.SHIPPING && shippingLoaded) || window.location.hash === STEPS.PAYMENT) {
-      const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
+    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
+      setTimeout(() => {
+        const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
 
-      if (!address || (address && address.addressType === AD_TYPE.RESIDENTIAL)) {
-        if (window.location.hash === STEPS.SHIPPING) {
-          console.log('!! SHIPPING STEP - STATE', state);
-          showCustomSections();
-          addAddressFormFields();
-          toggleGoogleInput();
+        if (!address || (address && address.addressType === AD_TYPE.DELIVERY)) {
+          if (window.location.hash === STEPS.SHIPPING) {
+            addAddressFormFields();
+            toggleGoogleInput();
 
-          // This button has a bug an needs to be clicked in two times; I trigger once to improve UX
-          if ($('button.vtex-omnishipping-1-x-btnDelivery').length > 0) {
-            $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
-          }
-        } else if (window.location.hash === STEPS.PAYMENT) {
-          const isAddressCompleted = isAddressFormCompleted();
-
-          console.log('!! isAddressCompleted', isAddressCompleted);
-
-          if (!isAddressCompleted) {
-            window.location.hash = STEPS.SHIPPING;
-            setTimeout(() => {
-              const addressEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress').length > 0
-                ? $('.vtex-omnishipping-1-x-buttonEditAddress')
-                : $('.vtex-omnishipping-1-x-linkEdit');
-              addressEditSelector.trigger('click');
-              /* Hay que dar un tiempo a VTEX para completar los campos y que estos no aparezcan con error */
+            if (address) {
               setTimeout(() => {
-                $('#custom-btn-go-to-shippping-method').trigger('click');
+                showCustomSections();
+                setDataInCustomFields();
+              }, TIMEOUT_500);
+            }
+          } else if (window.location.hash === STEPS.PAYMENT) {
+            const isAddressCompleted = isAddressFormCompleted();
+
+            if (!isAddressCompleted) {
+              window.location.hash = STEPS.SHIPPING;
+              setTimeout(() => {
+                const addressEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress').length > 0
+                  ? $('.vtex-omnishipping-1-x-buttonEditAddress')
+                  : $('.vtex-omnishipping-1-x-linkEdit');
+                addressEditSelector.trigger('click');
               }, TIMEOUT_750);
-            }, TIMEOUT_750);
-          }
+            }
 
-          console.log('!! state.showFurnitureForm', state.showFurnitureForm);
-          console.log('!! state.showRICAForm', state.showRICAForm);
-          console.log('!! state.showTVIDForm', state.showTVIDForm);
+            if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
+              let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 
-          if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
-            let isDataCompleted = localStorage.getItem('shippingDataCompleted');
+              if (!isDataCompleted) {
+                setTimeout(async () => {
+                  if (state.showRICAForm) {
+                    isDataCompleted = ricaFieldsCompleted();
+                  }
 
-            console.log('!! isDataCompleted', isDataCompleted);
+                  if (state.showFurnitureForm || state.showTVIDForm) {
+                    isDataCompleted = await shippingCustomDataCompleted();
+                  }
 
-            if (!isDataCompleted) {
-              setTimeout(async () => {
-                if (state.showRICAForm) {
-                  isDataCompleted = ricaFieldsCompleted();
-                }
-
-                if (state.showFurnitureForm || state.showTVIDForm) {
-                  isDataCompleted = await shippingCustomDataCompleted();
-                }
-
-                console.log('!! isDataCompleted', isDataCompleted);
-
-                if (!isDataCompleted) {
-                  window.location.hash = STEPS.SHIPPING;
-                }
-              }, TIMEOUT_750);
-            } else {
-              waitAndResetLocalStorage();
+                  if (!isDataCompleted) {
+                    window.location.hash = STEPS.SHIPPING;
+                  }
+                }, TIMEOUT_750);
+              } else {
+                waitAndResetLocalStorage();
+              }
             }
           }
         }
-      }
+      }, 1000);
     }
   };
 
@@ -344,6 +345,10 @@ const ViewController = (() => {
     /* Empty custom fields for new address & set default values */
     $('.tfg-custom-addressForm input').val('').attr('value', '');
     setValueToReceiverAndComplement();
+  });
+
+  $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
+    setDataInCustomFields();
   });
 
   const publicInit = () => { };

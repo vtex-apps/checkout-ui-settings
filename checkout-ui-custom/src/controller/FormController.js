@@ -3,10 +3,9 @@ import { STEPS, TIMEOUT_750, RICA_APP } from '../utils/const';
 import {
   saveAddress,
   checkoutSendCustomData,
-  setRicaFields,
-  setMasterdataFields
+  setRicaFields
 } from '../utils/functions';
-import { InputError, AlertBox } from '../templates';
+import { InputError } from '../templates';
 import ViewController from './ViewController';
 
 const FormController = (() => {
@@ -15,9 +14,6 @@ const FormController = (() => {
   };
 
   const checkField = (field) => {
-    console.log('!! valida campo:', field);
-    console.log('!! valor:', $(`#${field}`).val());
-
     if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
       $(`.${field}`).addClass('error');
       $(`.${field}`).append(InputError);
@@ -41,8 +37,7 @@ const FormController = (() => {
       'ship-number',
       'custom-field-receiverName',
       'custom-field-neighborhood',
-      'ship-postalCode',
-      'ship-state'
+      'ship-postalCode'
     ];
 
     /* When the list of addresses appears,
@@ -104,9 +99,7 @@ const FormController = (() => {
     return true;
   };
 
-  const checkForms = () => {
-    const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
-
+  const checkForms = (showFurnitureForm = false, showRICAForm = false, showTVIDForm = false) => {
     // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
@@ -165,7 +158,8 @@ const FormController = (() => {
   const saveShippingForm = () => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
-    checkForms();
+    checkForms(showFurnitureForm, showRICAForm, showTVIDForm);
+
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
@@ -185,10 +179,11 @@ const FormController = (() => {
         Object.assign(masterdataFields, getTVFormFields());
       }
 
-      saveAddress(masterdataFields);
+      saveAddress(masterdataFields, true);
 
       setTimeout(() => {
-        $('#btn-go-to-payment').trigger('click');
+        // $('#btn-go-to-payment').trigger('click');
+        window.location.hash = STEPS.PAYMENT;
       }, TIMEOUT_750);
     }
   };
@@ -215,21 +210,13 @@ const FormController = (() => {
     checkForms();
 
     if (state.validForm) {
+      $('#btn-go-to-shippping-method').trigger('click');
+
       setTimeout(() => {
-        $('#btn-go-to-shippping-method').trigger('click');
-
-        setTimeout(() => {
-          /* Show success msg */
-          $('p.delivery-address-title').prepend(AlertBox('Address added', 'success'));
-          const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
-          saveAddress(addressFormFields);
-
-          /* Hide success msg */
-          setTimeout(() => {
-            $('p.delivery-address-title .tfg-custom-msg').fadeOut();
-          }, 2000);
-        }, 3500);
-      }, TIMEOUT_750);
+        const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
+        saveAddress(addressFormFields);
+      }, 4500);
+      /* I give more time than necessary to make sure that VTEX saves correctly in the first step */
     }
   };
 
@@ -251,31 +238,13 @@ const FormController = (() => {
     }
   };
 
-  const setDataInCustomFields = async () => {
-    if (window.vtexjs.checkout.orderForm) {
-      const { address } = window.vtexjs.checkout.orderForm.shippingData;
-      const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
-
-      if (showRICAForm) {
-        setRicaFields();
-      }
-
-      if (address) {
-        await setMasterdataFields(showFurnitureForm, showTVIDForm);
-      }
-    }
-  };
-
-  const runCustomization = async () => {
-    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
-
-    if (window.location.hash === STEPS.SHIPPING && shippingLoaded) {
+  const runCustomization = () => {
+    if (window.location.hash === STEPS.SHIPPING) {
       const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
 
       if (selectedDelivery) {
         addCustomBtnPayment();
         addCustomGoToShippingBtn();
-        await setDataInCustomFields();
       }
     }
   };
@@ -319,10 +288,6 @@ const FormController = (() => {
     } else {
       $('.rica-field').val('');
     }
-  });
-
-  $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
-    setDataInCustomFields();
   });
 
   // EVENTS SUBSCRIPTION

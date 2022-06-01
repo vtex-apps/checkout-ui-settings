@@ -1,5 +1,18 @@
 /* eslint-disable import/prefer-default-export */
-import { RICA_APP } from './const';
+import { RICA_APP, TIMEOUT_500 } from './const';
+import { AlertBox } from '../templates';
+
+const showSuccessMsg = () => {
+  setTimeout(() => {
+    $('p.delivery-address-title').prepend(AlertBox('Address added', 'success'));
+  }, TIMEOUT_500);
+};
+
+const hideSuccessMsg = () => {
+  if ($('p.delivery-address-title .tfg-custom-msg').length > 0) {
+    $('p.delivery-address-title .tfg-custom-msg').fadeOut();
+  }
+};
 
 // API Functions
 const getShippingData = async (addressName, fields) => {
@@ -28,10 +41,12 @@ const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
   const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
-  // AD already exists (?)
-  const savedAddress = await getShippingData(address.addressId, '?_fields=id');
+  if (!address) return;
 
-  if (savedAddress.id) {
+  // AD already exists (?)
+  const savedAddress = address?.addressId ? await getShippingData(address.addressId, '?_fields=id') : {};
+
+  if (savedAddress?.id) {
     path = `/custom-api/masterdata/address/${savedAddress.id}`;
   } else {
     path = '/custom-api/masterdata/addresses';
@@ -43,8 +58,6 @@ const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
     ...address,
     ...fields
   };
-
-  console.log('!! newAddress', newAddress);
 
   if (!savedAddress.id) {
     newAddress.addressName = address.addressId;
@@ -60,18 +73,22 @@ const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
     .then((res) => {
       if (shippingDataCompleted) {
         localStorage.setItem('shippingDataCompleted', true);
+      } else {
+        showSuccessMsg();
       }
 
-      /*  The field created to control the "Address correctly saved" message is removed */
       if (localStorage.getItem('custom-address-form-fields')) {
         localStorage.removeItem('custom-address-form-fields');
       }
 
-      /* Update orderForm.shippingData */
-      window.vtexjs.checkout.calculateShipping(newAddress);
-
       if (res.status !== 204) {
         res.json();
+        setTimeout(() => {
+          if (!shippingDataCompleted) {
+            window.vtexjs.checkout.calculateShipping(newAddress);
+            hideSuccessMsg();
+          }
+        }, 3000);
       }
     })
     .catch((error) => console.log(error));
@@ -172,9 +189,7 @@ const checkoutSendCustomData = (appId, customData) => {
 const setRicaFields = (getDataFrom = 'customApps') => {
   let ricaFields;
 
-  if (getDataFrom === 'customApps') {
-    ricaFields = checkoutGetCustomData(RICA_APP);
-  } else if (getDataFrom === 'shippingAddress') {
+  if (getDataFrom === 'shippingAddress') {
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     ricaFields = {
@@ -187,6 +202,8 @@ const setRicaFields = (getDataFrom = 'customApps') => {
       postalCode: address.postalCode,
       province: address.state
     };
+  } else if (getDataFrom === 'customApps') {
+    ricaFields = checkoutGetCustomData(RICA_APP);
   }
 
   if (ricaFields && !jQuery.isEmptyObject(ricaFields)) {
