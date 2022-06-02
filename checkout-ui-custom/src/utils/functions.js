@@ -77,10 +77,6 @@ const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
         showSuccessMsg();
       }
 
-      if (localStorage.getItem('custom-address-form-fields')) {
-        localStorage.removeItem('custom-address-form-fields');
-      }
-
       if (res.status !== 204) {
         res.json();
         setTimeout(() => {
@@ -100,38 +96,12 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
-    const fields = '?_fields=receiverName,complement,companyBuilding,neighborhood,buildingType,'
-      + 'parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace'
+      + ',assembleFurniture,tvID';
 
     const shippingData = await getShippingData(address.addressId, fields);
 
     if (shippingData && !jQuery.isEmptyObject(shippingData)) {
-      $('#custom-field-receiverName')
-        .val(shippingData.receiverName)
-        .attr('value', shippingData.receiverName);
-
-      $('#custom-field-complement')
-        .val(shippingData.complement)
-        .attr('value', shippingData.complement);
-
-      $('#custom-field-companyBuilding')
-        .val(shippingData.companyBuilding)
-        .attr('value', shippingData.companyBuilding);
-
-      $('#custom-field-neighborhood')
-        .val(shippingData.neighborhood)
-        .attr('value', shippingData.neighborhood);
-
-      /* Adding correct data to localStorage */
-      const customFields = {
-        receiverName: shippingData.receiverName,
-        complement: shippingData.complement,
-        companyBuilding: shippingData.companyBuilding,
-        neighborhood: shippingData.neighborhood
-      };
-
-      localStorage.setItem('custom-address-form-fields', JSON.stringify(customFields));
-
       /* Setting furniture form values */
       if (completeFurnitureForm) {
         $('#tfg-building-type').val(shippingData.buildingType);

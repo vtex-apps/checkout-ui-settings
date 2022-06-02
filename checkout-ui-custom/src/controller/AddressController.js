@@ -17,6 +17,7 @@ const AddressController = (() => {
 
   const setInputPhone = () => {
     const phoneInput = document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement');
+    phoneInput.setAttribute('placeholder', '');
 
     const customPlaceholder = (_, selectedCountryData) => {
       $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
@@ -30,7 +31,6 @@ const AddressController = (() => {
         customPlaceholder
       });
       state.intTelInput = iti;
-      phoneInput.setAttribute('placeholder', '');
     }
   };
 
@@ -61,7 +61,7 @@ const AddressController = (() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
 
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
-          setInputPhone('.vtex-omnishipping-1-x-address input#ship-complement');
+          setInputPhone();
           toggleGoogleInput();
         }
       }, TIMEOUT_500);

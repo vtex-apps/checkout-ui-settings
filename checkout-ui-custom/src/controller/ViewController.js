@@ -22,7 +22,6 @@ import {
   MixedProducts
 } from '../templates';
 import CartController from './CartController';
-import 'intl-tel-input/build/css/intlTelInput.css';
 
 const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"`
   + 'target="_blank">Furniture delivery costs</a>';
@@ -33,10 +32,7 @@ const ViewController = (() => {
     showTVIDForm: false,
     showRICAForm: false,
     showTVorRICAMsg: false,
-    showMixedProductsMsg: false,
-    intTelInput: {},
-    captureGoogleInputOnChange: false,
-    captureAddressListOnChange: false
+    showMixedProductsMsg: false
   };
 
   const checkCartCategories = () => {
@@ -160,8 +156,8 @@ const ViewController = (() => {
     return validData;
   };
 
-  const isAddressFormCompleted = (address) => {
-    console.log('!! address', address);
+  const isAddressFormCompleted = () => {
+    const { address } = window.vtexjs.checkout.orderForm.shippingData;
     return (address.complement && address.receiverName && address.neighborhood);
   };
 
@@ -204,18 +200,16 @@ const ViewController = (() => {
               setDataInCustomFields();
             }, TIMEOUT_750);
           } else if (window.location.hash === STEPS.PAYMENT) {
-            const isAddressCompleted = isAddressFormCompleted(address);
+            setTimeout(async () => {
+              if (!isAddressFormCompleted()) {
+                window.location.hash = STEPS.SHIPPING;
+                return;
+              }
 
-            if (!isAddressCompleted) {
-              window.location.hash = STEPS.SHIPPING;
-              return;
-            }
+              if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
+                let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 
-            if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
-              let isDataCompleted = localStorage.getItem('shippingDataCompleted');
-
-              if (!isDataCompleted) {
-                setTimeout(async () => {
+                if (!isDataCompleted) {
                   if (state.showRICAForm) {
                     isDataCompleted = ricaFieldsCompleted();
                   }
@@ -227,11 +221,11 @@ const ViewController = (() => {
                   if (!isDataCompleted) {
                     window.location.hash = STEPS.SHIPPING;
                   }
-                }, TIMEOUT_750);
-              } else {
-                waitAndResetLocalStorage();
+                } else {
+                  waitAndResetLocalStorage();
+                }
               }
-            }
+            }, 1500);
           }
         }
       }, TIMEOUT_750);

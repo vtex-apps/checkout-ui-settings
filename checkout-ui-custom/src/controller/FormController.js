@@ -7,6 +7,7 @@ import {
 } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
+import AddressController from './AddressController';
 
 const FormController = (() => {
   const state = {
@@ -50,35 +51,33 @@ const FormController = (() => {
     checkFields(ricaFields);
   };
 
-  const isValidAddressForm = () => {
-    if (!state.validForm) {
-      const addressListEditSelector = $('.vtex-omnishipping-1-x-buttonEditAddress');
-      const addressItemEditSelector = $('.vtex-omnishipping-1-x-linkEdit');
-      if (addressListEditSelector.length) {
-        addressListEditSelector.trigger('click');
-      } else {
-        addressItemEditSelector.trigger('click');
-      }
-      return false;
-    }
-    return true;
-  };
-
   const checkForm = () => {
     // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
 
-    if (!isValidAddressForm()) return;
+    /* Checking Receiver & Receiver Phone */
+    checkField('ship-receiverName');
 
+    if (!AddressController.state.intTelInput) return;
+    if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
+
+    if (!AddressController.state.intTelInput.isValidNumber()) {
+      $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
+      $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
+      $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
+      state.validForm = false;
+    } else {
+      $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error');
+    }
+
+    /* Checking Custom Fields */
     if (ViewController.state.showFurnitureForm) {
       checkFurnitureForm();
     }
-
     if (ViewController.state.showRICAForm) {
       checkRICAForm();
     }
-
     if (ViewController.state.showTVIDForm) {
       checkField('tfg-tv-licence');
     }
@@ -143,9 +142,7 @@ const FormController = (() => {
       saveAddress(masterdataFields, true);
 
       setTimeout(() => {
-        //! TODO: REVISAR
-        // $('#btn-go-to-payment').trigger('click');
-        window.location.hash = STEPS.PAYMENT;
+        $('#btn-go-to-payment').trigger('click');
       }, TIMEOUT_750);
     }
   };
@@ -169,10 +166,12 @@ const FormController = (() => {
 
   const runCustomization = () => {
     if (window.location.hash === STEPS.SHIPPING) {
-      const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
-      if (selectedDelivery) {
-        addCustomBtnPayment();
-      }
+      setTimeout(() => {
+        const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
+        if (selectedDelivery) {
+          addCustomBtnPayment();
+        }
+      }, TIMEOUT_750);
     }
   };
 
@@ -215,6 +214,10 @@ const FormController = (() => {
     } else {
       $('.rica-field').val('');
     }
+  });
+
+  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+    runCustomization();
   });
 
   // EVENTS SUBSCRIPTION
