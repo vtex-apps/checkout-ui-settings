@@ -57,18 +57,20 @@ const FormController = (() => {
     state.validForm = true;
 
     /* Checking Receiver & Receiver Phone */
-    checkField('ship-receiverName');
+    if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {
+      checkField('ship-receiverName');
 
-    if (!AddressController.state.intTelInput) return;
-    if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
+      if (!AddressController.state.intTelInput) return;
+      if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
 
-    if (!AddressController.state.intTelInput.isValidNumber()) {
-      $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
-      $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
-      $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
-      state.validForm = false;
-    } else {
-      $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error');
+      if (!AddressController.state.intTelInput.isValidNumber()) {
+        $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
+        $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
+        $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
+        state.validForm = false;
+      } else {
+        $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error');
+      }
     }
 
     /* Checking Custom Fields */
@@ -121,6 +123,8 @@ const FormController = (() => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
     checkForm();
+
+    console.log('!! saveShippingForm - state', state);
 
     if (state.validForm) {
       // Fields saved in orderForm
