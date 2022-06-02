@@ -17,7 +17,6 @@ const AddressController = (() => {
 
   const setInputPhone = () => {
     const phoneInput = document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement');
-    phoneInput.setAttribute('placeholder', '');
 
     const customPlaceholder = (_, selectedCountryData) => {
       $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
@@ -25,12 +24,21 @@ const AddressController = (() => {
     };
 
     if (phoneInput) {
+      phoneInput.setAttribute('placeholder', '');
+
       const iti = intlTelInput(phoneInput, {
         initialCountry: COUNTRIES.za.code,
         onlyCountries: COUNTRIES_AVAILABLES,
         customPlaceholder
       });
       state.intTelInput = iti;
+
+      if (!phoneInput.value) {
+        phoneInput.value = window.vtexjs.checkout.orderForm.shippingData.address.complement || '';
+        phoneInput.setAttribute('value', window.vtexjs.checkout.orderForm.shippingData.address.complement || '');
+      }
+
+      phoneInput.focus();
     }
   };
 
@@ -75,6 +83,16 @@ const AddressController = (() => {
 
   $(window).on('hashchange orderFormUpdated.vtex', () => {
     runCustomization();
+  });
+
+  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+    setTimeout(() => {
+      if (!$('#ship-complement').val()) {
+        $('#ship-complement')
+          .val(window.vtexjs.checkout.orderForm.shippingData.address.complement || '')
+          .attr('value', window.vtexjs.checkout.orderForm.shippingData.address.complement || '');
+      }
+    }, TIMEOUT_500);
   });
 
   const publicInit = () => { };

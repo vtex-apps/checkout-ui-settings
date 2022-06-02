@@ -158,7 +158,7 @@ const ViewController = (() => {
 
   const isAddressFormCompleted = () => {
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
-    return (address.complement && address.receiverName && address.neighborhood);
+    return (!!(address.complement && address.receiverName));
   };
 
   const setDataInCustomFields = async () => {
@@ -199,33 +199,31 @@ const ViewController = (() => {
               showCustomSections();
               setDataInCustomFields();
             }, TIMEOUT_750);
+
+            // eslint-disable-next-line no-use-before-define
+            runViewObserver();
           } else if (window.location.hash === STEPS.PAYMENT) {
             setTimeout(async () => {
-              if (!isAddressFormCompleted()) {
-                window.location.hash = STEPS.SHIPPING;
-                return;
-              }
+              let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 
-              if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
-                let isDataCompleted = localStorage.getItem('shippingDataCompleted');
-
-                if (!isDataCompleted) {
+              if (isDataCompleted) {
+                waitAndResetLocalStorage();
+              } else {
+                isDataCompleted = isAddressFormCompleted();
+                if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
                   if (state.showRICAForm) {
                     isDataCompleted = ricaFieldsCompleted();
                   }
-
                   if (state.showFurnitureForm || state.showTVIDForm) {
                     isDataCompleted = await shippingCustomDataCompleted();
                   }
+                }
 
-                  if (!isDataCompleted) {
-                    window.location.hash = STEPS.SHIPPING;
-                  }
-                } else {
-                  waitAndResetLocalStorage();
+                if (!isDataCompleted) {
+                  window.location.hash = STEPS.SHIPPING;
                 }
               }
-            }, 1500);
+            }, 1750);
           }
         }
       }, TIMEOUT_750);
@@ -241,9 +239,27 @@ const ViewController = (() => {
     runCustomization();
   });
 
+  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+    runCustomization();
+  });
+
   $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
     setDataInCustomFields();
   });
+
+  const runViewObserver = () => {
+    const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+    const observerConfig = { attributes: false, childList: true, characterData: false };
+    const observer = new MutationObserver(() => {
+      if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
+        runCustomization();
+      }
+    });
+
+    if (elementToObserveChange) {
+      observer.observe(elementToObserveChange, observerConfig);
+    }
+  };
 
   const publicInit = () => { };
 

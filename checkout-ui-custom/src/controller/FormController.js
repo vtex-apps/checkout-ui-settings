@@ -139,7 +139,7 @@ const FormController = (() => {
         Object.assign(masterdataFields, getTVFormFields());
       }
 
-      saveAddress(masterdataFields, true);
+      saveAddress(masterdataFields);
 
       setTimeout(() => {
         $('#btn-go-to-payment').trigger('click');
@@ -171,11 +171,28 @@ const FormController = (() => {
         if (selectedDelivery) {
           addCustomBtnPayment();
         }
+
+        // eslint-disable-next-line no-use-before-define
+        runFormObserver();
       }, TIMEOUT_750);
     }
   };
 
   // INPUT EVENT SUBSCRIPTION
+  const runFormObserver = () => {
+    const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+    const observerConfig = { attributes: false, childList: true, characterData: false };
+    const observer = new MutationObserver(() => {
+      if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
+        runCustomization();
+      }
+    });
+
+    if (elementToObserveChange) {
+      observer.observe(elementToObserveChange, observerConfig);
+    }
+  };
+
   $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
     if ($(this).val() === 'Ground') {
       $('#tfg-lift-stairs').val('');

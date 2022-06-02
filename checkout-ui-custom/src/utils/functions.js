@@ -1,18 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { RICA_APP, TIMEOUT_500 } from './const';
-import { AlertBox } from '../templates';
-
-const showSuccessMsg = () => {
-  setTimeout(() => {
-    $('p.delivery-address-title').prepend(AlertBox('Address added', 'success'));
-  }, TIMEOUT_500);
-};
-
-const hideSuccessMsg = () => {
-  if ($('p.delivery-address-title .tfg-custom-msg').length > 0) {
-    $('p.delivery-address-title .tfg-custom-msg').fadeOut();
-  }
-};
+import { RICA_APP } from './const';
 
 // API Functions
 const getShippingData = async (addressName, fields) => {
@@ -36,7 +23,7 @@ const getShippingData = async (addressName, fields) => {
   return data;
 };
 
-const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
+const saveAddress = async (fields = {}) => {
   let path;
   const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
@@ -71,20 +58,9 @@ const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
 
   await fetch(path, options)
     .then((res) => {
-      if (shippingDataCompleted) {
-        localStorage.setItem('shippingDataCompleted', true);
-      } else {
-        showSuccessMsg();
-      }
-
+      localStorage.setItem('shippingDataCompleted', true);
       if (res.status !== 204) {
         res.json();
-        setTimeout(() => {
-          if (!shippingDataCompleted) {
-            window.vtexjs.checkout.calculateShipping(newAddress);
-            hideSuccessMsg();
-          }
-        }, 3000);
       }
     })
     .catch((error) => console.log(error));
@@ -92,7 +68,7 @@ const saveAddress = async (fields = {}, shippingDataCompleted = false) => {
 
 const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {
   /* Data will only be searched and set if any of the custom fields for TFG are displayed. */
-  if ($('#custom-field-companyBuilding').length > 0 || completeFurnitureForm || completeTVIDForm) {
+  if (completeFurnitureForm || completeTVIDForm) {
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
@@ -165,7 +141,7 @@ const setRicaFields = (getDataFrom = 'customApps') => {
     ricaFields = {
       idOrPassport: '',
       sameAddress: 'true',
-      fullName: address.receiverName,
+      fullName: address.receiverName || $('#ship-receiverName').val(),
       streetAddress: `${address.street}, ${address.number}`,
       suburb: address.neighborhood,
       city: address.city,
@@ -192,10 +168,8 @@ const setRicaFields = (getDataFrom = 'customApps') => {
 
 // Random Functions
 const addBorderTop = (elementClass) => {
-  if ($(elementClass).length > 1) {
-    $(elementClass).addClass('custom-step-border');
-    $(elementClass).last().addClass('last-custom-step-border');
-  }
+  $(elementClass).addClass('custom-step-border');
+  $(elementClass).last().addClass('last-custom-step-border');
 };
 
 const waitAndResetLocalStorage = () => {
