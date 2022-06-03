@@ -119,7 +119,7 @@ const CollectController = (() => {
   const addCustomPhoneInput = () => {
     if ($('input#custom-pickup-complement').length === 0) {
       $('.btn-go-to-payment-wrapper').before(PickupComplementField);
-      setInputPhone();
+      setInputPhone('input#custom-pickup-complement');
 
       /* Set orderForm value if exists */
       const selectedAddress = window.vtexjs.checkout.orderForm?.shippingData?.address;
