@@ -1,21 +1,30 @@
-import intlTelInput from 'intl-tel-input';
-import utilsScript from 'intl-tel-input/build/js/utils';
 import {
   STEPS,
   TIMEOUT_500,
   TIMEOUT_750,
   RICA_APP,
   FURNITURE_FEES,
-  COUNTRIES_AVAILABLES,
-  COUNTRIES,
   AD_TYPE
 } from '../utils/const';
-import { getShippingData, addBorderTop, waitAndResetLocalStorage, checkoutGetCustomData } from '../utils/functions';
-import { FurnitureForm, TVorRICAMsg, TVIDForm, RICAForm, MixedProducts, AddressForm, SuburbField } from '../templates';
+import {
+  getShippingData,
+  addBorderTop,
+  waitAndResetLocalStorage,
+  checkoutGetCustomData,
+  setMasterdataFields,
+  setRicaFields
+} from '../utils/functions';
+import {
+  FurnitureForm,
+  TVorRICAMsg,
+  TVIDForm,
+  RICAForm,
+  MixedProducts
+} from '../templates';
 import CartController from './CartController';
-import 'intl-tel-input/build/css/intlTelInput.css';
 
-const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
+const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"`
+  + 'target="_blank">Furniture delivery costs</a>';
 
 const ViewController = (() => {
   const state = {
@@ -23,13 +32,12 @@ const ViewController = (() => {
     showTVIDForm: false,
     showRICAForm: false,
     showTVorRICAMsg: false,
-    showMixedProductsMsg: false,
-    intTelInput: {}
+    showMixedProductsMsg: false
   };
 
   const checkCartCategories = () => {
-    if (vtexjs.checkout.orderForm) {
-      const { items } = vtexjs.checkout.orderForm;
+    if (window.vtexjs.checkout.orderForm) {
+      const { items } = window.vtexjs.checkout.orderForm;
       const { categories } = CartController.state;
       const { config } = CartController;
 
@@ -70,6 +78,7 @@ const ViewController = (() => {
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
       $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
+      $('div.subheader').css('display', 'none');
     }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
@@ -93,8 +102,8 @@ const ViewController = (() => {
 
     if (window.vtexjs.checkout.orderForm && window.vtexjs.checkout.orderForm.shippingData.address) {
       const { addressId } = window.vtexjs.checkout.orderForm.shippingData.address;
-      const fields = '?_fields=companyBuilding,furnitureReady,buildingType,parkingDistance,'
-        + 'deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+      const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace'
+        + ',assembleFurniture,tvID';
 
       const customShippingInfo = await getShippingData(addressId, fields);
 
@@ -147,150 +156,77 @@ const ViewController = (() => {
     return validData;
   };
 
-  const addAddressFormFields = () => {
-    const setValuesOnGoToShipping = () => {
-      const elementToObserveChange = document.querySelector('.shipping-container .box-step');
-      const observer = new MutationObserver(() => {
-        const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {
-          complement: '',
-          receiverName: '',
-          neighborhood: '',
-          companyBuilding: ''
-        };
-        window.vtexjs.checkout.orderForm.shippingData.address = {
-          ...window.vtexjs.checkout.orderForm.shippingData.address,
-          ...fields
-        };
-        $('.ship-complement input').val(fields.complement).attr('value', fields.complement);
-        $('#custom-field-complement').val(fields.complement).attr('value', fields.complement);
-        $('.ship-receiverName input').val(fields.receiverName).attr('value', fields.receiverName);
-        $('#custom-field-receiverName').val(fields.receiverName).attr('value', fields.receiverName);
-        $('#custom-field-companyBuilding').val(fields.companyBuilding).attr('value', fields.companyBuilding);
-        $('#custom-field-neighborhood').val(fields.neighborhood).attr('value', fields.neighborhood);
-      });
-      const observerConfig = { attributes: false, childList: true, characterData: false };
-      if (elementToObserveChange) {
-        observer.observe(elementToObserveChange, observerConfig);
-      }
-    };
-    setValuesOnGoToShipping();
-
-    const setInputPhone = () => {
-      const phoneInput = document.querySelector('.custom-field-complement input');
-
-      const customPlaceholder = (_, selectedCountryData) => {
-        $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
-      };
-
-      if (phoneInput) {
-        const iti = intlTelInput(phoneInput, {
-          initialCountry: COUNTRIES.za.code,
-          onlyCountries: COUNTRIES_AVAILABLES,
-          formatOnDisplay: true,
-          utilsScript, // just for formatting/placeholders etc
-          customPlaceholder
-        });
-        state.intTelInput = iti;
-      }
-    };
-
-    const saveCustomFieldAddress = () => {
-      $('.tfg-custom-addressForm input').change((event) => {
-        const field = event.target;
-        const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
-        fields[field.getAttribute('field')] = field.value;
-        localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
-      });
-    };
-
-    // Insert elements
-    const isAddressFormFieldsAdded = !!$('.tfg-custom-addressForm').length;
-    if (!isAddressFormFieldsAdded) {
-      $('.vcustom--vtex-omnishipping-1-x-address form').prepend(AddressForm());
-      $('.vcustom--vtex-omnishipping-1-x-address__state').prepend(SuburbField());
-      setInputPhone();
-      saveCustomFieldAddress();
-    }
+  const isAddressFormCompleted = () => {
+    const { address } = window.vtexjs.checkout.orderForm.shippingData;
+    return (!!(address.complement && address.receiverName));
   };
 
-  const setValueToReceiverAndComplementByDefault = () => {
-    const { firstName, lastName, phone } = window.vtexjs.checkout.orderForm.clientProfileData;
-    const receiverName = `${firstName} ${lastName}`;
-    const fields = JSON.parse(localStorage.getItem('custom-address-form-fields')) ?? {};
-    $('#custom-field-receiverName').val(receiverName).attr('value', receiverName);
-    fields.receiverName = receiverName;
-    $('#custom-field-complement').val(phone).attr('value', phone);
-    fields.complement = phone;
-    localStorage.setItem('custom-address-form-fields', JSON.stringify(fields));
-  };
-  const toggleGoogleInput = () => {
-    if (!$('#v-custom-ship-street').val()) {
-      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-      const selector = `.custom-field-receiverName,
-       .custom-field-complement, .custom-field-companyBuilding,
-        .vcustom--vtex-omnishipping-1-x-address__state,
-         .v-custom-ship-info, .btn-go-to-shipping-wrapper`;
-      $(selector).hide();
-      $('.v-custom-ship-street label').text('Add a new delivery address');
-      $('#v-custom-ship-street').attr('placeholder', 'Search for address');
+  const setDataInCustomFields = async () => {
+    if (window.vtexjs.checkout.orderForm) {
+      const { address } = window.vtexjs.checkout.orderForm.shippingData;
+      const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
-      $('#v-custom-ship-street').one('change', () => {
-        $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-        $(selector).show();
-        $('.v-custom-ship-street label').text('Street address');
-        $('#v-custom-ship-street').attr(
-          'placeholder',
-          'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
-        );
-        setValueToReceiverAndComplementByDefault();
-      });
+      if (showRICAForm) {
+        setRicaFields();
+      }
+
+      if (address) {
+        await setMasterdataFields(showFurnitureForm, showTVIDForm);
+      }
     }
   };
 
   const runCustomization = () => {
-    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
+    /* Hiding subheader when there is furniture in cart */
+    setTimeout(() => {
+      checkCartCategories();
 
-    if ((window.location.hash === STEPS.SHIPPING && shippingLoaded) || window.location.hash === STEPS.PAYMENT) {
-      const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
+      if (state.showFurnitureForm) {
+        $('div.subheader').css('display', 'none');
+      } else {
+        $('div.subheader').css('display', 'block');
+      }
+    }, TIMEOUT_500);
 
-      if (!address || (address && address.addressType === AD_TYPE.RESIDENTIAL)) {
-        checkCartCategories();
+    /* Adding custom sections */
+    if (window.location.hash === STEPS.SHIPPING || window.location.hash === STEPS.PAYMENT) {
+      setTimeout(() => {
+        const address = window.vtexjs.checkout?.orderForm?.shippingData?.address;
 
-        if (window.location.hash === STEPS.SHIPPING) {
-          showCustomSections();
-          addAddressFormFields();
-          toggleGoogleInput();
+        if (address && address.addressType === AD_TYPE.DELIVERY) {
+          if (window.location.hash === STEPS.SHIPPING) {
+            setTimeout(() => {
+              showCustomSections();
+              setDataInCustomFields();
+            }, TIMEOUT_750);
 
-          // This button has a bug an needs to be clicked in two times; I trigger once to improve UX
-          if ($('button.vtex-omnishipping-1-x-btnDelivery').length > 0) {
-            $('button.vtex-omnishipping-1-x-btnDelivery').trigger('click');
-          }
-        } else if (window.location.hash === STEPS.PAYMENT) {
-          setTimeout(() => {
-            if ((state.showFurnitureForm || state.showRICAForm || state.showTVIDForm)) {
+            // eslint-disable-next-line no-use-before-define
+            runViewObserver();
+          } else if (window.location.hash === STEPS.PAYMENT) {
+            setTimeout(async () => {
               let isDataCompleted = localStorage.getItem('shippingDataCompleted');
 
-              if (!isDataCompleted) {
-                setTimeout(async () => {
+              if (isDataCompleted) {
+                waitAndResetLocalStorage();
+              } else {
+                isDataCompleted = isAddressFormCompleted();
+                if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
                   if (state.showRICAForm) {
                     isDataCompleted = ricaFieldsCompleted();
                   }
-
                   if (state.showFurnitureForm || state.showTVIDForm) {
                     isDataCompleted = await shippingCustomDataCompleted();
                   }
+                }
 
-                  if (!isDataCompleted) {
-                    window.location.hash = STEPS.SHIPPING;
-                  }
-                }, TIMEOUT_750);
-              } else {
-                waitAndResetLocalStorage();
+                if (!isDataCompleted) {
+                  window.location.hash = STEPS.SHIPPING;
+                }
               }
-            }
-          }, TIMEOUT_500);
+            }, 1750);
+          }
         }
-      }
+      }, TIMEOUT_750);
     }
   };
 
@@ -302,6 +238,28 @@ const ViewController = (() => {
   $(window).on('hashchange orderFormUpdated.vtex', () => {
     runCustomization();
   });
+
+  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+    runCustomization();
+  });
+
+  $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
+    setDataInCustomFields();
+  });
+
+  const runViewObserver = () => {
+    const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+    const observerConfig = { attributes: false, childList: true, characterData: false };
+    const observer = new MutationObserver(() => {
+      if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
+        runCustomization();
+      }
+    });
+
+    if (elementToObserveChange) {
+      observer.observe(elementToObserveChange, observerConfig);
+    }
+  };
 
   const publicInit = () => { };
 

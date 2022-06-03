@@ -1,10 +1,13 @@
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
 /* eslint-disable func-names */
 import { STEPS, TIMEOUT_750, RICA_APP } from '../utils/const';
-import { saveAddress, checkoutSendCustomData, setRicaFields, setMasterdataFields } from '../utils/functions';
+import {
+  saveAddress,
+  checkoutSendCustomData,
+  setRicaFields
+} from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
+import AddressController from './AddressController';
 
 const FormController = (() => {
   const state = {
@@ -28,21 +31,6 @@ const FormController = (() => {
     });
   };
 
-  const checkNativeForm = () => {
-    const nativeFields = ['ship-street', 'ship-city', 'ship-receiverName'];
-
-    /* When the list of addresses appears,
-    it does not complete ship-state correctly in the native process so,
-    if it has already been reported, it is not validated. */
-    const { address } = vtexjs.checkout.orderForm.shippingData;
-
-    if (!address.state) {
-      nativeFields.push('ship-state');
-    }
-
-    checkFields(nativeFields);
-  };
-
   const checkFurnitureForm = () => {
     const furnitureFields = ['tfg-building-type', 'tfg-parking-distance', 'tfg-delivery-floor', 'tfg-lift-stairs'];
 
@@ -63,24 +51,36 @@ const FormController = (() => {
     checkFields(ricaFields);
   };
 
-  const checkForms = () => {
-    const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
-
+  const checkForm = () => {
     // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
 
-    checkNativeForm();
+    /* Checking Receiver & Receiver Phone */
+    if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {
+      checkField('ship-receiverName');
 
-    if (showFurnitureForm) {
+      if (!AddressController.state.intTelInput) return;
+      if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
+
+      if (!AddressController.state.intTelInput.isValidNumber()) {
+        $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
+        $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
+        $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
+        state.validForm = false;
+      } else {
+        $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error');
+      }
+    }
+
+    /* Checking Custom Fields */
+    if (ViewController.state.showFurnitureForm) {
       checkFurnitureForm();
     }
-
-    if (showRICAForm) {
+    if (ViewController.state.showRICAForm) {
       checkRICAForm();
     }
-
-    if (showTVIDForm) {
+    if (ViewController.state.showTVIDForm) {
       checkField('tfg-tv-licence');
     }
   };
@@ -88,6 +88,7 @@ const FormController = (() => {
   const getFurnitureFormFields = () => {
     const furnitureFields = {};
 
+    furnitureFields.furnitureReady = true;
     furnitureFields.buildingType = $('#tfg-building-type').val();
     furnitureFields.parkingDistance = $('#tfg-parking-distance').val();
     furnitureFields.deliveryFloor = $('#tfg-delivery-floor').val();
@@ -118,52 +119,26 @@ const FormController = (() => {
 
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
-  const checkPhoneField = () => {
-    if (!ViewController.state.intTelInput) return;
-    if (typeof ViewController.state.intTelInput.isValidNumber !== 'function') return;
-
-    const isValidNumber = ViewController.state.intTelInput.isValidNumber();
-    if (!isValidNumber) {
-      $('.custom-field-complement').append(InputError());
-      $('.custom-field-complement span.error').show();
-
-      state.validForm = false;
-    }
-
-    state.validForm = true;
-  };
-
-  const isValidAddressForm = () => {
-    // Reset state & clear errors
-    $('span.help.error').remove();
-    state.validForm = true;
-    checkField('custom-field-receiverName');
-    checkPhoneField();
-    checkField('custom-field-neighborhood');
-  };
-
   const saveShippingForm = () => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
 
-    checkForms();
-    isValidAddressForm();
+    checkForm();
+
+    console.log('!! saveShippingForm - state', state);
 
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
         const ricaFields = getRICAFields();
-
         checkoutSendCustomData(RICA_APP, ricaFields);
       }
 
       // Fields saved in Masterdata
-      const addressFormFields = JSON.parse(localStorage.getItem('custom-address-form-fields'));
-      const masterdataFields = { ...addressFormFields };
+      const masterdataFields = {};
 
       if (showFurnitureForm) {
         Object.assign(masterdataFields, getFurnitureFormFields());
       }
-
       if (showTVIDForm) {
         Object.assign(masterdataFields, getTVFormFields());
       }
@@ -193,64 +168,35 @@ const FormController = (() => {
     }
   };
 
-  const goToShipping = (event) => {
-    event.preventDefault();
-    isValidAddressForm();
-    if (state.validForm) {
+  const runCustomization = () => {
+    if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
-        $('#btn-go-to-shippping-method').trigger('click');
+        const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
+        if (selectedDelivery) {
+          addCustomBtnPayment();
+        }
+
+        // eslint-disable-next-line no-use-before-define
+        runFormObserver();
       }, TIMEOUT_750);
     }
   };
 
-  const addCustomGoToShippingBtn = () => {
-    if ($('#custom-btn-go-to-shippping-method').length <= 0) {
-      const nativeGoToShippingBtn = $('#btn-go-to-shippping-method');
-      const customGoToShippingBtn = nativeGoToShippingBtn.clone(false);
-
-      $(nativeGoToShippingBtn).hide();
-      $(customGoToShippingBtn).data('bind', '');
-      $(customGoToShippingBtn).removeAttr('id').attr('id', 'btn-go-to-shippping-method');
-      $(customGoToShippingBtn).removeAttr('data-bind');
-      $(customGoToShippingBtn).attr('id', 'custom-btn-go-to-shippping-method');
-      $(customGoToShippingBtn).css('display', 'block');
-
-      $('p.btn-go-to-shipping-wrapper').append(customGoToShippingBtn);
-
-      $(customGoToShippingBtn).on('click', goToShipping);
-    }
-  };
-
-  const setDataInCustomFields = async () => {
-    if (vtexjs.checkout.orderForm) {
-      const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
-
-      if (showRICAForm) {
-        setRicaFields();
-      }
-
-      const isExistsAddress = vtexjs.checkout.orderForm.shippingData.address;
-      if ((showFurnitureForm || showTVIDForm) && isExistsAddress) {
-        setMasterdataFields(showFurnitureForm, showTVIDForm);
-      }
-    }
-  };
-
-  const runCustomization = async () => {
-    const shippingLoaded = ($('div#postalCode-finished-loading').length > 0);
-
-    if (window.location.hash === STEPS.SHIPPING && shippingLoaded) {
-      const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
-
-      if (selectedDelivery) {
-        addCustomBtnPayment();
-        addCustomGoToShippingBtn();
-        await setDataInCustomFields();
-      }
-    }
-  };
-
   // INPUT EVENT SUBSCRIPTION
+  const runFormObserver = () => {
+    const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+    const observerConfig = { attributes: false, childList: true, characterData: false };
+    const observer = new MutationObserver(() => {
+      if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
+        runCustomization();
+      }
+    });
+
+    if (elementToObserveChange) {
+      observer.observe(elementToObserveChange, observerConfig);
+    }
+  };
+
   $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
     if ($(this).val() === 'Ground') {
       $('#tfg-lift-stairs').val('');
@@ -289,6 +235,10 @@ const FormController = (() => {
     } else {
       $('.rica-field').val('');
     }
+  });
+
+  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+    runCustomization();
   });
 
   // EVENTS SUBSCRIPTION
