@@ -156,11 +156,6 @@ const ViewController = (() => {
     return validData;
   };
 
-  const isAddressFormCompleted = () => {
-    const { address } = window.vtexjs.checkout.orderForm.shippingData;
-    return (!!(address.complement && address.receiverName));
-  };
-
   const setDataInCustomFields = async () => {
     if (window.vtexjs.checkout.orderForm) {
       const { address } = window.vtexjs.checkout.orderForm.shippingData;
@@ -208,15 +203,12 @@ const ViewController = (() => {
 
               if (isDataCompleted) {
                 waitAndResetLocalStorage();
-              } else {
-                isDataCompleted = isAddressFormCompleted();
-                if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
-                  if (state.showRICAForm) {
-                    isDataCompleted = ricaFieldsCompleted();
-                  }
-                  if (state.showFurnitureForm || state.showTVIDForm) {
-                    isDataCompleted = await shippingCustomDataCompleted();
-                  }
+              } else if (state.showFurnitureForm || state.showRICAForm || state.showTVIDForm) {
+                if (state.showRICAForm) {
+                  isDataCompleted = ricaFieldsCompleted();
+                }
+                if (state.showFurnitureForm || state.showTVIDForm) {
+                  isDataCompleted = await shippingCustomDataCompleted();
                 }
 
                 if (!isDataCompleted) {

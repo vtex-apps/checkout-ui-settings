@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- The receiver control in payment has been removed because I do not have the possibility to control that,
+  once I send the user to shipping, to show the fields to fill in the missing data.
+
 ## [0.1.4] - 2022-06-03
 ### Fixed
 - fixed problem with field saving
