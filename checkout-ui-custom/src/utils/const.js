@@ -27,6 +27,8 @@ const COUNTRIES = {
 };
 const COUNTRIES_AVAILABLES = [COUNTRIES.za.code];
 
+const BASE_URL_API = 'https://store-api.www.bash.com/custom-api/';
+
 export {
   STEPS,
   TIMEOUT_500,
@@ -35,5 +37,6 @@ export {
   FURNITURE_FEES,
   COUNTRIES,
   COUNTRIES_AVAILABLES,
-  AD_TYPE
+  AD_TYPE,
+  BASE_URL_API
 };
