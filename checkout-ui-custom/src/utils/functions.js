@@ -1,16 +1,29 @@
 /* eslint-disable import/prefer-default-export */
-import { RICA_APP } from './const';
+import { BASE_URL_API, RICA_APP } from './const';
 
 // API Functions
+const getHeadersByConfig = ({ cookie, cache }) => {
+  const headers = new Headers();
+  if (cookie) {
+    headers.append('Cookie', document?.cookie);
+  }
+  if (cache) {
+    headers.append('Cache-Control', 'no-cache');
+  }
+  return headers;
+};
+
 const getShippingData = async (addressName, fields) => {
   let data = {};
 
+  const headers = getHeadersByConfig({ cookie: true, cache: true });
   const options = {
-    headers: { 'Cache-Control': 'no-cache' }
+    headers,
+    credentials: 'include'
   };
 
   const response = await fetch(
-    `/custom-api/masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
+    `${BASE_URL_API}masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
     options
   )
     .then((res) => res.json())
@@ -34,9 +47,9 @@ const saveAddress = async (fields = {}) => {
   const savedAddress = address?.addressId ? await getShippingData(address.addressId, '?_fields=id') : {};
 
   if (savedAddress?.id) {
-    path = `/custom-api/masterdata/address/${savedAddress.id}`;
+    path = `${BASE_URL_API}masterdata/address/${savedAddress.id}`;
   } else {
-    path = '/custom-api/masterdata/addresses';
+    path = `${BASE_URL_API}masterdata/addresses`;
   }
 
   // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood
@@ -50,10 +63,13 @@ const saveAddress = async (fields = {}) => {
     newAddress.addressName = address.addressId;
   }
 
+  const headers = getHeadersByConfig({ cookie: true, cache: true });
+
   const options = {
     method: 'PATCH',
-    headers: { 'Cache-Control': 'no-cache' },
-    body: JSON.stringify(newAddress)
+    headers,
+    body: JSON.stringify(newAddress),
+    credentials: 'include'
   };
 
   await fetch(path, options)
