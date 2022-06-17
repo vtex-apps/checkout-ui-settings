@@ -77,6 +77,11 @@ function setAppConfiguration(config) {
 Once the application has been installed and configured, there are no further steps to be taken.
 The behavior required by TFG will be produced automatically in the checkout when the conditions of the configured products are satisfied. The additional fields in the shipping address will also be displayed automatically.
 
+## Development
+- run `vtex link`
+- cd `checkout-ui-custom`
+- run `npm run watch`
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
