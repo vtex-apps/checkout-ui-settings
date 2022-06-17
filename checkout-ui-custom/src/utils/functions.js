@@ -2,7 +2,7 @@
 import { BASE_URL_API, RICA_APP } from './const';
 
 // API Functions
-const getHeadersByConfig = ({ cookie, cache }) => {
+const getHeadersByConfig = ({ cookie, cache, json }) => {
   const headers = new Headers();
   if (cookie) {
     headers.append('Cookie', document?.cookie);
@@ -10,13 +10,16 @@ const getHeadersByConfig = ({ cookie, cache }) => {
   if (cache) {
     headers.append('Cache-Control', 'no-cache');
   }
+  if (json) {
+    headers.append('Content-type', 'application/json');
+  }
   return headers;
 };
 
 const getShippingData = async (addressName, fields) => {
   let data = {};
 
-  const headers = getHeadersByConfig({ cookie: true, cache: true });
+  const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
   const options = {
     headers,
     credentials: 'include'
@@ -63,7 +66,7 @@ const saveAddress = async (fields = {}) => {
     newAddress.addressName = address.addressId;
   }
 
-  const headers = getHeadersByConfig({ cookie: true, cache: true });
+  const headers = getHeadersByConfig({ cookie: true, cache: true, json: true });
 
   const options = {
     method: 'PATCH',
