@@ -7,6 +7,7 @@ import {
   STEPS,
   TIMEOUT_500
 } from '../utils/const';
+import setTranslations from '../utils/translations';
 
 const AddressController = (() => {
   const state = {
@@ -67,7 +68,7 @@ const AddressController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
-
+        setTranslations();
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
           setInputPhone();
           toggleGoogleInput();
