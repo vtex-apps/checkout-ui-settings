@@ -123,7 +123,6 @@ const FormController = (() => {
       .then((orderForm) => {
         const { shippingData } = orderForm;
         shippingData.selectedAddresses[0].addressType = addressType;
-        console.log(orderForm.shippingData);
         return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
       });
   };
