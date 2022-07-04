@@ -46,7 +46,7 @@ const AddressController = (() => {
     const addressTypeInput = document.querySelector('.vtex-omnishipping-1-x-address .ship-addressType');
 
     if (!addressTypeInput) {
-      $('.vtex-omnishipping-1-x-address > div').html();
+      $('.vtex-omnishipping-1-x-address > div').html('');
       $('.vtex-omnishipping-1-x-address > div').append(
         $('<p>').prop({
           class: 'input ship-addressType text',
@@ -103,7 +103,6 @@ const AddressController = (() => {
       );
 
       const addressTypeSelected = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
-      console.log(addressTypeSelected);
       if (addressTypeSelected === 'residential') {
         $('#ship-addressType-residential').attr('checked', true);
       } else if (addressTypeSelected === 'business') {
