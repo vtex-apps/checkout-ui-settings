@@ -94,7 +94,7 @@ const AddressController = (() => {
           type: 'radio',
           id: 'ship-addressType-business',
           name: 'ship-addressType',
-          value: 'business'
+          value: 'commercial'
         })
       ).append(
         $('<label>').prop({
@@ -105,7 +105,7 @@ const AddressController = (() => {
       const addressTypeSelected = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
       if (addressTypeSelected === 'residential') {
         $('#ship-addressType-residential').attr('checked', true);
-      } else if (addressTypeSelected === 'business') {
+      } else if (addressTypeSelected === 'commercial') {
         $('#ship-addressType-business').attr('checked', true);
       }
     }
