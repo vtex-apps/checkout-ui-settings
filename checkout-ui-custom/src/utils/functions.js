@@ -49,6 +49,9 @@ const saveAddress = async (fields = {}) => {
   // AD already exists (?)
   const savedAddress = address?.addressId ? await getShippingData(address.addressId, '?_fields=id') : {};
 
+  // Guardado del nuevo addressType
+  address.addressType = localStorage.getItem('addressType');
+
   if (savedAddress?.id) {
     path = `${BASE_URL_API}masterdata/address/${savedAddress.id}`;
   } else {

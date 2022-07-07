@@ -43,6 +43,75 @@ const AddressController = (() => {
     }
   };
 
+  const setAddressType = () => {
+    const addressTypeInput = document.querySelector('.vtex-omnishipping-1-x-address .ship-addressType');
+
+    if (!addressTypeInput) {
+      $('.vtex-omnishipping-1-x-address > div').html('');
+      $('.vtex-omnishipping-1-x-address > div').append(
+        $('<p>').prop({
+          class: 'input ship-addressType text',
+          style: 'order: 3'
+        })
+      );
+
+      $('.ship-addressType').append(
+        $('<label>').html('Address type')
+      );
+
+      $('.ship-addressType').append(
+        $('<div>').prop({
+          class: 'ship-addressType-container'
+        })
+      );
+
+      $('.ship-addressType-container').append(
+        $('<div>').prop({
+          class: 'ship-addressType-div-residential'
+        })
+      );
+
+      $('.ship-addressType-container').append(
+        $('<div>').prop({
+          class: 'ship-addressType-div-business'
+        })
+      );
+
+      $('.ship-addressType-div-residential').append(
+        $('<input>').prop({
+          type: 'radio',
+          id: 'ship-addressType-residential',
+          name: 'ship-addressType',
+          value: 'residential'
+        })
+      ).append(
+        $('<label>').prop({
+          for: 'ship-addressType-residential'
+        }).html('Residential')
+      );
+
+      $('.ship-addressType-div-business').append(
+        $('<input>').prop({
+          type: 'radio',
+          id: 'ship-addressType-business',
+          name: 'ship-addressType',
+          value: 'commercial'
+        })
+      ).append(
+        $('<label>').prop({
+          for: 'ship-addressType-business'
+        }).html('Business')
+      );
+
+      const addressTypeSelected = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
+      if (addressTypeSelected === 'residential') {
+        $('#ship-addressType-residential').attr('checked', true);
+      } else if (addressTypeSelected === 'commercial') {
+        $('#ship-addressType-business').attr('checked', true);
+      }
+    }
+  };
+
   const toggleGoogleInput = () => {
     if (!$('#v-custom-ship-street').val()) {
       $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
@@ -71,6 +140,7 @@ const AddressController = (() => {
         setTranslations();
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
           setInputPhone();
+          setAddressType();
           toggleGoogleInput();
         }
       }, TIMEOUT_500);
@@ -94,6 +164,10 @@ const AddressController = (() => {
           .attr('value', window.vtexjs.checkout.orderForm.shippingData.address.complement || '');
       }
     }, TIMEOUT_500);
+  });
+
+  $(document).on('change', 'input[name="ship-addressType"]', () => {
+    localStorage.setItem('addressType', document.querySelector('input[name="ship-addressType"]:checked').value);
   });
 
   const publicInit = () => { };
