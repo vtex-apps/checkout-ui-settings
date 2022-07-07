@@ -47,7 +47,6 @@ const AddressController = (() => {
     const addressTypeInput = document.querySelector('.vtex-omnishipping-1-x-address .ship-addressType');
 
     if (!addressTypeInput) {
-      $('.vtex-omnishipping-1-x-address > div').html('');
       $('.vtex-omnishipping-1-x-address > div').append(
         $('<p>').prop({
           class: 'input ship-addressType text',
