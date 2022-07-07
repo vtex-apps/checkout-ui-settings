@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.9] - 2022-07-07
 ### Added
 - new field addressType in checkout
-## [0.1.8] - 2022-07-16
+## [0.1.8] - 2022-07-06
 ### Changed
 - rename CTA `Continue to shipping` to `Save address`
 
