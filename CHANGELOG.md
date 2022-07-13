@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.1.11] - 2022-07-13
+### Fixed
+- check `intl-tel-input` dependencies
+
+## [0.1.10] - 2022-07-07
+### Fixed
+- remove container address
+
+## [0.1.9] - 2022-07-07
+### Added
+- new field addressType in checkout
+## [0.1.8] - 2022-07-06
+### Changed
+- rename CTA `Continue to shipping` to `Save address`
+
 ## [0.1.7] - 2022-06-17
 ### Added
 - add `Content-type` header

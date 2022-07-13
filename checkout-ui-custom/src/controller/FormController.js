@@ -117,6 +117,16 @@ const FormController = (() => {
     return ricaFields;
   };
 
+  const saveAddressType = () => {
+    const addressType = localStorage.getItem('addressType');
+    window.vtexjs.checkout.getOrderForm()
+      .then((orderForm) => {
+        const { shippingData } = orderForm;
+        shippingData.selectedAddresses[0].addressType = addressType;
+        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
+      });
+  };
+
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
   const saveShippingForm = () => {
@@ -147,6 +157,7 @@ const FormController = (() => {
 
       setTimeout(() => {
         $('#btn-go-to-payment').trigger('click');
+        saveAddressType();
       }, TIMEOUT_750);
     }
   };
