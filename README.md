@@ -146,19 +146,22 @@ curl --location --request POST 'https://thefoschini.vtexcommercestable.com.br/ap
 - [update the orderForm configuration](https://developers.vtex.com/vtex-rest-api/reference/updateorderformconfiguration)
 
 ## How to use?
-
 Once the application has been installed and configured, there are no further steps to be taken.
 The behavior required by TFG will be produced automatically in the checkout when the conditions of the configured products are satisfied. The additional fields in the shipping address will also be displayed automatically.
 
-## Vtex Dependencies
+## Dependencies
 - ```vtex.checkout-ui-custom@0.7.13```
 - ```vtex.checkout-ui-settings-server@0.4.2-hkignore.europe-0```
 
 ## Development
+- into main folder run `npm i`
 - run `vtex link`
 - in another terminal, run `cd checkout-ui-custom`
+- run `npm i`
 - run `npm run watch`
 
-## Contributing
+## Checkout styles setup
+the styles of this application are stored in the app [tfg-custom-components](https://github.com/TFG-Labs/tfg-custom-checkout), please refer to its [documentation](https://github.com/TFG-Labs/tfg-custom-checkout/tree/feature/doc_update#checkout-styles-setup) to review the process.
 
+## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
