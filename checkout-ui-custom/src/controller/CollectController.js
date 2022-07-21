@@ -36,7 +36,7 @@ const CollectController = (() => {
 
   const isValidNumberBash = (tel) => {
     const pattern = new RegExp('^\\d{9}$');
-
+    tel = tel.trim();
     return !!tel.match(pattern);
   };
 
@@ -51,13 +51,8 @@ const CollectController = (() => {
           parent = '.shp-pickup-receiver';
           break;
         case 'custom-pickup-complement':
-          if (!state.intTelInput) return;
-          if (typeof state.intTelInput.isValidNumber !== 'function') return;
+          isValid = isValidNumberBash($(`#${field}`).val());
 
-          isValid = state.intTelInput.isValidNumber();
-          if (isValid) {
-            isValid = isValidNumberBash($(`#${field}`).val());
-          }
           parent = '#box-pickup-complement';
           break;
         default:

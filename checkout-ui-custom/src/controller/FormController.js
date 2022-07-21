@@ -53,7 +53,7 @@ const FormController = (() => {
 
   const isValidNumberBash = (tel) => {
     const pattern = new RegExp('^\\d{9}$');
-
+    tel = tel.trim();
     return !!tel.match(pattern);
   };
 
@@ -66,12 +66,7 @@ const FormController = (() => {
     if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {
       checkField('ship-receiverName');
 
-      if (!AddressController.state.intTelInput) return;
-      if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
-
-      if (!AddressController.state.intTelInput.isValidNumber()
-        || !isValidNumberBash(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)) {
-        console.log('isValidNumberBash');
+      if (!isValidNumberBash(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)) {
         $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
         $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
         $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
