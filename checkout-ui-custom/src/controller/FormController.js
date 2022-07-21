@@ -3,7 +3,8 @@ import { STEPS, TIMEOUT_750, RICA_APP } from '../utils/const';
 import {
   saveAddress,
   checkoutSendCustomData,
-  setRicaFields
+  setRicaFields,
+  isValidNumberBash
 } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
@@ -49,12 +50,6 @@ const FormController = (() => {
     ];
 
     checkFields(ricaFields);
-  };
-
-  const isValidNumberBash = (tel) => {
-    const pattern = new RegExp('^\\d{9}$');
-    tel = tel.trim();
-    return !!tel.match(pattern);
   };
 
   const checkForm = () => {

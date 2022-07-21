@@ -4,6 +4,9 @@ import 'intl-tel-input/build/js/utils';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import { STEPS, COUNTRIES, COUNTRIES_AVAILABLES, AD_TYPE, TIMEOUT_750 } from '../utils/const';
 import { PickupComplementField, InputError } from '../templates';
+import {
+  isValidNumberBash
+} from '../utils/functions';
 
 const CollectController = (() => {
   const state = {
@@ -34,12 +37,6 @@ const CollectController = (() => {
         $(this).attr('placeholder', '');
       }
     });
-  };
-
-  const isValidNumberBash = (tel) => {
-    const pattern = new RegExp('^\\d{9}$');
-    tel = tel.trim();
-    return !!tel.match(pattern);
   };
 
   const checkFields = (fields) => {
