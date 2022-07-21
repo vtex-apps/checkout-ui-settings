@@ -1,4 +1,6 @@
 import intlTelInput from 'intl-tel-input';
+// the intlTelInput library has dependencies with ...js/utils import, do not remove it if using the intlTelInput library
+import 'intl-tel-input/build/js/utils';
 import 'intl-tel-input/build/css/intlTelInput.css';
 
 import {
@@ -30,7 +32,8 @@ const AddressController = (() => {
       const iti = intlTelInput(phoneInput, {
         initialCountry: COUNTRIES.za.code,
         onlyCountries: COUNTRIES_AVAILABLES,
-        customPlaceholder
+        customPlaceholder,
+        formatOnDisplay: false
       });
       state.intTelInput = iti;
 
