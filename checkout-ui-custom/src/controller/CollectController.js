@@ -34,6 +34,12 @@ const CollectController = (() => {
     });
   };
 
+  const isValidNumberBash = (tel) => {
+    const pattern = new RegExp('^\\d{9}$');
+
+    return !!tel.match(pattern);
+  };
+
   const checkFields = (fields) => {
     fields.forEach((field) => {
       let isValid = true;
@@ -49,6 +55,9 @@ const CollectController = (() => {
           if (typeof state.intTelInput.isValidNumber !== 'function') return;
 
           isValid = state.intTelInput.isValidNumber();
+          if (isValid) {
+            isValid = isValidNumberBash($(`#${field}`).val());
+          }
           parent = '#box-pickup-complement';
           break;
         default:

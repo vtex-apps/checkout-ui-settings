@@ -51,6 +51,12 @@ const FormController = (() => {
     checkFields(ricaFields);
   };
 
+  const isValidNumberBash = (tel) => {
+    const pattern = new RegExp('^\\d{9}$');
+
+    return !!tel.match(pattern);
+  };
+
   const checkForm = () => {
     // Reset state & clear errors
     $('span.help.error').remove();
@@ -63,7 +69,9 @@ const FormController = (() => {
       if (!AddressController.state.intTelInput) return;
       if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
 
-      if (!AddressController.state.intTelInput.isValidNumber()) {
+      if (!AddressController.state.intTelInput.isValidNumber()
+        || !isValidNumberBash(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)) {
+        console.log('isValidNumberBash');
         $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
         $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
         $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
