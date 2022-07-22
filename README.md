@@ -71,17 +71,117 @@ function setAppConfiguration(config) {
     "We'll ship your furniture and other items in your cart to the selected address. Only the furniture delivery fee will apply.";
 }
 ```
+### App configuration into orderForm
+if you need to add or update the configuration of orderForm, first get the current configuration, then update it
+
+#### Get request:
+```js
+
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-VTEX-API-AppKey': 'ApiKey',
+      'X-VTEX-API-AppToken': 'AppToken'
+    }
+  };
+
+  fetch('https://accountname.environment.com.br/api/checkout/pvt/configuration/orderForm', options)
+    .then(response => response.json())
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
+```
+
+#### Post request:
+```js
+
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-VTEX-API-AppKey': 'ApiKey',
+      'X-VTEX-API-AppToken': 'AppToken'
+    },
+    body: JSON.stringify({
+      "paymentConfiguration": {
+          "requiresAuthenticationForPreAuthorizedPaymentOption": false,
+          "allowInstallmentsMerge": null,
+          "blockPaymentSession": null,
+          "paymentSystemToCheckFirstInstallment": null,
+          "defaultPaymentSystemToApplyOnUserOrderForm": null
+      },
+      "taxConfiguration": null,
+      "minimumQuantityAccumulatedForItems": 1,
+      "decimalDigitsPrecision": 2,
+      "minimumValueAccumulated": 0,
+      "apps": [
+          {
+              "fields": [
+                  "idOrPassport",
+                  "sameAddress",
+                  "fullName",
+                  "streetAddress",
+                  "suburb",
+                  "city",
+                  "postalCode",
+                  "province",
+                  "country"
+              ],
+              "id": "ricafields",
+              "major": 1
+          },{
+              "fields": [
+                  "tvID"
+              ],
+              "id": "tvfields",
+              "major": "1"
+          },{
+              "fields": [
+                  "furnitureReady",
+                  "buildingType",
+                  "parkingDistance",
+                  "deliveryFloor",
+                  "liftOrStairs",
+                  "hasSufficientSpace",
+                  "assembleFurniture"
+              ],
+              "id": "furniturefields",
+              "major": "1"
+          }
+      ],
+      "allowMultipleDeliveries": true,
+      "allowManualPrice": false,
+      "savePersonalDataAsOptIn": false,
+      "maxNumberOfWhiteLabelSellers": null,
+      "maskFirstPurchaseData": null,
+      "recaptchaValidation": "never",
+      "maskStateOnAddress": true
+  })
+}
+```
+#### Vtex documentation:
+- [get the orderForm configuration](https://developers.vtex.com/vtex-rest-api/reference/getorderformconfiguration)
+- [update the orderForm configuration](https://developers.vtex.com/vtex-rest-api/reference/updateorderformconfiguration)
 
 ## How to use?
-
 Once the application has been installed and configured, there are no further steps to be taken.
 The behavior required by TFG will be produced automatically in the checkout when the conditions of the configured products are satisfied. The additional fields in the shipping address will also be displayed automatically.
 
+## Dependencies
+- ```vtex.checkout-ui-custom@0.7.13```
+- ```vtex.checkout-ui-settings-server@0.4.2-hkignore.europe-0```
+
 ## Development
+- into main folder run `npm i`
 - run `vtex link`
-- cd `checkout-ui-custom`
+- in another terminal, run `cd checkout-ui-custom`
+- run `npm i`
 - run `npm run watch`
 
-## Contributing
+## Checkout styles setup
+the styles of this application are stored in the app [tfg-custom-components](https://github.com/TFG-Labs/tfg-custom-checkout), please refer to its [documentation](https://github.com/TFG-Labs/tfg-custom-checkout/tree/feature/doc_update#checkout-styles-setup) to review the process.
 
+## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
