@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import { STEPS, TIMEOUT_750, RICA_APP } from '../utils/const';
+import { STEPS, TIMEOUT_750, RICA_APP, FURNITURE_APP, TV_APP } from '../utils/const';
 import {
   saveAddress,
   checkoutSendCustomData,
@@ -145,10 +145,14 @@ const FormController = (() => {
       const masterdataFields = {};
 
       if (showFurnitureForm) {
-        Object.assign(masterdataFields, getFurnitureFormFields());
+        const furnitureFields = getFurnitureFormFields();
+        checkoutSendCustomData(FURNITURE_APP, furnitureFields);
+        Object.assign(masterdataFields, furnitureFields);
       }
       if (showTVIDForm) {
-        Object.assign(masterdataFields, getTVFormFields());
+        const tvFields = getTVFormFields();
+        checkoutSendCustomData(TV_APP, tvFields);
+        Object.assign(masterdataFields, tvFields);
       }
 
       saveAddress(masterdataFields);
