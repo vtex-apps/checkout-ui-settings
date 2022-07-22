@@ -74,72 +74,92 @@ function setAppConfiguration(config) {
 ### App configuration into orderForm
 if you need to add or update the configuration of orderForm, first get the current configuration, then update it
 
-#### Get:
+#### Get request:
 ```js
-curl --location --request GET 'https://thefoschini.vtexcommercestable.com.br/api/checkout/pvt/configuration/orderForm' \
---header 'VtexIdclientAutCookie: eyJh...'
+
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-VTEX-API-AppKey': 'ApiKey',
+      'X-VTEX-API-AppToken': 'AppToken'
+    }
+  };
+
+  fetch('https://accountname.environment.com.br/api/checkout/pvt/configuration/orderForm', options)
+    .then(response => response.json())
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
 ```
 
-#### Update:
+#### Post request:
 ```js
-curl --location --request POST 'https://thefoschini.vtexcommercestable.com.br/api/checkout/pvt/configuration/orderForm' \
---header 'VtexIdclientAutCookie: eyJh...' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "paymentConfiguration": {
-        "requiresAuthenticationForPreAuthorizedPaymentOption": false,
-        "allowInstallmentsMerge": null,
-        "blockPaymentSession": null,
-        "paymentSystemToCheckFirstInstallment": null,
-        "defaultPaymentSystemToApplyOnUserOrderForm": null
+
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-VTEX-API-AppKey': 'ApiKey',
+      'X-VTEX-API-AppToken': 'AppToken'
     },
-    "taxConfiguration": null,
-    "minimumQuantityAccumulatedForItems": 1,
-    "decimalDigitsPrecision": 2,
-    "minimumValueAccumulated": 0,
-    "apps": [
-        {
-            "fields": [
-                "idOrPassport",
-                "sameAddress",
-                "fullName",
-                "streetAddress",
-                "suburb",
-                "city",
-                "postalCode",
-                "province",
-                "country"
-            ],
-            "id": "ricafields",
-            "major": 1
-        },{
-            "fields": [
-                "tvID"
-            ],
-            "id": "tvfields",
-            "major": "1"
-        },{
-            "fields": [
-                "furnitureReady",
-                "buildingType",
-                "parkingDistance",
-                "deliveryFloor",
-                "liftOrStairs",
-                "hasSufficientSpace",
-                "assembleFurniture"
-            ],
-            "id": "furniturefields",
-            "major": "1"
-        }
-    ],
-    "allowMultipleDeliveries": true,
-    "allowManualPrice": false,
-    "savePersonalDataAsOptIn": false,
-    "maxNumberOfWhiteLabelSellers": null,
-    "maskFirstPurchaseData": null,
-    "recaptchaValidation": "never",
-    "maskStateOnAddress": true
-}'
+    body: JSON.stringify({
+      "paymentConfiguration": {
+          "requiresAuthenticationForPreAuthorizedPaymentOption": false,
+          "allowInstallmentsMerge": null,
+          "blockPaymentSession": null,
+          "paymentSystemToCheckFirstInstallment": null,
+          "defaultPaymentSystemToApplyOnUserOrderForm": null
+      },
+      "taxConfiguration": null,
+      "minimumQuantityAccumulatedForItems": 1,
+      "decimalDigitsPrecision": 2,
+      "minimumValueAccumulated": 0,
+      "apps": [
+          {
+              "fields": [
+                  "idOrPassport",
+                  "sameAddress",
+                  "fullName",
+                  "streetAddress",
+                  "suburb",
+                  "city",
+                  "postalCode",
+                  "province",
+                  "country"
+              ],
+              "id": "ricafields",
+              "major": 1
+          },{
+              "fields": [
+                  "tvID"
+              ],
+              "id": "tvfields",
+              "major": "1"
+          },{
+              "fields": [
+                  "furnitureReady",
+                  "buildingType",
+                  "parkingDistance",
+                  "deliveryFloor",
+                  "liftOrStairs",
+                  "hasSufficientSpace",
+                  "assembleFurniture"
+              ],
+              "id": "furniturefields",
+              "major": "1"
+          }
+      ],
+      "allowMultipleDeliveries": true,
+      "allowManualPrice": false,
+      "savePersonalDataAsOptIn": false,
+      "maxNumberOfWhiteLabelSellers": null,
+      "maskFirstPurchaseData": null,
+      "recaptchaValidation": "never",
+      "maskStateOnAddress": true
+  })
+}
 ```
 #### Vtex documentation:
 - [get the orderForm configuration](https://developers.vtex.com/vtex-rest-api/reference/getorderformconfiguration)
