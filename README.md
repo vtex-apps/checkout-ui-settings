@@ -55,15 +55,15 @@ function setAppConfiguration(config) {
   config.tvId = "2";
   config.simCardId = "3";
   config.furnitureForm = {
-    buildingType: [
-      "Free standing",
-      "House in complex",
-      "Townhouse",
-      "Apartment",
-    ],
-    parkingDistance: [15, 25, 50, 100],
-    deliveryFloor: ["1", "2", "3+"],
-    liftStairs: ["lift", "stairs"],
+      buildingType: [
+        'Free standing',
+        'House in complex',
+        'Townhouse',
+        'Apartment'
+      ],
+      parkingDistance: [15, 25, 50, 100],
+      deliveryFloor: ['Ground', '1', '2', '3+'],
+      liftStairs: ['Lift', 'Stairs']
   };
   config.RICAMsg =
     "You can't collect this order in store because your cart contains items which require either RICA or TV License validation.";
