@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.1.12] - 2022-07-22
+### Changed
+- Include furniture, tv license and rica fields on the Order Form
+- update README
+
 ## [0.1.11] - 2022-07-13
 ### Fixed
 - check `intl-tel-input` dependencies

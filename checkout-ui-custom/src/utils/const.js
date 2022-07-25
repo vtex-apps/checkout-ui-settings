@@ -16,7 +16,10 @@ const AD_TYPE = {
 const TIMEOUT_500 = 500;
 const TIMEOUT_750 = 750;
 
+// APP CONFIGURATION IDs
 const RICA_APP = 'ricafields';
+const TV_APP = 'tvfields';
+const FURNITURE_APP = 'furniturefields';
 
 // Furniture fees Url
 const FURNITURE_FEES = 'http://image.tfgmedia.co.za/image/1/process/500x790?source=http://cdn.tfgmedia.co.za'
@@ -38,5 +41,7 @@ export {
   COUNTRIES,
   COUNTRIES_AVAILABLES,
   AD_TYPE,
-  BASE_URL_API
+  BASE_URL_API,
+  TV_APP,
+  FURNITURE_APP
 };
