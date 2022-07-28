@@ -181,7 +181,7 @@ The behavior required by TFG will be produced automatically in the checkout when
 - run `npm run watch`
 
 ## Checkout styles setup
-the styles of this application are stored in the app [tfg-custom-components](https://github.com/TFG-Labs/tfg-custom-checkout), please refer to its [documentation](https://github.com/TFG-Labs/tfg-custom-checkout/tree/feature/doc_update#checkout-styles-setup) to review the process.
+the styles of this application are stored in the app [tfg-custom-checkout](https://github.com/TFG-Labs/tfg-custom-checkout), please refer to its [documentation](https://github.com/TFG-Labs/tfg-custom-checkout/blob/main/README.md#checkout-styles-setup) to review the process.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
