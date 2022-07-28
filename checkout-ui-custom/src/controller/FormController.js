@@ -3,7 +3,8 @@ import { STEPS, TIMEOUT_750, RICA_APP, FURNITURE_APP, TV_APP } from '../utils/co
 import {
   saveAddress,
   checkoutSendCustomData,
-  setRicaFields
+  setRicaFields,
+  isValidNumberBash
 } from '../utils/functions';
 import { InputError } from '../templates';
 import ViewController from './ViewController';
@@ -60,10 +61,7 @@ const FormController = (() => {
     if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {
       checkField('ship-receiverName');
 
-      if (!AddressController.state.intTelInput) return;
-      if (typeof AddressController.state.intTelInput.isValidNumber !== 'function') return;
-
-      if (!AddressController.state.intTelInput.isValidNumber()) {
+      if (!isValidNumberBash(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)) {
         $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
         $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
         $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - check `intl-tel-input` dependencies
 
+### Fixed
+- Validation issue for mobile number
+
 ## [0.1.10] - 2022-07-07
 ### Fixed
 - remove container address

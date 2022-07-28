@@ -4,6 +4,9 @@ import 'intl-tel-input/build/js/utils';
 import 'intl-tel-input/build/css/intlTelInput.css';
 import { STEPS, COUNTRIES, COUNTRIES_AVAILABLES, AD_TYPE, TIMEOUT_750 } from '../utils/const';
 import { PickupComplementField, InputError } from '../templates';
+import {
+  isValidNumberBash
+} from '../utils/functions';
 
 const CollectController = (() => {
   const state = {
@@ -47,10 +50,8 @@ const CollectController = (() => {
           parent = '.shp-pickup-receiver';
           break;
         case 'custom-pickup-complement':
-          if (!state.intTelInput) return;
-          if (typeof state.intTelInput.isValidNumber !== 'function') return;
+          isValid = isValidNumberBash($(`#${field}`).val());
 
-          isValid = state.intTelInput.isValidNumber();
           parent = '#box-pickup-complement';
           break;
         default:
