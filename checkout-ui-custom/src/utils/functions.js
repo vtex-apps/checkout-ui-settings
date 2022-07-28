@@ -201,7 +201,7 @@ const waitAndResetLocalStorage = () => {
 };
 
 const isValidNumberBash = (tel) => {
-  const pattern = new RegExp('^\\d{9}$');
+  const pattern = new RegExp('^\\d{10}$');
   tel = tel.trim();
   return !!tel.match(pattern);
 };
