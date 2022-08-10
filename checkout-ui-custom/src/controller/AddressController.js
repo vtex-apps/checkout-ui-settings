@@ -1,14 +1,9 @@
-// the intlTelInput library has dependencies with ...js/utils import, do not remove it if using the intlTelInput library
-import 'intl-tel-input/build/css/intlTelInput.css';
-import 'intl-tel-input/build/js/utils';
-
 import { STEPS, TIMEOUT_500 } from '../utils/const';
 import setTranslations from '../utils/translations';
 import { preparePhoneField } from '../utils/validation';
 
 const AddressController = (() => {
   const state = {
-    intTelInput: {},
     captureGoogleInputOnChange: false,
     captureAddressListOnChange: false
   };
