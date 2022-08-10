@@ -7,7 +7,8 @@ import ViewController from './ViewController';
 
 const FormController = (() => {
   const state = {
-    validForm: true
+    validForm: true,
+    errorFields: []
   };
 
   const checkField = (field) => {
@@ -18,6 +19,7 @@ const FormController = (() => {
       if (!validatePhoneNumber(phoneNumber)) {
         $phoneFieldContainer.addClass('error').append(InputError());
         $phoneFieldContainer.find('span.error').show();
+        state.errorFields.push(field);
         state.validForm = false;
       } else {
         $phoneFieldContainer.removeClass('error');
@@ -26,8 +28,9 @@ const FormController = (() => {
     }
 
     if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
-      $(`.${field}`).addClass('error').append(InputError);
+      $(`.${field}`).addClass('error').append(InputError());
       $(`.${field} span.error`).show();
+      state.errorFields.push(field);
       state.validForm = false;
     } else {
       $(`.${field}`).removeClass('error');
@@ -41,8 +44,8 @@ const FormController = (() => {
   };
 
   const checkAddressForm = () => {
-    // "ship-complment" = Customer Phone number
-    checkFields(['ship-receiverName', 'ship-complement']);
+    // "ship-complement" = Customer Phone number
+    checkFields(['ship-street', 'ship-receiverName', 'ship-complement']);
   };
 
   const checkFurnitureForm = () => {
@@ -70,6 +73,7 @@ const FormController = (() => {
     // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
+    state.errorFields = [];
 
     /* Checking Receiver & Receiver Phone */
     if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {
@@ -85,6 +89,10 @@ const FormController = (() => {
     }
     if (ViewController.state.showTVIDForm) {
       checkField('tfg-tv-licence');
+    }
+
+    if (state.errorFields.length > 0 && document.getElementById(state.errorFields[0])) {
+      document.getElementById(state.errorFields[0]).focus();
     }
   };
 

@@ -1,10 +1,10 @@
-import intlTelInput from 'intl-tel-input';
 // the intlTelInput library has dependencies with ...js/utils import, do not remove it if using the intlTelInput library
 import 'intl-tel-input/build/css/intlTelInput.css';
 import 'intl-tel-input/build/js/utils';
 
-import { COUNTRIES, COUNTRIES_AVAILABLES, STEPS, TIMEOUT_500 } from '../utils/const';
+import { STEPS, TIMEOUT_500 } from '../utils/const';
 import setTranslations from '../utils/translations';
+import { preparePhoneField } from '../utils/validation';
 
 const AddressController = (() => {
   const state = {
@@ -13,32 +13,8 @@ const AddressController = (() => {
     captureAddressListOnChange: false
   };
 
-  const setInputPhone = () => {
-    const phoneInput = document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement');
-
-    const customPlaceholder = (_, selectedCountryData) => {
-      $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
-      return '';
-    };
-
-    if (phoneInput) {
-      phoneInput.setAttribute('placeholder', '');
-
-      const iti = intlTelInput(phoneInput, {
-        initialCountry: COUNTRIES.za.code,
-        onlyCountries: COUNTRIES_AVAILABLES,
-        customPlaceholder,
-        formatOnDisplay: false
-      });
-      state.intTelInput = iti;
-
-      if (!phoneInput.value) {
-        phoneInput.value = window.vtexjs.checkout.orderForm.shippingData.address.complement || '';
-        phoneInput.setAttribute('value', window.vtexjs.checkout.orderForm.shippingData.address.complement || '');
-      }
-
-      phoneInput.focus();
-    }
+  const prepPhoneField = () => {
+    preparePhoneField('.vtex-omnishipping-1-x-address input#ship-complement');
   };
 
   const setAddressType = () => {
@@ -142,7 +118,7 @@ const AddressController = (() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
         setTranslations();
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
-          setInputPhone();
+          prepPhoneField();
           setAddressType();
           toggleGoogleInput();
         }
