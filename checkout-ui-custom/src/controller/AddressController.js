@@ -1,15 +1,11 @@
 import { STEPS, TIMEOUT_500 } from '../utils/const';
+import { preparePhoneField } from '../utils/phoneFields';
 import setTranslations from '../utils/translations';
-import { preparePhoneField } from '../utils/validation';
 
 const AddressController = (() => {
   const state = {
     captureGoogleInputOnChange: false,
     captureAddressListOnChange: false
-  };
-
-  const prepPhoneField = () => {
-    preparePhoneField('.vtex-omnishipping-1-x-address input#ship-complement');
   };
 
   const setAddressType = () => {
@@ -113,7 +109,7 @@ const AddressController = (() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
         setTranslations();
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
-          prepPhoneField();
+          preparePhoneField('.vtex-omnishipping-1-x-address input#ship-complement');
           setAddressType();
           toggleGoogleInput();
         }

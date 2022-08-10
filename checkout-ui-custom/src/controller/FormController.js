@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import { ERRORS, FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
 import { checkoutSendCustomData, saveAddress, setRicaFields } from '../utils/functions';
-import { validatePhoneNumber } from '../utils/validation';
+import { validatePhoneNumber } from '../utils/phoneFields';
 import ViewController from './ViewController';
 
 import InputError from '../templates/InputError';
@@ -71,8 +71,7 @@ const FormController = (() => {
 
   const checkForm = () => {
     console.log('Check Form Form');
-    // Reset state & clear errors
-    $('span.help.error').remove();
+    $('span.help.error')?.remove();
     state.validForm = true;
     state.errorFields = [];
 
@@ -240,7 +239,7 @@ const FormController = (() => {
     function () {
       if ($(this).val()) {
         $(this).parent().removeClass('error');
-        $(this).next('span.help.error').remove();
+        $(this).next('span.help.error')?.remove();
         $(this).addClass('tfg-input-completed');
       } else {
         $(this).removeClass('tfg-input-completed');
@@ -251,7 +250,7 @@ const FormController = (() => {
   $(document).on('change', '.vtex-omnishipping-1-x-addressForm input', function () {
     if ($(this).val()) {
       $(this).parent().removeClass('error');
-      $(this).next('span.help.error').remove();
+      $(this).next('span.help.error')?.remove();
     }
   });
 

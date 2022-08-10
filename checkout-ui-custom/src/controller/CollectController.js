@@ -1,7 +1,7 @@
 import { PickupComplementField } from '../templates';
 import InputError from '../templates/InputError';
 import { AD_TYPE, ERRORS, STEPS, TIMEOUT_750 } from '../utils/const';
-import { preparePhoneField, validatePhoneNumber } from '../utils/validation';
+import { preparePhoneField, validatePhoneNumber } from '../utils/phoneFields';
 
 const CollectController = (() => {
   const state = {
@@ -42,6 +42,7 @@ const CollectController = (() => {
         error = ERRORS.PHONE;
         break;
       default:
+        isValid = $(`#${field}`).val().trim() !== '';
         break;
     }
 
@@ -65,7 +66,7 @@ const CollectController = (() => {
   // Validate Collection Form Fields
   const checkForm = () => {
     console.info('Check Collect Form');
-    $('span.help.error').remove();
+    $('span.help.error')?.remove();
     state.validForm = true;
     state.errorFields = [];
 
@@ -80,7 +81,7 @@ const CollectController = (() => {
     checkForm();
 
     if (state.validForm) {
-      const complement = $('#custom-pickup-complement').val();
+      const phoneNumber = $('#custom-pickup-complement').val();
 
       localStorage.setItem('saving-shipping-collect', true);
       $('#btn-go-to-payment').trigger('click');
@@ -90,7 +91,7 @@ const CollectController = (() => {
           .getOrderForm()
           .then((orderForm) => {
             const { address } = orderForm.shippingData;
-            address.complement = complement;
+            address.complement = phoneNumber;
 
             return window.vtexjs.checkout.calculateShipping(address);
           })
@@ -102,14 +103,17 @@ const CollectController = (() => {
   };
 
   const addCustomPhoneInput = () => {
-    if ($('input#custom-pickup-complement').length > 0) return;
+    const customPhoneInput = document.getElementById('custom-pickup-complement');
+    if (customPhoneInput) return;
+
     $('.btn-go-to-payment-wrapper').before(PickupComplementField);
-    preparePhoneField('input#custom-pickup-complement');
+    const newPhoneInput = document.getElementById('custom-pickup-complement');
     const profile = window.vtexjs.checkout.orderForm?.clientProfileData;
-    if (profile) {
+    if (profile && newPhoneInput) {
       const { phone } = profile;
-      $('input#custom-pickup-complement').val(phone).attr('value', phone);
+      newPhoneInput.value = phone;
     }
+    preparePhoneField('#custom-pickup-complement');
   };
 
   //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
@@ -159,7 +163,7 @@ const CollectController = (() => {
       }
     } else {
       /* Remove box-pickup-complement so that the input does not appear in the other steps of the checkout process  */
-      $('#box-pickup-complement').remove();
+      $('#box-pickup-complement')?.remove();
 
       if (window.location.hash === STEPS.PAYMENT) {
         setTimeout(() => {
