@@ -1,5 +1,6 @@
-import { InputError, PickupComplementField } from '../templates';
-import { AD_TYPE, STEPS, TIMEOUT_750 } from '../utils/const';
+import { PickupComplementField } from '../templates';
+import InputError from '../templates/InputError';
+import { AD_TYPE, ERRORS, STEPS, TIMEOUT_750 } from '../utils/const';
 import { preparePhoneField, validatePhoneNumber } from '../utils/validation';
 
 const CollectController = (() => {
@@ -26,6 +27,7 @@ const CollectController = (() => {
   const checkField = (field) => {
     let isValid = true;
     let parent;
+    let error = ERRORS.DEFAULT;
 
     switch (field) {
       // Customer name
@@ -37,6 +39,7 @@ const CollectController = (() => {
       case 'custom-pickup-complement':
         isValid = validatePhoneNumber($(`#${field}`).val());
         parent = '#box-pickup-complement';
+        error = ERRORS.PHONE;
         break;
       default:
         break;
@@ -44,7 +47,7 @@ const CollectController = (() => {
 
     if (!isValid) {
       $(parent).addClass('error');
-      $(parent).append(InputError());
+      $(parent).append(InputError(error));
       $(`${parent} span.error`).show();
       state.validForm = false;
       state.errorFields.push(field);

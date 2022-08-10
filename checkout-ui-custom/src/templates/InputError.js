@@ -1,3 +1,7 @@
-const InputError = () => '<span class="help error">This field is required.</span>';
+import { ERRORS } from '../utils/const.js'
 
-export default InputError;
+const InputError = (error) => {
+  return `<span class="help error">${error ?? ERRORS.DEFAULT}</span>`
+}
+
+export default InputError

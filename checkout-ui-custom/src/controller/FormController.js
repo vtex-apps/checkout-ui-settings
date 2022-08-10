@@ -1,9 +1,10 @@
 /* eslint-disable func-names */
-import { InputError } from '../templates';
-import { FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
+import { ERRORS, FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
 import { checkoutSendCustomData, saveAddress, setRicaFields } from '../utils/functions';
 import { validatePhoneNumber } from '../utils/validation';
 import ViewController from './ViewController';
+
+import InputError from '../templates/InputError';
 
 const FormController = (() => {
   const state = {
@@ -17,7 +18,7 @@ const FormController = (() => {
       const phoneNumber = $('.vtex-omnishipping-1-x-address input#ship-complement').val();
 
       if (!validatePhoneNumber(phoneNumber)) {
-        $phoneFieldContainer.addClass('error').append(InputError());
+        $phoneFieldContainer.addClass('error').append(InputError(ERRORS.PHONE));
         $phoneFieldContainer.find('span.error').show();
         state.errorFields.push(field);
         state.validForm = false;
