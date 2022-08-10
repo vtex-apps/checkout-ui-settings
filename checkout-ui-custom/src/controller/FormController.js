@@ -1,14 +1,9 @@
 /* eslint-disable func-names */
-import { STEPS, TIMEOUT_750, RICA_APP, FURNITURE_APP, TV_APP } from '../utils/const';
-import {
-  saveAddress,
-  checkoutSendCustomData,
-  setRicaFields,
-  isValidNumberBash
-} from '../utils/functions';
 import { InputError } from '../templates';
+import { FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
+import { checkoutSendCustomData, saveAddress, setRicaFields } from '../utils/functions';
+import { validatePhoneNumber } from '../utils/validation';
 import ViewController from './ViewController';
-import AddressController from './AddressController';
 
 const FormController = (() => {
   const state = {
@@ -16,9 +11,22 @@ const FormController = (() => {
   };
 
   const checkField = (field) => {
+    if (field === 'ship-complement') {
+      const $phoneFieldContainer = $('.vtex-omnishipping-1-x-address .ship-complement');
+      const phoneNumber = $('.vtex-omnishipping-1-x-address input#ship-complement').val();
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        $phoneFieldContainer.addClass('error').append(InputError());
+        $phoneFieldContainer.find('span.error').show();
+        state.validForm = false;
+      } else {
+        $phoneFieldContainer.removeClass('error');
+      }
+      return;
+    }
+
     if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {
-      $(`.${field}`).addClass('error');
-      $(`.${field}`).append(InputError);
+      $(`.${field}`).addClass('error').append(InputError);
       $(`.${field} span.error`).show();
       state.validForm = false;
     } else {
@@ -30,6 +38,11 @@ const FormController = (() => {
     fields.forEach((field) => {
       checkField(field);
     });
+  };
+
+  const checkAddressForm = () => {
+    // "ship-complment" = Customer Phone number
+    checkFields(['ship-receiverName', 'ship-complement']);
   };
 
   const checkFurnitureForm = () => {
@@ -53,22 +66,14 @@ const FormController = (() => {
   };
 
   const checkForm = () => {
+    console.log('Check Form Form');
     // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
 
     /* Checking Receiver & Receiver Phone */
     if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {
-      checkField('ship-receiverName');
-
-      if (!isValidNumberBash(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)) {
-        $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');
-        $('.vtex-omnishipping-1-x-address .ship-complement').append(InputError());
-        $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();
-        state.validForm = false;
-      } else {
-        $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error');
-      }
+      checkAddressForm();
     }
 
     /* Checking Custom Fields */
@@ -117,12 +122,11 @@ const FormController = (() => {
 
   const saveAddressType = () => {
     const addressType = localStorage.getItem('addressType');
-    window.vtexjs.checkout.getOrderForm()
-      .then((orderForm) => {
-        const { shippingData } = orderForm;
-        shippingData.selectedAddresses[0].addressType = addressType;
-        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
-      });
+    window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+      const { shippingData } = orderForm;
+      shippingData.selectedAddresses[0].addressType = addressType;
+      return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
+    });
   };
 
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
@@ -263,7 +267,7 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => { };
+  const publicInit = () => {};
 
   return {
     init: publicInit,
