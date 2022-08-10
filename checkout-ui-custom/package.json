@@ -12,8 +12,7 @@
   "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
   "license": "VTEX",
   "dependencies": {
-    "git": "^0.1.5",
-    "intl-tel-input": "^17.0.15"
+    "git": "^0.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
