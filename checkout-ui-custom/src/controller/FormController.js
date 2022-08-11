@@ -70,7 +70,6 @@ const FormController = (() => {
   };
 
   const checkForm = () => {
-    console.log('Check Form Form');
     $('span.help.error')?.remove();
     state.validForm = true;
     state.errorFields = [];
@@ -141,11 +140,7 @@ const FormController = (() => {
 
   const saveShippingForm = () => {
     const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
-
     checkForm();
-
-    console.log('!! saveShippingForm - state', state);
-
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
