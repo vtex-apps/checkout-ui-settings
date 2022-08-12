@@ -85,7 +85,7 @@ const saveAddress = async (fields = {}) => {
         res.json();
       }
     })
-    .catch((error) => console.log(error));
+    .catch((error) => console.error(error));
 };
 
 const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {
@@ -94,8 +94,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
-    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace'
-      + ',assembleFurniture,tvID';
+    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace' + ',assembleFurniture,tvID';
 
     const shippingData = await getShippingData(address.addressId, fields);
 
@@ -200,12 +199,6 @@ const waitAndResetLocalStorage = () => {
   }, 5000);
 };
 
-const isValidNumberBash = (tel) => {
-  const pattern = new RegExp('^\\d{10}$');
-  tel = tel.trim();
-  return !!tel.match(pattern);
-};
-
 export {
   getShippingData,
   saveAddress,
@@ -214,6 +207,5 @@ export {
   checkoutGetCustomData,
   checkoutSendCustomData,
   setRicaFields,
-  setMasterdataFields,
-  isValidNumberBash
+  setMasterdataFields
 };

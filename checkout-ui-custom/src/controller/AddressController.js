@@ -1,49 +1,11 @@
-import intlTelInput from 'intl-tel-input';
-// the intlTelInput library has dependencies with ...js/utils import, do not remove it if using the intlTelInput library
-import 'intl-tel-input/build/js/utils';
-import 'intl-tel-input/build/css/intlTelInput.css';
-
-import {
-  COUNTRIES_AVAILABLES,
-  COUNTRIES,
-  STEPS,
-  TIMEOUT_500
-} from '../utils/const';
+import { STEPS, TIMEOUT_500 } from '../utils/const';
+import { preparePhoneField } from '../utils/phoneFields';
 import setTranslations from '../utils/translations';
 
 const AddressController = (() => {
   const state = {
-    intTelInput: {},
     captureGoogleInputOnChange: false,
     captureAddressListOnChange: false
-  };
-
-  const setInputPhone = () => {
-    const phoneInput = document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement');
-
-    const customPlaceholder = (_, selectedCountryData) => {
-      $('.iti--allow-dropdown').attr('data-content', COUNTRIES[selectedCountryData.iso2].phonePlaceholder);
-      return '';
-    };
-
-    if (phoneInput) {
-      phoneInput.setAttribute('placeholder', '');
-
-      const iti = intlTelInput(phoneInput, {
-        initialCountry: COUNTRIES.za.code,
-        onlyCountries: COUNTRIES_AVAILABLES,
-        customPlaceholder,
-        formatOnDisplay: false
-      });
-      state.intTelInput = iti;
-
-      if (!phoneInput.value) {
-        phoneInput.value = window.vtexjs.checkout.orderForm.shippingData.address.complement || '';
-        phoneInput.setAttribute('value', window.vtexjs.checkout.orderForm.shippingData.address.complement || '');
-      }
-
-      phoneInput.focus();
-    }
   };
 
   const setAddressType = () => {
@@ -57,9 +19,7 @@ const AddressController = (() => {
         })
       );
 
-      $('.ship-addressType').append(
-        $('<label>').html('Address type')
-      );
+      $('.ship-addressType').append($('<label>').html('Address type'));
 
       $('.ship-addressType').append(
         $('<div>').prop({
@@ -79,31 +39,39 @@ const AddressController = (() => {
         })
       );
 
-      $('.ship-addressType-div-residential').append(
-        $('<input>').prop({
-          type: 'radio',
-          id: 'ship-addressType-residential',
-          name: 'ship-addressType',
-          value: 'residential'
-        })
-      ).append(
-        $('<label>').prop({
-          for: 'ship-addressType-residential'
-        }).html('Residential')
-      );
+      $('.ship-addressType-div-residential')
+        .append(
+          $('<input>').prop({
+            type: 'radio',
+            id: 'ship-addressType-residential',
+            name: 'ship-addressType',
+            value: 'residential'
+          })
+        )
+        .append(
+          $('<label>')
+            .prop({
+              for: 'ship-addressType-residential'
+            })
+            .html('Residential')
+        );
 
-      $('.ship-addressType-div-business').append(
-        $('<input>').prop({
-          type: 'radio',
-          id: 'ship-addressType-business',
-          name: 'ship-addressType',
-          value: 'commercial'
-        })
-      ).append(
-        $('<label>').prop({
-          for: 'ship-addressType-business'
-        }).html('Business')
-      );
+      $('.ship-addressType-div-business')
+        .append(
+          $('<input>').prop({
+            type: 'radio',
+            id: 'ship-addressType-business',
+            name: 'ship-addressType',
+            value: 'commercial'
+          })
+        )
+        .append(
+          $('<label>')
+            .prop({
+              for: 'ship-addressType-business'
+            })
+            .html('Business')
+        );
 
       const addressTypeSelected = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
       if (addressTypeSelected === 'residential') {
@@ -141,7 +109,7 @@ const AddressController = (() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
         setTranslations();
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
-          setInputPhone();
+          preparePhoneField('.vtex-omnishipping-1-x-address input#ship-complement');
           setAddressType();
           toggleGoogleInput();
         }
@@ -158,21 +126,11 @@ const AddressController = (() => {
     runCustomization();
   });
 
-  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
-    setTimeout(() => {
-      if (!$('#ship-complement').val()) {
-        $('#ship-complement')
-          .val(window.vtexjs.checkout.orderForm.shippingData.address.complement || '')
-          .attr('value', window.vtexjs.checkout.orderForm.shippingData.address.complement || '');
-      }
-    }, TIMEOUT_500);
-  });
-
   $(document).on('change', 'input[name="ship-addressType"]', () => {
     localStorage.setItem('addressType', document.querySelector('input[name="ship-addressType"]:checked').value);
   });
 
-  const publicInit = () => { };
+  const publicInit = () => {};
 
   return {
     init: publicInit,

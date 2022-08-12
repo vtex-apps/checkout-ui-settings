@@ -6,6 +6,13 @@ const STEPS = {
   PAYMENT: '#/payment'
 };
 
+// Errors
+const ERRORS = {
+  DEFAULT: 'This field is required.',
+  PHONE: 'Enter a valid phone number.',
+  EMAIL: 'Enter a valid email address.'
+};
+
 // Address types
 const AD_TYPE = {
   PICKUP: 'search',
@@ -43,5 +50,6 @@ export {
   AD_TYPE,
   BASE_URL_API,
   TV_APP,
-  FURNITURE_APP
+  FURNITURE_APP,
+  ERRORS
 };
