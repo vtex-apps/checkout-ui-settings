@@ -43,18 +43,17 @@ const formattedPhoneNumber = (value, doFormat = true) => {
  */
 export const preparePhoneField = (input) => {
   const phoneInput = document.querySelector(input);
+  if (!phoneInput) return;
   phoneInput.setAttribute('type', 'tel');
   phoneInput.setAttribute('maxlength', 12);
-  phoneInput.setAttribute('placeholder', 'xxx xxx xxxx');
   phoneInput.value = formattedPhoneNumber(phoneInput.value);
 
   const $phoneInput = $(input);
   $phoneInput.keyup((e) => {
     const value = e.currentTarget.value.replace(/[^0-9+*#]+/g, '').trim();
-    let displayValue = value;
 
     const isBackSpace = e.keyCode === 8;
-    displayValue = formattedPhoneNumber(value, !isBackSpace);
+    const displayValue = formattedPhoneNumber(value, !isBackSpace);
 
     $phoneInput.parent('.text').removeClass('error');
     $phoneInput.parent('.text').find('span.error').hide();
