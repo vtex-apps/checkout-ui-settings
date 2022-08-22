@@ -94,8 +94,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
-    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace'
-      + ',assembleFurniture,tvID';
+    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace' + ',assembleFurniture,tvID';
 
     const shippingData = await getShippingData(address.addressId, fields);
 
