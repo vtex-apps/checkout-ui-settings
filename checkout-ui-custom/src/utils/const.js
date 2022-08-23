@@ -30,7 +30,9 @@ const COUNTRIES = {
 };
 const COUNTRIES_AVAILABLES = [COUNTRIES.za.code];
 
-const BASE_URL_API = 'https://store-api.www.bash.com/custom-api/';
+const BASE_URL_API = window.location.host.includes('bash.com')
+  ? 'https://store-api.www.bash.com/custom-api/'
+  : `${window.location.protocol}//${window.location.host}/custom-api/`;
 
 export {
   STEPS,
