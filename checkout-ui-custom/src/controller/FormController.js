@@ -1,18 +1,12 @@
 /* eslint-disable func-names */
-import { STEPS, TIMEOUT_750, RICA_APP, FURNITURE_APP, TV_APP } from '../utils/const';
-import {
-  saveAddress,
-  checkoutSendCustomData,
-  setRicaFields,
-  isValidNumberBash
-} from '../utils/functions';
 import { InputError } from '../templates';
+import { FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
+import { checkoutSendCustomData, isValidNumberBash, saveAddress, setRicaFields } from '../utils/functions';
 import ViewController from './ViewController';
-import AddressController from './AddressController';
 
 const FormController = (() => {
   const state = {
-    validForm: true
+    validForm: true,
   };
 
   const checkField = (field) => {
@@ -46,7 +40,7 @@ const FormController = (() => {
       'tfg-rica-suburb',
       'tfg-rica-city',
       'tfg-rica-postal-code',
-      'tfg-rica-province'
+      'tfg-rica-province',
     ];
 
     checkFields(ricaFields);
@@ -117,12 +111,11 @@ const FormController = (() => {
 
   const saveAddressType = () => {
     const addressType = localStorage.getItem('addressType');
-    window.vtexjs.checkout.getOrderForm()
-      .then((orderForm) => {
-        const { shippingData } = orderForm;
-        shippingData.selectedAddresses[0].addressType = addressType;
-        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
-      });
+    window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+      const { shippingData } = orderForm;
+      shippingData.selectedAddresses[0].addressType = addressType;
+      return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
+    });
   };
 
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
@@ -182,6 +175,12 @@ const FormController = (() => {
   };
 
   const runCustomization = () => {
+    if ($('div.address-list').length < 1) {
+      $('body:not(.has-no-addresses)').addClass('has-no-addresses');
+    } else {
+      $('body.has-no-addresses').removeClass('has-no-addresses');
+    }
+
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
@@ -263,11 +262,11 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => { };
+  const publicInit = () => {};
 
   return {
     init: publicInit,
-    state
+    state,
   };
 })();
 
