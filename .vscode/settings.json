@@ -1,0 +1,21 @@
+{
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#16556e",
+        "titleBar.inactiveBackground": "#16556e",
+        "titleBar.activeForeground": "#fff",
+        "titleBar.inactiveForeground": "#fff",
+        "statusBar.foreground": "#ffffff",
+        "statusBar.background": "#16556e"
+    },
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true,
+        "source.fixAll": true
+    },
+    "eslint.alwaysShowStatus": true,
+    "emmet.triggerExpansionOnTab": true,
+    "files.autoSave": "onFocusChange",
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+}

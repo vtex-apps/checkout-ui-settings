@@ -4,22 +4,19 @@ module.exports = {
     commonjs: true,
     es2021: true,
     node: true,
-    jquery: true
+    jquery: true,
   },
-  extends: [
-    'airbnb-base'
-  ],
+  extends: ['airbnb-base'],
   parserOptions: {
-    ecmaVersion: 12
+    ecmaVersion: 12,
   },
   rules: {
     'linebreak-style': 0,
-    'comma-dangle': ['error', 'never'],
     'no-console': 0,
     'no-use-before-define': ['error', { functions: false, classes: true }],
     'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
     'no-param-reassign': 0,
     'max-len': ['error', { code: 120 }],
-    'object-curly-newline': 0
-  }
+    'object-curly-newline': 0,
+  },
 };

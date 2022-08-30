@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+    "naumovs.color-highlight",
+    "dbaeumer.vscode-eslint",
+    "graphql.vscode-graphql",
+  ]
+}
