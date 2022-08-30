@@ -1,30 +1,17 @@
+import { FurnitureForm, MixedProducts, RICAForm, TVIDForm, TVorRICAMsg } from '../templates';
+import { AD_TYPE, FURNITURE_FEES, RICA_APP, STEPS, TIMEOUT_500, TIMEOUT_750 } from '../utils/const';
 import {
-  STEPS,
-  TIMEOUT_500,
-  TIMEOUT_750,
-  RICA_APP,
-  FURNITURE_FEES,
-  AD_TYPE
-} from '../utils/const';
-import {
-  getShippingData,
   addBorderTop,
-  waitAndResetLocalStorage,
   checkoutGetCustomData,
+  getShippingData,
   setMasterdataFields,
-  setRicaFields
+  setRicaFields,
+  waitAndResetLocalStorage,
 } from '../utils/functions';
-import {
-  FurnitureForm,
-  TVorRICAMsg,
-  TVIDForm,
-  RICAForm,
-  MixedProducts
-} from '../templates';
 import CartController from './CartController';
 
-const FURNITURE_FEE_LINK = `<a href="${FURNITURE_FEES}" class="furniture-fees-link"`
-  + 'target="_blank">Furniture delivery costs</a>';
+const FURNITURE_FEE_LINK =
+  `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
 
 const ViewController = (() => {
   const state = {
@@ -32,7 +19,7 @@ const ViewController = (() => {
     showTVIDForm: false,
     showRICAForm: false,
     showTVorRICAMsg: false,
-    showMixedProductsMsg: false
+    showMixedProductsMsg: false,
   };
 
   const checkCartCategories = () => {
@@ -51,9 +38,10 @@ const ViewController = (() => {
         - after filter categories, this array includes at least one furniture id
         - there are only one category OR not all the categories in the array are furniture
       */
-      state.showMixedProductsMsg = items.length > 1
-        && categories.includes(config.furnitureId)
-        && (categories.length === 1 || !categories.every((value) => value === config.furnitureId));
+      state.showMixedProductsMsg =
+        items.length > 1 &&
+        categories.includes(config.furnitureId) &&
+        (categories.length === 1 || !categories.every((value) => value === config.furnitureId));
     }
   };
 
@@ -102,8 +90,9 @@ const ViewController = (() => {
 
     if (window.vtexjs.checkout.orderForm && window.vtexjs.checkout.orderForm.shippingData.address) {
       const { addressId } = window.vtexjs.checkout.orderForm.shippingData.address;
-      const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace'
-        + ',assembleFurniture,tvID';
+      const fields =
+        '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace' +
+        ',assembleFurniture,tvID';
 
       const customShippingInfo = await getShippingData(addressId, fields);
 
@@ -112,10 +101,10 @@ const ViewController = (() => {
         let tvCompleted = false;
 
         if (
-          state.showFurnitureForm
-          && customShippingInfo.buildingType
-          && customShippingInfo.deliveryFloor
-          && customShippingInfo.parkingDistance
+          state.showFurnitureForm &&
+          customShippingInfo.buildingType &&
+          customShippingInfo.deliveryFloor &&
+          customShippingInfo.parkingDistance
         ) {
           furnitureCompleted = true;
           validData = true;
@@ -141,14 +130,14 @@ const ViewController = (() => {
     const ricaFields = checkoutGetCustomData(RICA_APP);
 
     if (
-      ricaFields
-      && ricaFields.idOrPassport
-      && ricaFields.fullName
-      && ricaFields.streetAddress
-      && ricaFields.suburb
-      && ricaFields.city
-      && ricaFields.postalCode
-      && ricaFields.province
+      ricaFields &&
+      ricaFields.idOrPassport &&
+      ricaFields.fullName &&
+      ricaFields.streetAddress &&
+      ricaFields.suburb &&
+      ricaFields.city &&
+      ricaFields.postalCode &&
+      ricaFields.province
     ) {
       validData = true;
     }
@@ -253,11 +242,11 @@ const ViewController = (() => {
     }
   };
 
-  const publicInit = () => { };
+  const publicInit = () => {};
 
   return {
     init: publicInit,
-    state
+    state,
   };
 })();
 

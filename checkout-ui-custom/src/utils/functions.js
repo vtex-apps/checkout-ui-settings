@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { BASE_URL_API, RICA_APP } from './const';
+import { validatePhoneNumber } from './phoneFields';
 
 // API Functions
 const getHeadersByConfig = ({ cookie, cache, json }) => {
@@ -22,7 +23,7 @@ const getShippingData = async (addressName, fields) => {
   const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
   const options = {
     headers,
-    credentials: 'include'
+    credentials: 'include',
   };
 
   const response = await fetch(
@@ -62,7 +63,7 @@ const saveAddress = async (fields = {}) => {
   const newAddress = {
     userId: email,
     ...address,
-    ...fields
+    ...fields,
   };
 
   if (!savedAddress.id) {
@@ -75,7 +76,7 @@ const saveAddress = async (fields = {}) => {
     method: 'PATCH',
     headers,
     body: JSON.stringify(newAddress),
-    credentials: 'include'
+    credentials: 'include',
   };
 
   await fetch(path, options)
@@ -94,7 +95,8 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
-    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace' + ',assembleFurniture,tvID';
+    const fields =
+      '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace' + ',assembleFurniture,tvID';
 
     const shippingData = await getShippingData(address.addressId, fields);
 
@@ -149,7 +151,7 @@ const checkoutSendCustomData = (appId, customData) => {
     url: `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,
     dataType: 'json',
     contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(customData)
+    data: JSON.stringify(customData),
   });
 };
 
@@ -167,7 +169,7 @@ const setRicaFields = (getDataFrom = 'customApps') => {
       suburb: address.neighborhood,
       city: address.city,
       postalCode: address.postalCode,
-      province: address.state
+      province: address.state,
     };
   } else if (getDataFrom === 'customApps') {
     ricaFields = checkoutGetCustomData(RICA_APP);
@@ -199,11 +201,7 @@ const waitAndResetLocalStorage = () => {
   }, 5000);
 };
 
-const isValidNumberBash = (tel) => {
-  const pattern = new RegExp('^\\d{10}$');
-  tel = tel.trim();
-  return !!tel.match(pattern);
-};
+const isValidNumberBash = (tel) => validatePhoneNumber(tel);
 
 export {
   getShippingData,
@@ -214,5 +212,5 @@ export {
   checkoutSendCustomData,
   setRicaFields,
   setMasterdataFields,
-  isValidNumberBash
+  isValidNumberBash,
 };

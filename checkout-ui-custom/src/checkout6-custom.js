@@ -1,8 +1,8 @@
-import CartController from './controller/CartController';
 import AddressController from './controller/AddressController';
-import ViewController from './controller/ViewController';
-import FormController from './controller/FormController';
+import CartController from './controller/CartController';
 import CollectController from './controller/CollectController';
+import FormController from './controller/FormController';
+import ViewController from './controller/ViewController';
 
 CartController.init();
 AddressController.init();
