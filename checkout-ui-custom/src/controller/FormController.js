@@ -175,7 +175,8 @@ const FormController = (() => {
   };
 
   const runCustomization = () => {
-    if ($('div.address-list').length < 1) {
+    // If user has no addresses, and has Deliver selected.
+    if ($('div.address-list').length < 1 && $('#shipping-option-delivery').hasClass('shp-method-option-active')) {
       $('body:not(.has-no-addresses)').addClass('has-no-addresses');
     } else {
       $('body.has-no-addresses').removeClass('has-no-addresses');
