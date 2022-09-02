@@ -107,23 +107,7 @@ const CollectController = (() => {
   const addCustomPhoneInput = () => {
     if ($('input#custom-pickup-complement').length === 0) {
       $('.btn-go-to-payment-wrapper').before(PickupComplementField);
-      setInputPhone('input#custom-pickup-complement');
-
-      /* Set orderForm value if exists */
-      const selectedAddress = window.vtexjs.checkout.orderForm?.shippingData?.address;
-
-      if (selectedAddress) {
-        let { complement } = selectedAddress;
-
-        if (!complement) {
-          const availableAddressInfo = window.vtexjs.checkout.orderForm.shippingData.availableAddresses.find(
-            (address) => address.addressId === selectedAddress.addressId
-          );
-          complement = availableAddressInfo.complement;
-        }
-
-        $('input#custom-pickup-complement').val(complement).attr('value', complement);
-      }
+      setInputPhone();
     }
   };
 
