@@ -74,7 +74,7 @@ const CollectController = (() => {
     checkForm();
 
     if (state.validForm) {
-      let collectPhone = $('#custom-pickup-complement').val().replace(/\s/, '');
+      let collectPhone = $('#custom-pickup-complement').val().replace(/\s/g, '');
 
       if (collectPhone.length === 9 && collectPhone[0] !== '0') {
         collectPhone = `0${collectPhone}`;
