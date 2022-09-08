@@ -8,9 +8,11 @@
 export const validatePhoneNumber = (tel) => {
   if (!tel) return false;
   tel = tel.replace(/\s/g, '');
+
+  if (tel[0] === '0') return tel.match(/[0-9\s]{10}/);
+
   return tel.match(/[0-9\s]{9,}/);
 };
-
 /**
  * formattedPhoneNumber
  * Add spaces to help guide the user how the number should look.

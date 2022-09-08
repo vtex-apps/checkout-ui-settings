@@ -74,7 +74,11 @@ const CollectController = (() => {
     checkForm();
 
     if (state.validForm) {
-      const complement = $('#custom-pickup-complement').val();
+      let collectPhone = $('#custom-pickup-complement').val().replace(/\s/, '');
+
+      if (collectPhone.length === 9 && collectPhone[0] !== '0') {
+        collectPhone = `0${collectPhone}`;
+      }
 
       localStorage.setItem('saving-shipping-collect', true);
       $('#btn-go-to-payment').trigger('click');
@@ -84,7 +88,7 @@ const CollectController = (() => {
           .getOrderForm()
           .then((orderForm) => {
             const { address } = orderForm.shippingData;
-            address.complement = complement;
+            address.complement = collectPhone;
 
             return window.vtexjs.checkout.calculateShipping(address);
           })
@@ -108,6 +112,13 @@ const CollectController = (() => {
     if ($('input#custom-pickup-complement').length === 0) {
       $('.btn-go-to-payment-wrapper').before(PickupComplementField);
       setInputPhone();
+
+      /* Set orderForm value if exists */
+      const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? '';
+
+      if (phoneNumber) {
+        $('input#custom-pickup-complement').val(phoneNumber);
+      }
     }
   };
 
