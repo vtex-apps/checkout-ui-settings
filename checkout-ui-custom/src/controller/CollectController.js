@@ -140,6 +140,22 @@ const CollectController = (() => {
     }
   };
 
+  const toggleCollectionGoogleInput = () => {
+    if ($('#pkpmodal-search > .pac-target-input:not(.localizedGoogle)').length > 0) {
+      window.google.maps.event.clearInstanceListeners(document.querySelector('#pkpmodal-search > .pac-target-input'));
+      const options = {
+        types: ['(cities)'],
+        componentRestrictions: { country: 'za' },
+      };
+      // eslint-disable-next-line no-new
+      new window.google.maps.places.Autocomplete(
+        document.querySelector('#pkpmodal-search > .pac-target-input'),
+        options
+      );
+      $('#pkpmodal-search > .pac-target-input').addClass('localizedGoogle');
+    }
+  };
+
   const runCustomization = () => {
     const shippingLoaded = $('div#postalCode-finished-loading').length > 0;
 
@@ -160,6 +176,7 @@ const CollectController = (() => {
 
         changeTranslations();
         bindingEvents();
+        toggleCollectionGoogleInput();
       }
 
       /* If it has been redirected because of missing values, the click is forced to show the errors */
