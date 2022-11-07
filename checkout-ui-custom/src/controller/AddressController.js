@@ -83,24 +83,22 @@ const AddressController = (() => {
   };
 
   const toggleGoogleInput = () => {
-    if (!$('#v-custom-ship-street').val()) {
-      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-      const selector = `.vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info,
+    $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
+    const selector = `.vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info,
         .btn-go-to-shipping-wrapper`;
-      $(selector).hide();
-      $('.v-custom-ship-street label').text('Add a new delivery address');
-      $('#v-custom-ship-street').attr('placeholder', 'Search for address');
+    $(selector).hide();
+    $('.v-custom-ship-street label').text('Add a new delivery address');
+    $('#v-custom-ship-street').attr('placeholder', 'Search for address');
 
-      $('#v-custom-ship-street').one('change', () => {
-        $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-        $(selector).show();
-        $('.v-custom-ship-street label').text('Street address');
-        $('#v-custom-ship-street').attr(
-          'placeholder',
-          'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
-        );
-      });
-    }
+    $('#v-custom-ship-street').one('change', () => {
+      $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
+      $(selector).show();
+      $('.v-custom-ship-street label').text('Street address');
+      $('#v-custom-ship-street').attr(
+        'placeholder',
+        'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
+      );
+    });
   };
 
   const runCustomization = () => {
