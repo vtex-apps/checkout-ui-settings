@@ -122,6 +122,12 @@ const CollectController = (() => {
     } else {
       if ($('input#custom-pickup-complement').val() === '') {
         $('input#custom-pickup-complement').val(phoneNumber);
+
+        window.vtexjs.checkout.getOrderForm().then(function (orderForm) {
+          const { shippingData } = orderForm;
+          shippingData.address.complement = phoneNumber;
+          return vtexjs.checkout.sendAttachment('shippingData', shippingData);
+        });
       }
     }
     prePopulateReceiverName();
@@ -136,6 +142,12 @@ const CollectController = (() => {
 
     if ($('input#pickup-receiver').val() === '') {
       $('input#pickup-receiver').val(receiverName.trim());
+
+      window.vtexjs.checkout.getOrderForm().then(function (orderForm) {
+        const { shippingData } = orderForm;
+        shippingData.address.receiverName = receiverName.trim();
+        return vtexjs.checkout.sendAttachment('shippingData', shippingData);
+      });
     }
   };
 
