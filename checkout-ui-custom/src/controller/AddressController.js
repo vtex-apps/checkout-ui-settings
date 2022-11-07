@@ -128,7 +128,8 @@ const AddressController = (() => {
   $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
     setTimeout(() => {
       if (!$('#ship-complement').val()) {
-        const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? '';
+        const phoneNumber =
+          window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
 
         $('#ship-complement').val(phoneNumber);
       }
