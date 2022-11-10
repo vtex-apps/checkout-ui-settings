@@ -109,16 +109,45 @@ const CollectController = (() => {
   };
 
   const addCustomPhoneInput = () => {
+    /* Set orderForm value if exists */
+    const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
+
     if ($('input#custom-pickup-complement').length === 0) {
       $('.btn-go-to-payment-wrapper').before(PickupComplementField);
       setInputPhone();
 
-      /* Set orderForm value if exists */
-      const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? '';
-
       if (phoneNumber) {
         $('input#custom-pickup-complement').val(phoneNumber);
       }
+    } else {
+      if ($('input#custom-pickup-complement').val() === '') {
+        $('input#custom-pickup-complement').val(phoneNumber);
+
+        window.vtexjs.checkout.getOrderForm().then(function (orderForm) {
+          const { shippingData } = orderForm;
+          shippingData.address.complement = phoneNumber;
+          return vtexjs.checkout.sendAttachment('shippingData', shippingData);
+        });
+      }
+    }
+    prePopulateReceiverName();
+  };
+
+  const prePopulateReceiverName = () => {
+    const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+    const firstNameInput = $('#client-first-name').val();
+    const lastNameInput = $('#client-last-name').val();
+
+    const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');
+
+    if ($('input#pickup-receiver').val() === '') {
+      $('input#pickup-receiver').val(receiverName.trim());
+
+      window.vtexjs.checkout.getOrderForm().then(function (orderForm) {
+        const { shippingData } = orderForm;
+        shippingData.address.receiverName = receiverName.trim();
+        return vtexjs.checkout.sendAttachment('shippingData', shippingData);
+      });
     }
   };
 
