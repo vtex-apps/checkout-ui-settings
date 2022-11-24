@@ -7,6 +7,7 @@ import ViewController from './ViewController';
 const FormController = (() => {
   const state = {
     validForm: true,
+    runningObserver: false,
   };
 
   const checkField = (field) => {
@@ -197,9 +198,12 @@ const FormController = (() => {
 
   // INPUT EVENT SUBSCRIPTION
   const runFormObserver = () => {
+    if (state.runningObserver) return;
+
     const elementToObserveChange = document.querySelector('.shipping-container .box-step');
     const observerConfig = { attributes: false, childList: true, characterData: false };
     const observer = new MutationObserver(() => {
+      state.runningObserver = true;
       if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
         runCustomization();
       }
