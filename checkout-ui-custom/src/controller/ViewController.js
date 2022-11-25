@@ -7,6 +7,7 @@ import {
   setMasterdataFields,
   setRicaFields,
   waitAndResetLocalStorage,
+  getSpecialCategories,
 } from '../utils/functions';
 import CartController from './CartController';
 
@@ -26,12 +27,11 @@ const ViewController = (() => {
   const checkCartCategories = () => {
     if (window.vtexjs.checkout.orderForm) {
       const { items } = window.vtexjs.checkout.orderForm;
-      const { categories } = CartController.state;
+      const { furniture, TVs, SimCards, categories } = getSpecialCategories(items);
       const { config } = CartController;
-
-      state.showFurnitureForm = categories.includes(config.furnitureId);
-      state.showTVIDForm = categories.includes(config.tvId);
-      state.showRICAForm = categories.includes(config.simCardId);
+      state.showFurnitureForm = furniture;
+      state.showTVIDForm = TVs;
+      state.showRICAForm = SimCards;
       state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
       /**
         Conditions to show mixed products alert:
@@ -39,10 +39,8 @@ const ViewController = (() => {
         - after filter categories, this array includes at least one furniture id
         - there are only one category OR not all the categories in the array are furniture
       */
-      state.showMixedProductsMsg =
-        items.length > 1 &&
-        categories.includes(config.furnitureId) &&
-        (categories.length === 1 || !categories.every((value) => value === config.furnitureId));
+      state.showMixedProductsMsg = items.length > 1 && furniture
+        && (!categories.every((value) => value === config.furnitureId));
     }
   };
 

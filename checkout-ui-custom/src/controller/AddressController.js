@@ -1,4 +1,5 @@
 import { STEPS, TIMEOUT_500 } from '../utils/const';
+import { getSpecialCategories } from '../utils/functions';
 import setTranslations from '../utils/translations';
 
 const AddressController = (() => {
@@ -102,6 +103,19 @@ const AddressController = (() => {
   };
 
   const runCustomization = () => {
+    if (window.vtexjs.checkout.orderForm) {
+      const { items, shippingData: { address } } = window.vtexjs.checkout.orderForm;
+      const { furniture, TVs, SimCards } = getSpecialCategories(items);
+      const cannotCollect = furniture || SimCards || TVs;
+      if (address.addressType === 'search' && cannotCollect) {
+        const selectedDelivery = $('#shipping-option-delivery');
+        selectedDelivery.trigger('click');
+        if (window.location.hash === STEPS.PAYMENT) {
+          window.location.replace(STEPS.SHIPPING);
+        }
+      }
+    }
+
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
@@ -132,6 +146,10 @@ const AddressController = (() => {
         $('#ship-complement').val(phoneNumber);
       }
     }, TIMEOUT_500);
+  });
+
+  $(document).on('click', '#edit-shipping-data', () => {
+    runCustomization();
   });
 
   $(document).on('change', 'input[name="ship-addressType"]', () => {
