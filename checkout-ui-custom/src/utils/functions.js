@@ -203,6 +203,45 @@ const waitAndResetLocalStorage = () => {
 
 const isValidNumberBash = (tel) => validatePhoneNumber(tel);
 
+const getSpecialCategories = (items) => {
+  const furnitureCategories = ['1169288799'];
+  const tvCategories = ['938942995'];
+  const simCardCategories = ['24833302'];
+  const categories = [];
+  let TVs = false;
+  let SimCards = false;
+  let furniture = false;
+
+  items.forEach((item) => {
+    const itemCategories = item.productCategoryIds.split('/');
+    categories.push(itemCategories);
+    itemCategories.forEach((category) => {
+      if (!category) return;
+
+      if (tvCategories.includes(category)) {
+        TVs = true;
+      }
+      if (simCardCategories.includes(category)) {
+        SimCards = true;
+      }
+      if (furnitureCategories.includes(category)) {
+        furniture = true;
+      }
+    });
+  });
+
+  return {
+    furniture,
+    SimCards,
+    TVs,
+    categories,
+  };
+};
+
+export const clearLoaders = () => {
+  $('.shimmer').removeClass('shimmer');
+};
+
 export {
   getShippingData,
   saveAddress,
@@ -213,4 +252,5 @@ export {
   setRicaFields,
   setMasterdataFields,
   isValidNumberBash,
+  getSpecialCategories,
 };
