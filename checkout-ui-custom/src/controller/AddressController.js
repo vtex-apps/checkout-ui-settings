@@ -23,10 +23,15 @@ const AddressController = (() => {
 
   const toggleGoogleInput = () => {
     $('.body-order-form #shipping-data .vcustom--vtex-omnishipping-1-x-address > div > form').toggleClass('google');
-    const selector = `.vcustom--vtex-omnishipping-1-x-address__state, .v-custom-ship-info,
-        .btn-go-to-shipping-wrapper`;
+
+    const selector = `
+    .vcustom--vtex-omnishipping-1-x-address__state, 
+    .v-custom-ship-info, 
+    .btn-go-to-shipping-wrapper
+    `;
     $(selector).hide();
-    $('.v-custom-ship-street label').text('Add a new delivery address');
+
+    $('.v-custom-ship-street label').text('Add a new delivery address !!!!');
     $('#v-custom-ship-street').attr('placeholder', 'Search for address');
 
     $('#v-custom-ship-street').one('change', () => {
@@ -38,6 +43,14 @@ const AddressController = (() => {
         'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa'
       );
     });
+  };
+
+  const setProvinceSelect = () => {
+    if (!document.getElementById('ship-state')) return;
+
+    if (document.getElementById('ship-state').options[0].text === 'State') {
+      document.getElementById('ship-state').options[0].text = 'Select';
+    }
   };
 
   const populateDeliveryPhone = () => {
@@ -75,9 +88,10 @@ const AddressController = (() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
         setTranslations();
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
+          // toggleGoogleInput();
           setAddressType();
-          toggleGoogleInput();
           populateDeliveryPhone();
+          setProvinceSelect();
         }
       }, TIMEOUT_500);
     }
@@ -97,6 +111,7 @@ const AddressController = (() => {
     runCustomization();
   });
 
+  // TODO keep this?
   $(document).on('change', 'input[name="ship-addressType"]', () => {
     localStorage.setItem('addressType', document.querySelector('input[name="ship-addressType"]:checked').value);
   });
