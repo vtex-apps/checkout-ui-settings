@@ -7,6 +7,7 @@ const CollectController = (() => {
     inCollect: false,
     pickupSelected: false,
     validForm: false,
+    runningObserver: false,
   };
 
   const changeTranslations = () => {
@@ -108,6 +109,24 @@ const CollectController = (() => {
     }
   };
 
+  const prePopulateReceiverName = () => {
+    const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+    const firstNameInput = $('#client-first-name').val();
+    const lastNameInput = $('#client-last-name').val();
+
+    const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');
+
+    if ($('input#pickup-receiver').val() === '') {
+      $('input#pickup-receiver').val(receiverName.trim());
+
+      window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+        const { shippingData } = orderForm;
+        shippingData.address.receiverName = receiverName.trim();
+        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
+      });
+    }
+  };
+
   const addCustomPhoneInput = () => {
     /* Set orderForm value if exists */
     const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
@@ -119,36 +138,16 @@ const CollectController = (() => {
       if (phoneNumber) {
         $('input#custom-pickup-complement').val(phoneNumber);
       }
-    } else {
-      if ($('input#custom-pickup-complement').val() === '') {
-        $('input#custom-pickup-complement').val(phoneNumber);
+    } else if ($('input#custom-pickup-complement').val() === '') {
+      $('input#custom-pickup-complement').val(phoneNumber);
 
-        window.vtexjs.checkout.getOrderForm().then(function (orderForm) {
-          const { shippingData } = orderForm;
-          shippingData.address.complement = phoneNumber;
-          return vtexjs.checkout.sendAttachment('shippingData', shippingData);
-        });
-      }
-    }
-    prePopulateReceiverName();
-  };
-
-  const prePopulateReceiverName = () => {
-    const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
-    const firstNameInput = $('#client-first-name').val();
-    const lastNameInput = $('#client-last-name').val();
-
-    const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');
-
-    if ($('input#pickup-receiver').val() === '') {
-      $('input#pickup-receiver').val(receiverName.trim());
-
-      window.vtexjs.checkout.getOrderForm().then(function (orderForm) {
+      window.vtexjs.checkout.getOrderForm().then((orderForm) => {
         const { shippingData } = orderForm;
-        shippingData.address.receiverName = receiverName.trim();
-        return vtexjs.checkout.sendAttachment('shippingData', shippingData);
+        shippingData.address.complement = phoneNumber;
+        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
       });
     }
+    prePopulateReceiverName();
   };
 
   //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
@@ -166,22 +165,6 @@ const CollectController = (() => {
       $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);
 
       $(customPaymentBtn).on('click', saveCollectFields);
-    }
-  };
-
-  const toggleCollectionGoogleInput = () => {
-    if ($('#pkpmodal-search > .pac-target-input:not(.localizedGoogle)').length > 0) {
-      window.google.maps.event.clearInstanceListeners(document.querySelector('#pkpmodal-search > .pac-target-input'));
-      const options = {
-        types: ['(cities)'],
-        componentRestrictions: { country: 'za' },
-      };
-      // eslint-disable-next-line no-new
-      new window.google.maps.places.Autocomplete(
-        document.querySelector('#pkpmodal-search > .pac-target-input'),
-        options
-      );
-      $('#pkpmodal-search > .pac-target-input').addClass('localizedGoogle');
     }
   };
 
@@ -205,7 +188,6 @@ const CollectController = (() => {
 
         changeTranslations();
         bindingEvents();
-        toggleCollectionGoogleInput();
       }
 
       /* If it has been redirected because of missing values, the click is forced to show the errors */
@@ -239,9 +221,11 @@ const CollectController = (() => {
 
   /* We need this observer to detect the change in the deliver and collect buttons */
   const runCollectObserver = () => {
+    if (state.runningObserver) return;
     const elementToObserveChange = document.querySelector('.shipping-container .box-step');
     const observerConfig = { attributes: false, childList: true, characterData: false };
     const observer = new MutationObserver(() => {
+      state.runningObserver = true;
       runCustomization();
     });
 

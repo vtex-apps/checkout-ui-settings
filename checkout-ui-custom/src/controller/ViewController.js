@@ -20,6 +20,7 @@ const ViewController = (() => {
     showRICAForm: false,
     showTVorRICAMsg: false,
     showMixedProductsMsg: false,
+    runningObserver: false,
   };
 
   const checkCartCategories = () => {
@@ -229,9 +230,12 @@ const ViewController = (() => {
   });
 
   const runViewObserver = () => {
+    if (state.runningObserver) return;
+
     const elementToObserveChange = document.querySelector('.shipping-container .box-step');
     const observerConfig = { attributes: false, childList: true, characterData: false };
     const observer = new MutationObserver(() => {
+      state.runningObserver = true;
       if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
         runCustomization();
       }
