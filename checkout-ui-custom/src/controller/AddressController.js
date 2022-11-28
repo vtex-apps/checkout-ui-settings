@@ -1,6 +1,9 @@
+import AddressTypeField from '../partials/AddressTypeField';
 import { STEPS, TIMEOUT_500 } from '../utils/const';
-import { getSpecialCategories, clearLoaders } from '../utils/functions';
+import { clearLoaders, getSpecialCategories } from '../utils/functions';
+import { getBestPhoneNumber } from '../utils/phoneFields';
 import setTranslations from '../utils/translations';
+import setReceiverPhoneNumber from '../utils/vtex';
 
 const AddressController = (() => {
   const state = {
@@ -13,73 +16,8 @@ const AddressController = (() => {
     const addressTypeInput = document.querySelector('.vtex-omnishipping-1-x-address .ship-addressType');
 
     if (!addressTypeInput) {
-      $('.vtex-omnishipping-1-x-address > div').append(
-        $('<p>').prop({
-          class: 'input ship-addressType text',
-          style: 'order: 3',
-        })
-      );
-
-      $('.ship-addressType').append($('<label>').html('Address type'));
-
-      $('.ship-addressType').append(
-        $('<div>').prop({
-          class: 'ship-addressType-container',
-        })
-      );
-
-      $('.ship-addressType-container').append(
-        $('<div>').prop({
-          class: 'ship-addressType-div-residential',
-        })
-      );
-
-      $('.ship-addressType-container').append(
-        $('<div>').prop({
-          class: 'ship-addressType-div-business',
-        })
-      );
-
-      $('.ship-addressType-div-residential')
-        .append(
-          $('<input>').prop({
-            type: 'radio',
-            id: 'ship-addressType-residential',
-            name: 'ship-addressType',
-            value: 'residential',
-          })
-        )
-        .append(
-          $('<label>')
-            .prop({
-              for: 'ship-addressType-residential',
-            })
-            .html('Residential')
-        );
-
-      $('.ship-addressType-div-business')
-        .append(
-          $('<input>').prop({
-            type: 'radio',
-            id: 'ship-addressType-business',
-            name: 'ship-addressType',
-            value: 'commercial',
-          })
-        )
-        .append(
-          $('<label>')
-            .prop({
-              for: 'ship-addressType-business',
-            })
-            .html('Business')
-        );
-
       const addressTypeSelected = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
-      if (addressTypeSelected === 'residential') {
-        $('#ship-addressType-residential').attr('checked', true);
-      } else if (addressTypeSelected === 'commercial') {
-        $('#ship-addressType-business').attr('checked', true);
-      }
+      $('.ship-receiverName').after(AddressTypeField(addressTypeSelected));
     }
   };
 
@@ -102,18 +40,33 @@ const AddressController = (() => {
     });
   };
 
+  const populateDeliveryPhone = () => {
+    if (window.vtexjs.checkout.orderForm?.shippingData?.address?.complement || $('#ship-complement').val()) return;
+
+    const phoneNumber = getBestPhoneNumber();
+    if (!window.vtexjs.checkout.orderForm?.shippingData?.address?.complement) {
+      setReceiverPhoneNumber(phoneNumber);
+    }
+
+    if ($('#ship-complement').val() === '') $('#ship-complement').val(phoneNumber);
+  };
+
   const runCustomization = () => {
-    if (window.vtexjs.checkout.orderForm) {
-      const { items, shippingData: { address } } = window.vtexjs.checkout.orderForm;
-      const { furniture, TVs, SimCards } = getSpecialCategories(items);
-      const cannotCollect = furniture || SimCards || TVs;
-      if (address.addressType === 'search' && cannotCollect) {
-        $('#shipping-data').addClass('shimmer');
-        const selectedDelivery = $('#shipping-option-delivery');
-        selectedDelivery.trigger('click');
-        if (window.location.hash === STEPS.PAYMENT) {
-          window.location.replace(STEPS.SHIPPING);
-        }
+    if (!window.vtexjs.checkout.orderForm) return;
+
+    const { items, shippingData } = window.vtexjs.checkout.orderForm;
+    if (!shippingData || items.length < 1) return;
+
+    const { address } = shippingData;
+    const { furniture, TVs, SimCards } = getSpecialCategories(items);
+    const cannotCollect = furniture || SimCards || TVs;
+
+    if (address?.addressType === 'search' && cannotCollect) {
+      $('#shipping-data').addClass('shimmer');
+      const selectedDelivery = $('#shipping-option-delivery');
+      selectedDelivery.trigger('click');
+      if (window.location.hash === STEPS.PAYMENT) {
+        window.location.replace(STEPS.SHIPPING);
       }
     }
 
@@ -124,6 +77,7 @@ const AddressController = (() => {
         if (window.location.hash === STEPS.SHIPPING && selectedDelivery) {
           setAddressType();
           toggleGoogleInput();
+          populateDeliveryPhone();
         }
       }, TIMEOUT_500);
     }
@@ -137,17 +91,6 @@ const AddressController = (() => {
   $(window).on('hashchange orderFormUpdated.vtex', () => {
     clearLoaders();
     runCustomization();
-  });
-
-  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
-    setTimeout(() => {
-      if ($('#ship-complement').val() === '') {
-        const phoneNumber =
-          window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
-
-        $('#ship-complement').val(phoneNumber);
-      }
-    }, TIMEOUT_500);
   });
 
   $(document).on('click', '#edit-shipping-data', () => {
