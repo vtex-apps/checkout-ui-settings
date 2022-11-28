@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import { InputError } from '../templates';
+import { InputError } from '../partials';
 import { FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
 import { checkoutSendCustomData, isValidNumberBash, saveAddress, setRicaFields } from '../utils/functions';
 import ViewController from './ViewController';

@@ -1,4 +1,4 @@
-import { InputError, PickupComplementField } from '../templates';
+import { InputError, PickupComplementField } from '../partials';
 import { AD_TYPE, STEPS, TIMEOUT_750 } from '../utils/const';
 import { isValidNumberBash } from '../utils/functions';
 

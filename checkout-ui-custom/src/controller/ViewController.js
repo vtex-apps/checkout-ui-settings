@@ -1,13 +1,13 @@
-import { FurnitureForm, MixedProducts, RICAForm, TVIDForm, TVorRICAMsg } from '../templates';
+import { FurnitureForm, MixedProducts, RICAForm, TVIDForm, TVorRICAMsg } from '../partials';
 import { AD_TYPE, FURNITURE_FEES, RICA_APP, STEPS, TIMEOUT_500, TIMEOUT_750 } from '../utils/const';
 import {
   addBorderTop,
   checkoutGetCustomData,
   getShippingData,
+  getSpecialCategories,
   setMasterdataFields,
   setRicaFields,
   waitAndResetLocalStorage,
-  getSpecialCategories,
 } from '../utils/functions';
 import CartController from './CartController';
 
@@ -39,8 +39,8 @@ const ViewController = (() => {
         - after filter categories, this array includes at least one furniture id
         - there are only one category OR not all the categories in the array are furniture
       */
-      state.showMixedProductsMsg = items.length > 1 && furniture
-        && (!categories.every((value) => value === config.furnitureId));
+      state.showMixedProductsMsg =
+        items.length > 1 && furniture && !categories.every((value) => value === config.furnitureId);
     }
   };
 
