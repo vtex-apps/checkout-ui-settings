@@ -238,6 +238,10 @@ const getSpecialCategories = (items) => {
   };
 };
 
+export const clearLoaders = () => {
+  $('.shimmer').removeClass('shimmer');
+};
+
 export {
   getShippingData,
   saveAddress,

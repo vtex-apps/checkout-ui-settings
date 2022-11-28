@@ -1,5 +1,5 @@
 import { STEPS, TIMEOUT_500 } from '../utils/const';
-import { getSpecialCategories } from '../utils/functions';
+import { getSpecialCategories, clearLoaders } from '../utils/functions';
 import setTranslations from '../utils/translations';
 
 const AddressController = (() => {
@@ -108,6 +108,7 @@ const AddressController = (() => {
       const { furniture, TVs, SimCards } = getSpecialCategories(items);
       const cannotCollect = furniture || SimCards || TVs;
       if (address.addressType === 'search' && cannotCollect) {
+        $('#shipping-data').addClass('shimmer');
         const selectedDelivery = $('#shipping-option-delivery');
         selectedDelivery.trigger('click');
         if (window.location.hash === STEPS.PAYMENT) {
@@ -134,6 +135,7 @@ const AddressController = (() => {
   });
 
   $(window).on('hashchange orderFormUpdated.vtex', () => {
+    clearLoaders();
     runCustomization();
   });
 
