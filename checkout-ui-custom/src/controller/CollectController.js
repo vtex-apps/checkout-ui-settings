@@ -222,6 +222,7 @@ const CollectController = (() => {
   /* We need this observer to detect the change in the deliver and collect buttons */
   const runCollectObserver = () => {
     if (state.runningObserver) return;
+
     const elementToObserveChange = document.querySelector('.shipping-container .box-step');
     const observerConfig = { attributes: false, childList: true, characterData: false };
     const observer = new MutationObserver(() => {

@@ -3,13 +3,13 @@ const STEPS = {
   CART: '#/cart',
   PROFILE: '#/profile',
   SHIPPING: '#/shipping',
-  PAYMENT: '#/payment'
+  PAYMENT: '#/payment',
 };
 
 // Address types
 const AD_TYPE = {
   PICKUP: 'search',
-  DELIVERY: 'residential'
+  DELIVERY: 'residential',
 };
 
 // TIMEOUT
@@ -22,17 +22,21 @@ const TV_APP = 'tvfields';
 const FURNITURE_APP = 'furniturefields';
 
 // Furniture fees Url
-const FURNITURE_FEES = 'http://image.tfgmedia.co.za/image/1/process/500x790?source=http://cdn.tfgmedia.co.za'
-  + '/15/Marketing/HTMLPages/Furniture_Delivery_Fees_tab_image.jpg';
+const FURNITURE_FEES =
+  'http://image.tfgmedia.co.za/image/1/process/500x790?source=http://cdn.tfgmedia.co.za' +
+  '/15/Marketing/HTMLPages/Furniture_Delivery_Fees_tab_image.jpg';
 
 const COUNTRIES = {
-  za: { code: 'za', phonePlaceholder: '(+27)' } // South Africa
+  za: { code: 'za', phonePlaceholder: '(+27)' }, // South Africa
 };
 const COUNTRIES_AVAILABLES = [COUNTRIES.za.code];
 
 const BASE_URL_API = window.location.host.includes('bash.com')
   ? 'https://store-api.www.bash.com/custom-api/'
   : `${window.location.protocol}//${window.location.host}/custom-api/`;
+
+const FURNITURE_FEE_LINK =
+  `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
 
 export {
   STEPS,
@@ -45,5 +49,6 @@ export {
   AD_TYPE,
   BASE_URL_API,
   TV_APP,
-  FURNITURE_APP
+  FURNITURE_APP,
+  FURNITURE_FEE_LINK,
 };

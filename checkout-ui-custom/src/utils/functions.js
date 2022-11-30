@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { BASE_URL_API, RICA_APP } from './const';
-import { validatePhoneNumber } from './phoneFields';
+import { getBestPhoneNumber, validatePhoneNumber } from './phoneFields';
 
 // API Functions
 const getHeadersByConfig = ({ cookie, cache, json }) => {
@@ -58,6 +58,8 @@ const saveAddress = async (fields = {}) => {
   } else {
     path = `${BASE_URL_API}masterdata/addresses`;
   }
+
+  address.complement = address.complement || getBestPhoneNumber();
 
   // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood
   const newAddress = {

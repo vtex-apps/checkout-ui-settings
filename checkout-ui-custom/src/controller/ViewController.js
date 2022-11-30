@@ -1,5 +1,5 @@
 import { FurnitureForm, MixedProducts, RICAForm, TVIDForm, TVorRICAMsg } from '../partials';
-import { AD_TYPE, FURNITURE_FEES, RICA_APP, STEPS, TIMEOUT_500, TIMEOUT_750 } from '../utils/const';
+import { AD_TYPE, FURNITURE_FEE_LINK, RICA_APP, STEPS, TIMEOUT_500, TIMEOUT_750 } from '../utils/const';
 import {
   addBorderTop,
   checkoutGetCustomData,
@@ -10,9 +10,6 @@ import {
   waitAndResetLocalStorage,
 } from '../utils/functions';
 import CartController from './CartController';
-
-const FURNITURE_FEE_LINK =
-  `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
 
 const ViewController = (() => {
   const state = {
@@ -210,6 +207,10 @@ const ViewController = (() => {
     }
   };
 
+  const setView = (view) => {
+    document.body.setAttribute('data-delivery-view', view);
+  };
+
   // EVENTS SUBSCRIPTION
   $(document).ready(() => {
     runCustomization();
@@ -223,10 +224,6 @@ const ViewController = (() => {
     runCustomization();
   });
 
-  $(document).on('click', '.vtex-omnishipping-1-x-addressList #edit-address-button', () => {
-    setDataInCustomFields();
-  });
-
   const runViewObserver = () => {
     if (state.runningObserver) return;
 
@@ -234,7 +231,7 @@ const ViewController = (() => {
     const observerConfig = { attributes: false, childList: true, characterData: false };
     const observer = new MutationObserver(() => {
       state.runningObserver = true;
-      if (window.location.hash === STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {
+      if (window.location.hash === STEPS.SHIPPING) {
         runCustomization();
       }
     });
@@ -249,6 +246,8 @@ const ViewController = (() => {
   return {
     init: publicInit,
     state,
+    setView,
+    setDataInCustomFields,
   };
 })();
 
