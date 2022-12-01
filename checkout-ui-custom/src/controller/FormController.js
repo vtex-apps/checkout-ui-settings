@@ -273,6 +273,7 @@ const FormController = (() => {
 
   return {
     state,
+    init: () => {},
   };
 })();
 

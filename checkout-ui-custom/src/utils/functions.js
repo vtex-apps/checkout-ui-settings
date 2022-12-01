@@ -2,6 +2,12 @@ import { BASE_URL_API, FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const'
 import { getBestPhoneNumber, validatePhoneNumber } from './phoneFields';
 
 // API Functions
+
+const catchError = (message) => {
+  console.error('ERROR', message);
+  throw new Error(message);
+};
+
 const getHeadersByConfig = ({ cookie, cache, json }) => {
   const headers = new Headers();
   if (cookie) headers.append('Cookie', document?.cookie);
@@ -23,7 +29,7 @@ const getShippingData = async (addressName, fields) => {
     options
   )
     .then((res) => res.json())
-    .catch((err) => console.error(err));
+    .catch((error) => catchError(`GET_ADDRESS_ERROR: ${error?.message}`));
 
   if (response && !response.error && response.data && response.data.length > 0) {
     [data] = response.data;
@@ -80,10 +86,7 @@ const saveAddress = async (fields = {}) => {
         res.json();
       }
     })
-    .catch((error) => {
-      console.error(error);
-      throw new Error('Could not save address', error);
-    });
+    .catch((error) => catchError(`SAVE_ADDRESS_ERROR: ${error?.message}`));
 };
 
 const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {

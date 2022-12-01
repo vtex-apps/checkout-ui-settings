@@ -119,6 +119,7 @@ const AddressController = (() => {
 
   return {
     state,
+    init: () => {},
   };
 })();
 

@@ -231,6 +231,7 @@ const CollectController = (() => {
 
   return {
     state,
+    init: () => {},
   };
 })();
 

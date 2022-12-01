@@ -240,6 +240,7 @@ const ViewController = (() => {
     state,
     setView,
     setDataInCustomFields,
+    init: () => {},
   };
 })();
 
