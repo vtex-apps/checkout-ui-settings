@@ -236,10 +236,7 @@ const ViewController = (() => {
     }
   };
 
-  const publicInit = () => {};
-
   return {
-    init: publicInit,
     state,
     setView,
     setDataInCustomFields,

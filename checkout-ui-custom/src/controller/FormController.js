@@ -177,10 +177,15 @@ const FormController = (() => {
 
   const runCustomization = () => {
     // If user has no addresses, and has Deliver selected.
-    if ($('div.address-list').length < 1 && $('#shipping-option-delivery').hasClass('shp-method-option-active')) {
+    if (
+      $('div.address-list').length < 1 &&
+      $('#shipping-option-delivery').hasClass('shp-method-option-active') &&
+      $('body').data('delivery-view') !== 'address-list'
+    ) {
       $('body:not(.has-no-addresses)').addClass('has-no-addresses');
     } else {
       $('body.has-no-addresses').removeClass('has-no-addresses');
+      document.body.setAttribute('data-delivery-view', 'address-list');
     }
 
     if (window.location.hash === STEPS.SHIPPING) {
@@ -267,10 +272,7 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {};
-
   return {
-    init: publicInit,
     state,
   };
 })();

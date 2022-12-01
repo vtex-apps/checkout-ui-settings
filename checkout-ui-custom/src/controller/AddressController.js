@@ -48,8 +48,8 @@ const AddressController = (() => {
     if (!shippingData || items.length < 1) return;
 
     const { address } = shippingData;
-    const { hasFurniture, TVs, hasSimCards } = getSpecialCategories(items);
-    const cannotCollect = hasFurniture || hasSimCards || TVs;
+    const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+    const cannotCollect = hasFurniture || hasSimCards || hasTVs;
 
     if (address?.addressType === 'search' && cannotCollect) {
       $('#shipping-data').addClass('shimmer');
@@ -117,10 +117,7 @@ const AddressController = (() => {
     $('#v-custom-ship-street').attr('placeholder', 'Eg: 234 Brickfield Rd, Salt River, Cape Town, 7501, South Africa');
   });
 
-  const publicInit = () => {};
-
   return {
-    init: publicInit,
     state,
   };
 })();

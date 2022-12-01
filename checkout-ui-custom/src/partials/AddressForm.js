@@ -20,7 +20,7 @@ export const SuburbField = () => `<p class="input custom-field-neighborhood tfg-
 export const PickupComplementField = () => `
   <p id="box-pickup-complement" class="input custom-field-complement tfg-custom-addressForm">
     <label>Mobile number</label>
-    <input id="custom-pickup-complement" class="input-xlarge success" type="text" field="complement"/>
+    <input id="custom-pickup-complement" class="input-xlarge success" type="text" field="complement" placeholder="" />
   </p>`;
 
 export default AddressForm;
