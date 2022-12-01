@@ -185,7 +185,6 @@ const FormController = (() => {
       $('body:not(.has-no-addresses)').addClass('has-no-addresses');
     } else {
       $('body.has-no-addresses').removeClass('has-no-addresses');
-      document.body.setAttribute('data-delivery-view', 'address-list');
     }
 
     if (window.location.hash === STEPS.SHIPPING) {

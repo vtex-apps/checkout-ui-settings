@@ -1,25 +1,17 @@
-/* eslint-disable import/prefer-default-export */
 import { BASE_URL_API, FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { getBestPhoneNumber, validatePhoneNumber } from './phoneFields';
 
 // API Functions
 const getHeadersByConfig = ({ cookie, cache, json }) => {
   const headers = new Headers();
-  if (cookie) {
-    headers.append('Cookie', document?.cookie);
-  }
-  if (cache) {
-    headers.append('Cache-Control', 'no-cache');
-  }
-  if (json) {
-    headers.append('Content-type', 'application/json');
-  }
+  if (cookie) headers.append('Cookie', document?.cookie);
+  if (cache) headers.append('Cache-Control', 'no-cache');
+  if (json) headers.append('Content-type', 'application/json');
   return headers;
 };
 
 const getShippingData = async (addressName, fields) => {
   let data = {};
-
   const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
   const options = {
     headers,
@@ -47,7 +39,7 @@ const saveAddress = async (fields = {}) => {
 
   if (!address) return;
 
-  // AD already exists (?)
+  // Address already exists (?)
   const savedAddress = address?.addressId ? await getShippingData(address.addressId, '?_fields=id') : {};
 
   // Guardado del nuevo addressType
@@ -88,7 +80,10 @@ const saveAddress = async (fields = {}) => {
         res.json();
       }
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.error(error);
+      throw new Error('Could not save address', error);
+    });
 };
 
 const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {
@@ -98,7 +93,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
 
     /* Setting Masterdata custom fields */
     const fields =
-      '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace' + ',assembleFurniture,tvID';
+      '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
 
     const shippingData = await getShippingData(address.addressId, fields);
 
@@ -219,16 +214,9 @@ const getSpecialCategories = (items) => {
     categories.push(itemCategories);
     itemCategories.forEach((category) => {
       if (!category) return;
-
-      if (tvCategories.includes(category)) {
-        hasTVs = true;
-      }
-      if (simCardCategories.includes(category)) {
-        hasSimCards = true;
-      }
-      if (furnitureCategories.includes(category)) {
-        hasFurniture = true;
-      }
+      if (tvCategories.includes(category)) hasTVs = true;
+      if (simCardCategories.includes(category)) hasSimCards = true;
+      if (furnitureCategories.includes(category)) hasFurniture = true;
     });
   });
 

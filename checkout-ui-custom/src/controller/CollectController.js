@@ -35,7 +35,6 @@ const CollectController = (() => {
           break;
         case 'custom-pickup-complement':
           isValid = isValidNumberBash($(`#${field}`).val());
-
           parent = '#box-pickup-complement';
           break;
         default:
@@ -54,16 +53,13 @@ const CollectController = (() => {
   };
 
   const checkForm = () => {
-    // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
-
     checkFields(['pickup-receiver', 'custom-pickup-complement']);
   };
 
   const saveCollectFields = () => {
     checkForm();
-
     if (state.validForm) {
       let collectPhone = $('#custom-pickup-complement').val().replace(/\s/g, '');
 
