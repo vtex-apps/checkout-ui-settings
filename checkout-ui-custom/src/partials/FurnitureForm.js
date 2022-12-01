@@ -1,4 +1,12 @@
-const FurnitureForm = ({ buildingType, parkingDistance, deliveryFloor, liftStairs }) => {
+const furnitureForm = {
+  buildingType: ['Free standing', 'House in complex', 'Townhouse', 'Apartment'],
+  parkingDistance: [15, 25, 50, 100],
+  deliveryFloor: ['Ground', '1', '2', '3+'],
+  liftStairs: ['Lift', 'Stairs'],
+};
+
+const FurnitureForm = () => {
+  const { buildingType, parkingDistance, deliveryFloor, liftStairs } = furnitureForm;
   // Building type selector
   let buildingTypeInput = `
     <p class="input tfg-custom-input tfg-building-type">

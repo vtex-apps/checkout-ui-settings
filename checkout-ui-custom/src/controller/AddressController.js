@@ -48,8 +48,8 @@ const AddressController = (() => {
     if (!shippingData || items.length < 1) return;
 
     const { address } = shippingData;
-    const { furniture, TVs, SimCards } = getSpecialCategories(items);
-    const cannotCollect = furniture || SimCards || TVs;
+    const { hasFurniture, TVs, hasSimCards } = getSpecialCategories(items);
+    const cannotCollect = hasFurniture || hasSimCards || TVs;
 
     if (address?.addressType === 'search' && cannotCollect) {
       $('#shipping-data').addClass('shimmer');

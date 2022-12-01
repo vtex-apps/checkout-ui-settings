@@ -1,5 +1,5 @@
 import { FurnitureForm, MixedProducts, RICAForm, TVIDForm, TVorRICAMsg } from '../partials';
-import { AD_TYPE, FURNITURE_FEE_LINK, RICA_APP, STEPS, TIMEOUT_500, TIMEOUT_750 } from '../utils/const';
+import { AD_TYPE, FURNITURE_CAT, FURNITURE_FEE_LINK, RICA_APP, STEPS, TIMEOUT_500, TIMEOUT_750 } from '../utils/const';
 import {
   addBorderTop,
   checkoutGetCustomData,
@@ -9,7 +9,6 @@ import {
   setRicaFields,
   waitAndResetLocalStorage,
 } from '../utils/functions';
-import CartController from './CartController';
 
 const ViewController = (() => {
   const state = {
@@ -24,11 +23,10 @@ const ViewController = (() => {
   const checkCartCategories = () => {
     if (window.vtexjs.checkout.orderForm) {
       const { items } = window.vtexjs.checkout.orderForm;
-      const { furniture, TVs, SimCards, categories } = getSpecialCategories(items);
-      const { config } = CartController;
-      state.showFurnitureForm = furniture;
-      state.showTVIDForm = TVs;
-      state.showRICAForm = SimCards;
+      const { hasFurniture, hasTVs, hasSimCards, categories } = getSpecialCategories(items);
+      state.showFurnitureForm = hasFurniture;
+      state.showTVIDForm = hasTVs;
+      state.showRICAForm = hasSimCards;
       state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
       /**
         Conditions to show mixed products alert:
@@ -36,14 +34,11 @@ const ViewController = (() => {
         - after filter categories, this array includes at least one furniture id
         - there are only one category OR not all the categories in the array are furniture
       */
-      state.showMixedProductsMsg =
-        items.length > 1 && furniture && !categories.every((value) => value === config.furnitureId);
+      state.showMixedProductsMsg = items.length > 1 && hasFurniture && !categories.every((c) => c === FURNITURE_CAT);
     }
   };
 
   const showCustomSections = () => {
-    const { config } = CartController;
-
     const tvRICAStepExists = $('#tfg-custom-rica-msg').length > 0;
     const tvIDStepExists = $('#tfg-custom-tvid-step').length > 0;
     const furnitureStepExists = $('#tfg-custom-furniture-step').length > 0;
@@ -60,7 +55,7 @@ const ViewController = (() => {
     }
 
     if (state.showFurnitureForm && !furnitureStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm(config.furnitureForm));
+      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm());
       $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
       $('div.subheader').css('display', 'none');
     }
@@ -70,11 +65,11 @@ const ViewController = (() => {
       $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
 
       if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
-        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg(config.TVorRICAMsg));
+        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg());
       }
 
       if (state.showMixedProductsMsg && !mixedProductsMsgExits) {
-        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(MixedProducts(config.MixedProductsMsg));
+        $('.vtex-omnishipping-1-x-addressFormPart1').prepend(MixedProducts());
       }
     }
 

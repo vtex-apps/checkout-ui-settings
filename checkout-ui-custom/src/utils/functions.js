@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { BASE_URL_API, RICA_APP } from './const';
+import { BASE_URL_API, FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { getBestPhoneNumber, validatePhoneNumber } from './phoneFields';
 
 // API Functions
@@ -206,13 +206,13 @@ const waitAndResetLocalStorage = () => {
 const isValidNumberBash = (tel) => validatePhoneNumber(tel);
 
 const getSpecialCategories = (items) => {
-  const furnitureCategories = ['1169288799'];
-  const tvCategories = ['938942995'];
-  const simCardCategories = ['24833302'];
+  const furnitureCategories = [FURNITURE_CAT];
+  const tvCategories = [TV_CAT];
+  const simCardCategories = [SIM_CAT];
   const categories = [];
-  let TVs = false;
-  let SimCards = false;
-  let furniture = false;
+  let hasTVs = false;
+  let hasSimCards = false;
+  let hasFurniture = false;
 
   items.forEach((item) => {
     const itemCategories = item.productCategoryIds.split('/');
@@ -221,21 +221,21 @@ const getSpecialCategories = (items) => {
       if (!category) return;
 
       if (tvCategories.includes(category)) {
-        TVs = true;
+        hasTVs = true;
       }
       if (simCardCategories.includes(category)) {
-        SimCards = true;
+        hasSimCards = true;
       }
       if (furnitureCategories.includes(category)) {
-        furniture = true;
+        hasFurniture = true;
       }
     });
   });
 
   return {
-    furniture,
-    SimCards,
-    TVs,
+    hasFurniture,
+    hasSimCards,
+    hasTVs,
     categories,
   };
 };

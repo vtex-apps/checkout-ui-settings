@@ -38,6 +38,10 @@ const BASE_URL_API = window.location.host.includes('bash.com')
 const FURNITURE_FEE_LINK =
   `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
 
+const FURNITURE_CAT = '1169288799';
+const TV_CAT = '938942995';
+const SIM_CAT = '24833302';
+
 export {
   STEPS,
   TIMEOUT_500,
@@ -51,4 +55,7 @@ export {
   TV_APP,
   FURNITURE_APP,
   FURNITURE_FEE_LINK,
+  SIM_CAT,
+  TV_CAT,
+  FURNITURE_CAT,
 };
