@@ -45,35 +45,44 @@ const ViewController = (() => {
     const tvOrRICAMsgStepExists = $('#tfg-custom-tvrica-msg').length > 0;
     const mixedProductsMsgExits = $('#tfg-custom-mixed-msg').length > 0;
 
+    let addBorder = false;
+
     if (state.showRICAForm && !tvRICAStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAForm());
       $('#tfg-rica-same-address').trigger('change');
+      addBorder = true;
     }
 
     if (state.showTVIDForm && !tvIDStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(TVIDForm());
+      addBorder = true;
     }
 
     if (state.showFurnitureForm && !furnitureStepExists) {
       $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm());
       $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
       $('div.subheader').css('display', 'none');
+      addBorder = true;
     }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
-      $('#shipping-option-delivery').trigger('click');
-      $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
+      if ($('.vtex-omnishipping-1-x-deliveryChannelsWrapper.custom-disabled').length < 1) {
+        $('#shipping-option-delivery').trigger('click');
+        $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');
+      }
 
       if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {
         $('.vtex-omnishipping-1-x-addressFormPart1').prepend(TVorRICAMsg());
+        addBorder = true;
       }
 
       if (state.showMixedProductsMsg && !mixedProductsMsgExits) {
         $('.vtex-omnishipping-1-x-addressFormPart1').prepend(MixedProducts());
+        addBorder = true;
       }
     }
 
-    addBorderTop('.tfg-custom-step');
+    if (addBorder) addBorderTop('.tfg-custom-step');
   };
 
   const shippingCustomDataCompleted = async () => {
@@ -240,6 +249,7 @@ const ViewController = (() => {
     state,
     setView,
     setDataInCustomFields,
+    showCustomSections,
     init: () => {},
   };
 })();

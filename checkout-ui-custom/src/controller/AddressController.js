@@ -41,24 +41,32 @@ const AddressController = (() => {
     if ($('#ship-complement').val() === '') $('#ship-complement').val(phoneNumber);
   };
 
-  const runCustomization = () => {
-    if (!window.vtexjs.checkout.orderForm) return;
-
+  const checkCollectTab = () => {
     const { items, shippingData } = window.vtexjs.checkout.orderForm;
     if (!shippingData || items.length < 1) return;
 
     const { address } = shippingData;
-    const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
-    const cannotCollect = hasFurniture || hasSimCards || hasTVs;
+    const { hasTVs, hasSimCards } = getSpecialCategories(items);
+    const cannotCollect = hasSimCards || hasTVs;
 
-    if (address?.addressType === 'search' && cannotCollect) {
-      $('#shipping-data').addClass('shimmer');
-      const selectedDelivery = $('#shipping-option-delivery');
-      selectedDelivery.trigger('click');
-      if (window.location.hash === STEPS.PAYMENT) {
-        window.location.replace(STEPS.SHIPPING);
+    if (cannotCollect) {
+      if (address?.addressType === 'search') {
+        $('#shipping-data').addClass('shimmer');
+        $('#shipping-option-delivery').trigger('click');
+
+        // If user is on Payment, take them to Delivery
+        if (window.location.hash !== STEPS.SHIPPING) window.location.hash = STEPS.SHIPPING;
+      } else {
+        // If collect tab is clickable, fix it...
+        ViewController.showCustomSections();
       }
     }
+  };
+
+  const runCustomization = () => {
+    if (!window.vtexjs.checkout.orderForm) return;
+
+    checkCollectTab();
 
     if (window.location.hash === STEPS.SHIPPING) {
       setTimeout(() => {

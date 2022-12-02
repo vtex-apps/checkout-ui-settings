@@ -128,6 +128,9 @@ const FormController = (() => {
 
     console.log('!! saveShippingForm - state', state);
 
+    if (!state.validForm) {
+      // Click edit
+    }
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
@@ -243,7 +246,7 @@ const FormController = (() => {
     }
   );
 
-  $(document).on('change', '.vtex-omnishipping-1-x-addressForm input', function () {
+  $(document).on('change keyup', '.vtex-omnishipping-1-x-addressForm input, #tfg-tv-licence', function () {
     if ($(this).val()) {
       $(this).parent().removeClass('error');
       $(this).next('span.help.error').remove();
