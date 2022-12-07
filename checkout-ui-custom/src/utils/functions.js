@@ -16,6 +16,50 @@ const getHeadersByConfig = ({ cookie, cache, json }) => {
   return headers;
 };
 
+const getAddresses = async () => {
+  const { email } = window.vtexjs.checkout.orderForm?.clientProfileData;
+
+  const fields = [
+    'id',
+    'addressType',
+    'addressQuery',
+    'addressName',
+    'reference',
+    'number',
+    'geolocation',
+    'receiverName',
+    'complement',
+    'companyBuilding',
+    'street',
+    'neighborhood',
+    'city',
+    'postalCode',
+    'state',
+    'country',
+    'buildingType',
+    'parkingDistance',
+    'deliveryFloor',
+    'liftOrStairs',
+    'hasSufficientSpace',
+    'assembleFurniture',
+    'tvID',
+  ].join(',');
+
+  const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
+  const options = {
+    headers,
+    credentials: 'include',
+  };
+
+  return fetch(
+    `${BASE_URL_API}masterdata/addresses?_fields=${fields}&_where=${encodeURIComponent(`userIdQuery=${email}`)}`, // + `&timestamp=${Date.now()}`
+    options
+  )
+    .then((res) => res.json())
+    .then((data) => data)
+    .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
+};
+
 const getShippingData = async (addressName, fields) => {
   let data = {};
   const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
@@ -236,6 +280,7 @@ export const clearLoaders = () => {
 };
 
 export {
+  getAddresses,
   getShippingData,
   saveAddress,
   addBorderTop,

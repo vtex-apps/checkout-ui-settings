@@ -35,8 +35,15 @@ const BASE_URL_API = window.location.host.includes('bash.com')
   ? 'https://store-api.www.bash.com/custom-api/'
   : `${window.location.protocol}//${window.location.host}/custom-api/`;
 
-const FURNITURE_FEE_LINK =
-  `<a href="${FURNITURE_FEES}" class="furniture-fees-link"` + 'target="_blank">Furniture delivery costs</a>';
+const FURNITURE_FEE_LINK = `
+<a 
+  href="${FURNITURE_FEES}"
+  class="furniture-fees-link" 
+  target="_blank"
+>
+  Furniture delivery costs
+</a>
+`;
 
 const FURNITURE_CAT = '1169288799';
 const TV_CAT = '938942995';
