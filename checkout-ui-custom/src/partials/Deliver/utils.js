@@ -22,13 +22,44 @@ export const mapGoogleAddress = (addressComponents, geometry) => {
   };
 };
 
+const provinceShortCode = (province) => {
+  switch (province) {
+    case 'Select':
+      return '';
+    case 'Western Cape':
+      return 'WC';
+    case 'Easter Cape':
+      return 'EC';
+    case 'Gauteng':
+      return 'GP';
+    case 'KwaZulu-Natal':
+    case 'KwaZulu Natal':
+      return 'KZN';
+    case 'Northern Cape':
+      return 'NC';
+    case 'Limpopo':
+      return 'LP';
+    case 'Mpumalanga':
+      return 'MP';
+    case 'North West':
+      return 'NW';
+    case 'Freestate':
+    case 'Free State':
+      return 'FS';
+    default:
+      return province;
+  }
+};
+
 const populateAddressFromSearch = (address) => {
-  const { street, neighborhood, postalCode } = address;
+  console.info('populateAddressFromSearch', { address });
+  const { street, neighborhood, postalCode, state } = address;
 
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
   document.getElementById('bash--input-neighborhood').value = neighborhood;
   document.getElementById('bash--input-postalCode').value = postalCode;
+  document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
 };
 
 export const initGoogleAutocomplete = () => {

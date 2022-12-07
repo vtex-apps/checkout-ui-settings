@@ -44,19 +44,82 @@ const AddressForm = () => {
     {
       name: 'neighborhood',
       label: 'Suburb',
-      required: true,
       value: 'Kenilworth',
     },
     {
       name: 'postalCode',
       label: 'Postal code',
-      required: true,
       value: '7708',
       type: 'tel',
       minlength: 4,
       maxLength: 4,
     },
-    // TODO Province Dropdown
+    {
+      type: 'note',
+      required: false,
+      name: 'suburb-postal-reminder',
+      value: 'Make sure to specify the correct Suburb and Postal code so we can easily find your address.',
+    },
+    {
+      name: 'state',
+      label: 'Province',
+      type: 'dropdown',
+      options: [
+        {
+          value: '',
+          label: 'Select',
+        },
+        {
+          value: 'EC',
+          label: 'Eastern Cape',
+        },
+        {
+          value: 'FS',
+          label: 'Free State',
+        },
+        {
+          value: 'GP',
+          label: 'Gauteng',
+        },
+        {
+          value: 'KZN',
+          label: 'KwaZulu-Natal',
+        },
+        {
+          value: 'LP',
+          label: 'Limpopo',
+        },
+        {
+          value: 'MP',
+          label: 'Mpumalanga',
+        },
+        {
+          value: 'NC',
+          label: 'Northern Cape',
+        },
+        {
+          value: 'NW',
+          label: 'North West',
+        },
+        {
+          value: 'WC',
+          label: 'Western Cape',
+        },
+      ],
+    },
+
+    {
+      name: 'country',
+      label: 'Province',
+      type: 'dropdown',
+      disabled: true,
+      options: [
+        {
+          value: 'ZAF',
+          label: 'South Africa',
+        },
+      ],
+    },
   ];
 
   const formFields = fields.map((field) => FormField(field)).join('');

@@ -16,11 +16,10 @@ const DeliverContainer = () => `
       ${AddressSearch()} 
     </section>
     
-    
     <section class="bash--delivery-view" data-section="address-form">
       <h3>Add a new delivery address</h3>
       <a href="#" data-view="address-search">&lt; Back</a>
-          ${AddressForm()}
+      ${AddressForm()}
     </section>
 
     <section class="bash--delivery-view" data-section="complete-address">
