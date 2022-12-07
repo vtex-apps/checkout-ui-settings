@@ -26,7 +26,7 @@ const AddressListing = (address) => {
   </div>
   <div class="address-edit">
     <a href="#" data-view="edit-address">
-    Edit
+      Change
     </a>
   </div>
 </div>

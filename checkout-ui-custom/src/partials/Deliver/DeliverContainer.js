@@ -1,4 +1,5 @@
 import Addresses from './Addresses';
+import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
 
 const DeliverContainer = () => `
@@ -12,10 +13,14 @@ const DeliverContainer = () => `
     <section class="bash--delivery-view" data-section="address-search">
       <h3>Add a new delivery address</h3>
       <a href="#" data-view="select-address">&lt; Back</a>
-
-      ${AddressSearch()}
-
-    <p>Search....</p>
+      ${AddressSearch()} 
+    </section>
+    
+    
+    <section class="bash--delivery-view" data-section="address-form">
+      <h3>Add a new delivery address</h3>
+      <a href="#" data-view="address-search">&lt; Back</a>
+          ${AddressForm()}
     </section>
 
     <section class="bash--delivery-view" data-section="complete-address">
