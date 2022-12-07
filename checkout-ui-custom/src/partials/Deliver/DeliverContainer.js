@@ -5,30 +5,48 @@ import AddressSearch from './AddressSearch';
 const DeliverContainer = () => `
   <div class="bash--delivery-container" data-view="select-address">
     <section class="bash--delivery-view" data-section="select-address">
-      <h3>Select address</h3>
-      <a href="#" data-view="address-search">Add address</a>
+     <div class="bash--heading">
+        <h2>Delivery address</h2>
+        <a href="#" data-view="address-search">Add address</a>
+      </div>
       ${Addresses()}
+
+      <div class="bash--heading">
+        <h2>[ Extra fields ]</h2>
+      </div>
+      <div id="bash--extra-fields">For furniture, tv, etc.</div>
+
+      <div class="bash--heading">
+        <h2>Delivery method</h2>
+        <a href="#" data-view="address-search">Furniture shipping costs</a>
+      </div>
+
+
     </section>
 
     <section class="bash--delivery-view" data-section="address-search">
-      <h3>Add a new delivery address</h3>
-      <a href="#" data-view="select-address">&lt; Back</a>
+      <div class="bash--heading">
+        <h2>Add a new delivery address</h2>
+        <a href="#" data-view="select-address">&lt; Back</a>
+      </div>
       ${AddressSearch()} 
     </section>
     
     <section class="bash--delivery-view" data-section="address-form">
-      <h3>Add a new delivery address</h3>
-      <a href="#" data-view="address-search">&lt; Back</a>
+      <div class="bash--heading">
+        <h2>Complete address</h2>
+        <a href="#" data-view="address-search">&lt; Back</a>
+      </div>
       ${AddressForm()}
     </section>
 
     <section class="bash--delivery-view" data-section="complete-address">
-      <h3>Complete address</h3>
+      <h2>Complete address</h2>
       <a href="#" data-view="select-address">&lt; Back</a>
     </section>
 
     <section class="bash--delivery-view" data-section="edit-address">
-      <h3>Edit address</h3>
+      <h2>Edit address</h2>
       <a href="#" data-view="select-address">&lt; Back</a>
     </section>
     

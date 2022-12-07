@@ -33,7 +33,7 @@ const FormField = ({
 
   // TODO add drop downs, etc.
   return `
-<p class="input bash--${type}field-${name.replace(/\s/g, '-')} text ${required ? 'required' : 'optional'}">
+<p class="input bash--${type}field-${name.replace(/\s/g, '-')} bash--${type} ${required ? 'required' : 'optional'}">
   ${label ? `<label id="bash--label-${fieldId}" for="bash--input-${fieldId}">${label}</label>` : ''}
  ${formField()}
 </p>  

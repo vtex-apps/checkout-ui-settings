@@ -1,9 +1,7 @@
+import { getBestPhoneNumber } from '../../utils/phoneFields';
 import FormField from './Elements/FormField';
 
-// TODO pass address?
 const AddressForm = () => {
-  console.info('Address form');
-
   const fields = [
     {
       name: 'receiverName',
@@ -15,13 +13,13 @@ const AddressForm = () => {
       name: 'complement',
       label: 'Recipient’s mobile number',
       required: true,
-      value: '072 123 4567',
+      value: getBestPhoneNumber(),
       type: 'tel',
     },
     {
       name: 'addressType',
       label: 'Address type',
-      required: false,
+      required: true,
       type: 'radio',
       options: [
         { value: 'residential', label: 'Residential', checked: true },
@@ -33,23 +31,23 @@ const AddressForm = () => {
       name: 'number',
       label: 'Building/Complex and number',
       required: false,
-      value: '6 Kenilworth Vlg',
+      value: '',
     },
     {
       name: 'street',
       label: 'Street address',
       required: true,
-      value: '7 Punters Way',
+      value: '',
     },
     {
       name: 'neighborhood',
       label: 'Suburb',
-      value: 'Kenilworth',
+      value: '',
     },
     {
       name: 'postalCode',
       label: 'Postal code',
-      value: '7708',
+      value: '',
       type: 'tel',
       minlength: 4,
       maxLength: 4,

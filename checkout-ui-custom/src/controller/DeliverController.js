@@ -1,4 +1,5 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
+import { populateAddressForm } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 
 const DeliverController = (() => {
@@ -26,7 +27,8 @@ const DeliverController = (() => {
   $(document).on('click', 'a[data-view]', function (e) {
     e.preventDefault();
     const viewTarget = $(this).data('view');
-    window.postMessage({ action: 'setDeliveryView', view: viewTarget });
+    const content = decodeURIComponent($(this).data('content'));
+    window.postMessage({ action: 'setDeliveryView', view: viewTarget, content });
   });
 
   window.addEventListener('message', (event) => {
@@ -36,6 +38,10 @@ const DeliverController = (() => {
     switch (data.action) {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
+
+        if (data.view === 'address-form' && data.content) {
+          populateAddressForm(JSON.parse(data.content));
+        }
 
         break;
       default:

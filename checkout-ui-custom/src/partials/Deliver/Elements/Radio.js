@@ -13,7 +13,7 @@ const Radio = ({ name, options = [] }) => `
           id="radio-${name}-${value}"
         />
           <span class="radio-icon"></span> 
-          <span class="radio-label">${label}</span>
+          ${label ? `<span class="radio-label">${label}</span>` : ''}
       </label>
     `
     )

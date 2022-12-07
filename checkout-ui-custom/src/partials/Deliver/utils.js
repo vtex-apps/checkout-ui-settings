@@ -52,8 +52,28 @@ const provinceShortCode = (province) => {
 };
 
 const populateAddressFromSearch = (address) => {
-  console.info('populateAddressFromSearch', { address });
   const { street, neighborhood, postalCode, state } = address;
+
+  // Clear any populated fields
+  document.getElementById('bash--address-form').reset();
+
+  document.getElementById('bash--input-number').value = '';
+  document.getElementById('bash--input-street').value = street;
+  document.getElementById('bash--input-neighborhood').value = neighborhood;
+  document.getElementById('bash--input-postalCode').value = postalCode;
+  document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
+};
+
+export const populateAddressForm = (address) => {
+  console.info('populateAddressForm', { address });
+  const { street, neighborhood, postalCode, state, receiverName, complement } = address;
+
+  // Clear any populated fields
+  document.getElementById('bash--address-form').reset();
+
+  // Only overwrite defaults if values exist.
+  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName;
+  if (complement) document.getElementById('bash--input-complement').value = complement;
 
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
