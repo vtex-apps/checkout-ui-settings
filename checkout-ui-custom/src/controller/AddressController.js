@@ -107,7 +107,7 @@ const AddressController = (() => {
       const { items, shippingData: { address } } = window.vtexjs.checkout.orderForm;
       const { furniture, TVs, SimCards } = getSpecialCategories(items);
       const cannotCollect = furniture || SimCards || TVs;
-      if (address.addressType === 'search' && cannotCollect) {
+      if (address && address.addressType === 'search' && cannotCollect) {
         $('#shipping-data').addClass('shimmer');
         const selectedDelivery = $('#shipping-option-delivery');
         selectedDelivery.trigger('click');
