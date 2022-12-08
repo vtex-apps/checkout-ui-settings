@@ -1,5 +1,5 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
-import { populateAddressForm } from '../partials/Deliver/utils';
+import { parseAttribute, populateAddressForm, setAddress } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 
 const DeliverController = (() => {
@@ -24,11 +24,21 @@ const DeliverController = (() => {
   //   view: "select-address"
   // }
 
+  // Change view
   $(document).on('click', 'a[data-view]', function (e) {
     e.preventDefault();
     const viewTarget = $(this).data('view');
     const content = decodeURIComponent($(this).data('content'));
     window.postMessage({ action: 'setDeliveryView', view: viewTarget, content });
+  });
+
+  // Select address
+  $(document).on('change', 'input[type="radio"][name="selected-address"]', function () {
+    console.info({ newAddress: this.value });
+
+    const address = parseAttribute($(`#address-${this.value}`).data('address'));
+
+    setAddress(address);
   });
 
   window.addEventListener('message', (event) => {

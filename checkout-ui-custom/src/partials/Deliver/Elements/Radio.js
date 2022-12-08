@@ -8,7 +8,7 @@ const Radio = ({ name, options = [] }) => `
         <input type="radio" 
           ${checked ? "checked='checked'" : ''} 
           ${disabled ? "disabled='disabled'" : ''} 
-          value="${value}" 
+          value="${value ?? ''}" 
           name="${name}" 
           id="radio-${name}-${value}"
         />

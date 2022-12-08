@@ -1,3 +1,9 @@
+import { clearLoaders } from '../../utils/functions';
+
+export const setDeliveryLoading = () => {
+  document.querySelector('.bash--delivery-container').classList.add('shimmer');
+};
+
 export const mapGoogleAddress = (addressComponents, geometry) => {
   const streetNumber = addressComponents.find((item) => item.types.includes('street_number'))?.long_name;
   const street = addressComponents.find((item) => item.types.includes('route'))?.long_name;
@@ -104,6 +110,78 @@ export const initGoogleAutocomplete = () => {
     populateAddressFromSearch(address);
     window.postMessage({ action: 'setDeliveryView', view: 'address-form' });
   });
+};
+
+export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
+
+export const addressIsValid = (address) => {
+  let requiredFields = [];
+  const invalidFields = [];
+  const hasFurniture = false;
+  const hasTV = false;
+  const hasSim = false;
+
+  const requiredAddressFields = [
+    'receiverName',
+    'complement',
+    'street',
+    'neighborhood',
+    'state',
+    'city',
+    'country',
+    'postalCode',
+  ];
+
+  const requiredFurnitureFields = [
+    'buildingType',
+    'assembleFurniture',
+    'deliveryFloor',
+    'hasSufficientSpace',
+    'liftOrStairs',
+    'parkingDistance',
+  ];
+
+  const requiredRicaFields = ['tvID'];
+
+  requiredFields = [...requiredAddressFields];
+
+  if (hasFurniture) requiredFields = [...requiredFields, ...requiredFurnitureFields];
+  if (hasTV || hasSim) requiredFields = [...requiredFields, ...requiredRicaFields];
+
+  for (let i = 0; i < requiredFields.length; i++) {
+    if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);
+  }
+
+  return { isValid: !invalidFields.length, invalidFields };
+};
+
+// TODO move somewhere else?
+export const setAddress = (address) => {
+  const { isValid, invalidFields } = addressIsValid(address);
+  console.info('setAddress', { address, isValid, invalidFields });
+
+  if (!isValid) return;
+
+  const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
+
+  // Fix bad addressType.
+  if (address.addressType === 'business') address.addressType = 'commercial';
+  if (!validAddressTypes.includes(address.addressType)) address.addressType = 'residential';
+
+  const { shippingData } = window?.vtexjs?.checkout?.orderForm;
+
+  shippingData.address = address;
+  shippingData.selectedAddresses = [address];
+
+  // Start Shimmering
+  setDeliveryLoading();
+  window.vtexjs.checkout
+    .sendAttachment('shippingData', shippingData)
+    .then((result) => {
+      // End shimmer
+      console.info('setAddress', { result });
+    })
+    .done(() => clearLoaders());
 };
 
 export default mapGoogleAddress;
