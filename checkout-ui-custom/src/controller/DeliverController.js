@@ -40,7 +40,8 @@ const DeliverController = (() => {
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
 
         if (data.view === 'address-form' && data.content) {
-          populateAddressForm(JSON.parse(data.content));
+          const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
+          populateAddressForm(address);
         }
 
         break;

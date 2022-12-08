@@ -4,13 +4,13 @@ import AddressSearch from './AddressSearch';
 
 const DeliverContainer = () => `
   <div class="bash--delivery-container" data-view="select-address">
-    <section class="bash--delivery-view" data-section="select-address">
+  
+  <section class="bash--delivery-view" data-section="select-address">
      <div class="bash--heading">
         <h2>Delivery address</h2>
         <a href="#" data-view="address-search">Add address</a>
       </div>
       ${Addresses()}
-
       <div class="bash--heading">
         <h2>[ Extra fields ]</h2>
       </div>
@@ -20,8 +20,6 @@ const DeliverContainer = () => `
         <h2>Delivery method</h2>
         <a href="#" data-view="address-search">Furniture shipping costs</a>
       </div>
-
-
     </section>
 
     <section class="bash--delivery-view" data-section="address-search">

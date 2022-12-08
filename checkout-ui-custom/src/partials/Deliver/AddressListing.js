@@ -14,7 +14,7 @@ const AddressListing = (address) => {
   const addressString = encodeURIComponent(JSON.stringify(address));
 
   return `
-<label class="bash--address-listing">
+<label id="address-${id}" class="bash--address-listing" data-address="${addressString}">
   <div class="address-radio">
   ${Radio({ name: 'selected-address', options: [{ name: id, checked: id === addressId }] })}
   </div>
@@ -23,7 +23,7 @@ const AddressListing = (address) => {
     <div>${contactLine}</div>  
   </div>
   <div class="address-edit">
-    <a href="#" data-view="address-form" data-content="${addressString}">
+    <a href="#" data-view="address-form" data-content="address-${id}">
       Change
     </a>
   </div>

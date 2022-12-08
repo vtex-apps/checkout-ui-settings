@@ -4,6 +4,13 @@ import FormField from './Elements/FormField';
 const AddressForm = () => {
   const fields = [
     {
+      name: 'addressId',
+      type: 'hidden',
+      value: '',
+      required: false,
+    },
+
+    {
       name: 'receiverName',
       label: 'Recipient’s name',
       required: true,

@@ -1,11 +1,21 @@
 [x] Radio option
 [x] Select box
-[ ] Select address - Save to checkout
+[x] Hidden field
+[x] Note field
+[ ] Add Save Address button.
+[ ] Select address - Save to checkout sendAttachment()
 [ ] Select address - prompt user to complete details
+[ ] Detect when adress is invalid for cart items.
 [ ] Add address - Save to checkout
 [ ] Add address - Save to masterdata
 [ ] Edit address - Save to checkout
 [ ] Edit address - Save to masterdata
 [ ] Delivery Method - show delivery fee
-[ ] Show Extra Fields forms
-[ ] Prevent duplicate DeliveryContainers
+[ ] Detect Furniture delivery
+[ ] Detect TV/Sim delivery
+[ ] Show/Inject Extra Fields forms
+[?] Prevent duplicate DeliveryContainers
+[ ] Format phone numbers correctly
+[ ] Add Business Name field (shown if addressType === 'business')
+[ ] Prevent Vtex forms from displaying.
+[ ] Remove AddressController?
