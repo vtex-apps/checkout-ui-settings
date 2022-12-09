@@ -10,6 +10,17 @@ const DeliverController = (() => {
   const setupDeliver = () => {
     if ($('#bash--deliver-container').length) return;
     $('#postalCode-finished-loading').after(DeliverContainer());
+
+    // Form validation
+    $('select, input').off('invalid');
+    $('select, input')
+      .on('invalid', function () {
+        $(this[0]).parents('form').addClass('show-form-errors');
+        $(this)[0].setCustomValidity(' ');
+      })
+      .on('change keyUp', function () {
+        $(this)[0].setCustomValidity('');
+      });
   };
 
   $(window).on('hashchange', () => {
@@ -41,6 +52,7 @@ const DeliverController = (() => {
     setAddress(address);
   });
 
+  // Form validation
   window.addEventListener('message', (event) => {
     const { data } = event;
     if (!data || !data.action) return;
@@ -49,9 +61,13 @@ const DeliverController = (() => {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
 
-        if (data.view === 'address-form' && data.content) {
-          const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
-          populateAddressForm(address);
+        if (data.view === 'address-form') {
+          // init form validation.
+
+          if (data.content) {
+            const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
+            populateAddressForm(address);
+          }
         }
 
         break;

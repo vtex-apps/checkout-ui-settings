@@ -11,7 +11,7 @@ const TextField = ({
   const fieldId = name.replace(/\s/g, '-');
   return `
   <input 
-    ${required ? 'required="required"' : ''}
+    ${required ? ' required ' : ''}
     autocomplete="${autoComplete}" 
     id="bash--input-${fieldId}" 
     type="${type}" 

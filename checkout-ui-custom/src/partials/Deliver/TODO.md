@@ -2,9 +2,10 @@
 [x] Select box
 [x] Hidden field
 [x] Note field
+[ ] Function to getBestReceiverName() (clientProfile or form field or address...)
 [ ] Address listing - filter duplicate street number.
 [ ] Add Save Address button.
-[ ] Select address - Save to checkout sendAttachment()
+[x] Select address - Save to checkout sendAttachment()
 [ ] Select address - prompt user to complete details
 [ ] Detect when adress is invalid for cart items.
 [ ] Add address - Save to checkout

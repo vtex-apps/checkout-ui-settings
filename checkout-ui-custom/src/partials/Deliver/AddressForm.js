@@ -9,19 +9,11 @@ const AddressForm = () => {
       value: '',
       required: false,
     },
-
     {
-      name: 'receiverName',
-      label: 'Recipient’s name',
+      name: 'street',
+      label: 'Street address',
       required: true,
-      value: 'Fred',
-    },
-    {
-      name: 'complement',
-      label: 'Recipient’s mobile number',
-      required: true,
-      value: getBestPhoneNumber(),
-      type: 'tel',
+      value: '',
     },
     {
       name: 'addressType',
@@ -33,7 +25,6 @@ const AddressForm = () => {
         { value: 'business', label: 'Business' },
       ],
     },
-
     {
       name: 'number',
       label: 'Building/Complex and number',
@@ -41,14 +32,14 @@ const AddressForm = () => {
       value: '',
     },
     {
-      name: 'street',
-      label: 'Street address',
-      required: true,
+      name: 'neighborhood',
+      label: 'Suburb',
       value: '',
     },
     {
-      name: 'neighborhood',
-      label: 'Suburb',
+      name: 'city',
+      label: 'City',
+      required: true,
       value: '',
     },
     {
@@ -114,16 +105,31 @@ const AddressForm = () => {
     },
 
     {
+      type: 'note',
+      required: false,
+      name: 'country-display',
+      label: 'Country',
+      value: 'South Africa',
+    },
+    {
+      type: 'hidden',
+      required: true,
       name: 'country',
-      label: 'Province',
-      type: 'dropdown',
-      disabled: true,
-      options: [
-        {
-          value: 'ZAF',
-          label: 'South Africa',
-        },
-      ],
+      value: 'ZAF',
+    },
+    {
+      name: 'receiverName',
+      label: 'Recipient’s name',
+      required: true,
+      value: 'Fred',
+    },
+    {
+      name: 'complement',
+      label: 'Recipient’s mobile number',
+      required: true,
+      value: getBestPhoneNumber(),
+      type: 'tel',
+      helperText: 'We send shipping updates to this number.',
     },
   ];
 
@@ -132,6 +138,14 @@ const AddressForm = () => {
   return `
   <form id="bash--address-form" method="post">
     ${formFields}
+
+    <button 
+      class="submit btn-go-to-payment btn btn-large btn-success"
+      id="btn-save-address" 
+      type="submit"
+    >
+      Save address
+    </button>
   </form>
   
   `;

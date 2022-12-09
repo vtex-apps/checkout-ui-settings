@@ -1,14 +1,28 @@
-const DropDown = ({ name, disabled = false, options }) => `
-  <select name="${name}" ${disabled ? ' disabled ' : ''} id="bash--dropdown-${name}" class="input-large" >
-    ${options.map(
-      ({ value, label, selected }) => `
-      <option 
-        value="${value}" 
-        ${selected ? ' selected ' : ''}
-      >${label}</option>
-      `
-    )}
+const DropDown = ({ name, disabled = false, options, required }) => {
+  const hasASelectedOption = options.find((option) => option.selected === true);
+
+  return `
+  <select 
+    name="${name}" 
+    ${required ? ' required ' : ''} 
+    ${disabled ? ' disabled ' : ''} 
+    id="bash--dropdown-${name}" 
+    class="input-large" 
+  >
+  ${options
+    .map(
+      ({ value, label, selected }, index) => `
+    <option 
+    ${index === 0 ? ' disabled ' : ''}
+    ${index === 0 && !hasASelectedOption ? ' selected ' : ''}
+    ${selected ? ' selected ' : ''}
+      value="${value}" 
+    >${label}</option>
+    `
+    )
+    .join('')}
   </select>
   `;
+};
 
 export default DropDown;

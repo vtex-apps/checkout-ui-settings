@@ -15,6 +15,7 @@ const FormField = ({
   minlength,
   disabled = false,
   options,
+  error = 'This field is required.',
 }) => {
   const fieldId = name.replace(/\s/g, '-');
 
@@ -23,7 +24,7 @@ const FormField = ({
       case 'radio':
         return Radio({ name, options });
       case 'dropdown':
-        return DropDown({ name, disabled, options });
+        return DropDown({ name, disabled, options, required });
       case 'note':
         return Note({ name, value });
       default:
@@ -36,6 +37,8 @@ const FormField = ({
 <p class="input bash--${type}field-${name.replace(/\s/g, '-')} bash--${type} ${required ? 'required' : 'optional'}">
   ${label ? `<label id="bash--label-${fieldId}" for="bash--input-${fieldId}">${label}</label>` : ''}
  ${formField()}
+  ${required ? `<span class="bash--field-error">${error}</span>` : ''}
+
 </p>  
 `;
 };

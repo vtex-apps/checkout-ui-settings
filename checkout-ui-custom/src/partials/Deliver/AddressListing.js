@@ -24,7 +24,7 @@ const AddressListing = (address) => {
   </div>
   <div class="address-edit">
     <a href="#" data-view="address-form" data-content="address-${id}">
-      Change
+      Edit
     </a>
   </div>
 </label>

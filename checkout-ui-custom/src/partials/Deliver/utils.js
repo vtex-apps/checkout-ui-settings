@@ -58,7 +58,7 @@ const provinceShortCode = (province) => {
 };
 
 const populateAddressFromSearch = (address) => {
-  const { street, neighborhood, postalCode, state } = address;
+  const { street, neighborhood, postalCode, state, city } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -66,13 +66,14 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
   document.getElementById('bash--input-neighborhood').value = neighborhood;
+  document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
   document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
 };
 
 export const populateAddressForm = (address) => {
   console.info('populateAddressForm', { address });
-  const { street, neighborhood, postalCode, state, receiverName, complement, id } = address;
+  const { street, neighborhood, postalCode, state, city, receiverName, complement, id } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -87,6 +88,7 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
   document.getElementById('bash--input-neighborhood').value = neighborhood;
+  document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
   document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
 

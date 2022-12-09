@@ -17,7 +17,7 @@ const DeliverContainer = () => `
       <div id="bash--extra-fields">For furniture, tv, etc.</div>
 
       <div class="bash--heading">
-        <h2>Delivery method</h2>
+        <h2>Delivery options</h2>
         <a href="#" data-view="address-search">Furniture shipping costs</a>
       </div>
     </section>
