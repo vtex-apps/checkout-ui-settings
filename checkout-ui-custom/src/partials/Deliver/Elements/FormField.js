@@ -2,6 +2,7 @@ import DropDown from './DropDown';
 import Note from './Note';
 import Radio from './Radio';
 import TextField from './TextField';
+import Checkbox from './Checkbox';
 
 const FormField = ({
   label,
@@ -15,6 +16,7 @@ const FormField = ({
   minlength,
   disabled = false,
   options,
+  checked,
 }) => {
   const fieldId = name.replace(/\s/g, '-');
 
@@ -26,6 +28,8 @@ const FormField = ({
         return DropDown({ name, disabled, options });
       case 'note':
         return Note({ name, value });
+      case 'checkbox':
+        return Checkbox({ name, label, checked });
       default:
         return TextField({ name, value, required, type, placeholder, autoComplete, maxLength, minlength });
     }

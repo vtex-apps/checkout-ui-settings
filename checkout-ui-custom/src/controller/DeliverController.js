@@ -1,15 +1,29 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import { populateAddressForm } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
+import { getSpecialCategories } from '../utils/functions';
 
 const DeliverController = (() => {
   const state = {
     view: 'list', // list, addNew, add, edit, complete, selected
+    hasFurn: false,
+    hasTVs: false,
+    hasSim: false,
   };
 
   const setupDeliver = () => {
     if ($('#bash--deliver-container').length) return;
-    $('#postalCode-finished-loading').after(DeliverContainer());
+    if (window.vtexjs.checkout.orderForm) {
+      const { items } = window.vtexjs.checkout.orderForm;
+      const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+      console.log('{ hasFurniture, hasTVs, hasSimCards }', { hasFurniture, hasTVs, hasSimCards });
+      state.hasFurn = hasFurniture;
+      state.hasTVs = hasTVs;
+      state.hasSim = hasSimCards;
+    }
+    $('#postalCode-finished-loading').after(DeliverContainer({
+      hasFurn: state.hasFurn, hasSim: state.hasSim, hasTV: state.hasTVs,
+    }));
   };
 
   $(window).on('hashchange', () => {
