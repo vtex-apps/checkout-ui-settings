@@ -5,7 +5,7 @@ const AddressListing = (address) => {
 
   const { number, street, neighborhood, postalCode, city, receiverName, complement, id } = address;
 
-  const addressLine = [`${number} ${street}`, neighborhood ?? city, postalCode].join(', ');
+  const addressLine = [`${number ?? ''} ${street}`, neighborhood ?? city, postalCode].join(', ');
   const contactLine = [receiverName, complement].join(' - ');
 
   // orderform
@@ -16,7 +16,7 @@ const AddressListing = (address) => {
   return `
 <label id="address-${id}" class="bash--address-listing" data-address="${addressString}">
   <div class="address-radio">
-  ${Radio({ name: 'selected-address', options: [{ name: id, checked: id === addressId }] })}
+  ${Radio({ name: 'selected-address', options: [{ checked: id === addressId, value: id }] })}
   </div>
   <div class="address-text">
     <div>${addressLine}</div>  
@@ -24,7 +24,7 @@ const AddressListing = (address) => {
   </div>
   <div class="address-edit">
     <a href="#" data-view="address-form" data-content="address-${id}">
-      Change
+      Edit
     </a>
   </div>
 </label>

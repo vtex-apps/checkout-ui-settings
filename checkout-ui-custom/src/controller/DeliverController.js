@@ -1,5 +1,5 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
-import { populateAddressForm } from '../partials/Deliver/utils';
+import { parseAttribute, populateAddressForm, setAddress } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
 
@@ -24,6 +24,18 @@ const DeliverController = (() => {
     $('#postalCode-finished-loading').after(DeliverContainer({
       hasFurn: state.hasFurn, hasSim: state.hasSim, hasTV: state.hasTVs,
     }));
+    $('#postalCode-finished-loading').after(DeliverContainer());
+
+    // Form validation
+    $('select, input').off('invalid');
+    $('select, input')
+      .on('invalid', function () {
+        $(this[0]).parents('form').addClass('show-form-errors');
+        $(this)[0].setCustomValidity(' ');
+      })
+      .on('change keyUp', function () {
+        $(this)[0].setCustomValidity('');
+      });
   };
 
   $(window).on('hashchange', () => {
@@ -38,6 +50,7 @@ const DeliverController = (() => {
   //   view: "select-address"
   // }
 
+  // Change view
   $(document).on('click', 'a[data-view]', function (e) {
     e.preventDefault();
     const viewTarget = $(this).data('view');
@@ -45,6 +58,13 @@ const DeliverController = (() => {
     window.postMessage({ action: 'setDeliveryView', view: viewTarget, content });
   });
 
+  // Select address
+  $(document).on('change', 'input[type="radio"][name="selected-address"]', function () {
+    const address = parseAttribute($(`#address-${this.value}`).data('address'));
+    setAddress(address);
+  });
+
+  // Form validation
   window.addEventListener('message', (event) => {
     const { data } = event;
     if (!data || !data.action) return;
@@ -53,9 +73,13 @@ const DeliverController = (() => {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
 
-        if (data.view === 'address-form' && data.content) {
-          const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
-          populateAddressForm(address);
+        if (data.view === 'address-form') {
+          // init form validation.
+
+          if (data.content) {
+            const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
+            populateAddressForm(address);
+          }
         }
 
         break;

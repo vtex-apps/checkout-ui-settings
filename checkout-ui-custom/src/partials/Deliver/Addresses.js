@@ -6,7 +6,9 @@ const Addresses = () => {
     // if(addresses.length < 1)... go to Add Address
 
     const addressesHtml = addresses.map((address) => AddressListing(address));
+
     document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
+
     clearLoaders();
   });
 

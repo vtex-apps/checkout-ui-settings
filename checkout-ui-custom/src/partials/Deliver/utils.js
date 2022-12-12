@@ -1,3 +1,9 @@
+import { clearLoaders } from '../../utils/functions';
+
+export const setDeliveryLoading = () => {
+  document.querySelector('.bash--delivery-container').classList.add('shimmer');
+};
+
 export const mapGoogleAddress = (addressComponents, geometry) => {
   const streetNumber = addressComponents.find((item) => item.types.includes('street_number'))?.long_name;
   const street = addressComponents.find((item) => item.types.includes('route'))?.long_name;
@@ -52,7 +58,7 @@ const provinceShortCode = (province) => {
 };
 
 const populateAddressFromSearch = (address) => {
-  const { street, neighborhood, postalCode, state } = address;
+  const { street, neighborhood, postalCode, state, city } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -60,13 +66,14 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
   document.getElementById('bash--input-neighborhood').value = neighborhood;
+  document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
-  document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-state').value = provinceShortCode(state);
 };
 
 export const populateAddressForm = (address) => {
   console.info('populateAddressForm', { address });
-  const { street, neighborhood, postalCode, state, receiverName, complement, id } = address;
+  const { street, neighborhood, postalCode, state, city, receiverName, complement, id } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -81,8 +88,9 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
   document.getElementById('bash--input-neighborhood').value = neighborhood;
+  document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
-  document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-state').value = provinceShortCode(state);
 
   // TODO Furniture, Rica fields.
   // Ensure it happens after they are in the DOM.
@@ -104,6 +112,97 @@ export const initGoogleAutocomplete = () => {
     populateAddressFromSearch(address);
     window.postMessage({ action: 'setDeliveryView', view: 'address-form' });
   });
+};
+
+export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
+
+export const addressIsValid = (address) => {
+  let requiredFields = [];
+  const invalidFields = [];
+  const hasFurniture = false;
+  const hasTV = false;
+  const hasSim = false;
+
+  const requiredAddressFields = [
+    'receiverName',
+    'complement',
+    'street',
+    'neighborhood',
+    'state',
+    'city',
+    'country',
+    'postalCode',
+  ];
+
+  const requiredFurnitureFields = [
+    'buildingType',
+    'assembleFurniture',
+    'deliveryFloor',
+    'hasSufficientSpace',
+    'liftOrStairs',
+    'parkingDistance',
+  ];
+
+  const requiredRicaFields = ['tvID'];
+
+  requiredFields = [...requiredAddressFields];
+
+  if (hasFurniture) requiredFields = [...requiredFields, ...requiredFurnitureFields];
+  if (hasTV || hasSim) requiredFields = [...requiredFields, ...requiredRicaFields];
+
+  for (let i = 0; i < requiredFields.length; i++) {
+    if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);
+  }
+
+  return { isValid: !invalidFields.length, invalidFields };
+};
+
+// TODO move somewhere else?
+export const setAddress = (address) => {
+  const { isValid, invalidFields } = addressIsValid(address);
+
+  if (!isValid) {
+    console.info('setAddress', { address, isValid, invalidFields });
+
+    populateAddressForm(address);
+    $('#bash--address-form').addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    window.postMessage({
+      action: 'setDeliveryView',
+      view: 'address-form',
+    });
+    return;
+  }
+
+  const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
+
+  // Fix bad addressType.
+  if (address.addressType === 'business') address.addressType = 'commercial';
+  if (!validAddressTypes.includes(address.addressType)) address.addressType = 'residential';
+
+  const { shippingData } = window?.vtexjs?.checkout?.orderForm;
+
+  shippingData.address = address;
+  shippingData.address.number = shippingData.address.number ?? '';
+  shippingData.selectedAddresses = [address];
+
+  // Start Shimmering
+  setDeliveryLoading();
+  window.vtexjs.checkout
+    .sendAttachment('shippingData', shippingData)
+    .then((result) => {
+      // End shimmer
+      console.info('setAddress', { result });
+    })
+    .done(() => clearLoaders());
+};
+
+export const getBestRecipient = () => {
+  const { receiverName } = window.vtexjs.checkout.orderForm?.shippingData?.address;
+  const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+  const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
+  return receiverName || clientProfileName || document.getElementById('client-first-name')?.value;
 };
 
 export default mapGoogleAddress;
