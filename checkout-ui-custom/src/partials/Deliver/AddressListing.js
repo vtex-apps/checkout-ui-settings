@@ -5,7 +5,7 @@ const AddressListing = (address) => {
 
   const { number, street, neighborhood, postalCode, city, receiverName, complement, id } = address;
 
-  const addressLine = [`${number} ${street}`, neighborhood ?? city, postalCode].join(', ');
+  const addressLine = [`${number ?? ''} ${street}`, neighborhood ?? city, postalCode].join(', ');
   const contactLine = [receiverName, complement].join(' - ');
 
   // orderform

@@ -1,5 +1,6 @@
 import { getBestPhoneNumber } from '../../utils/phoneFields';
 import FormField from './Elements/FormField';
+import { getBestRecipient } from './utils';
 
 const AddressForm = () => {
   const fields = [
@@ -121,7 +122,7 @@ const AddressForm = () => {
       name: 'receiverName',
       label: 'Recipient’s name',
       required: true,
-      value: 'Fred',
+      value: getBestRecipient(),
     },
     {
       name: 'complement',

@@ -45,10 +45,7 @@ const DeliverController = (() => {
 
   // Select address
   $(document).on('change', 'input[type="radio"][name="selected-address"]', function () {
-    console.info({ newAddress: this.value });
-
     const address = parseAttribute($(`#address-${this.value}`).data('address'));
-
     setAddress(address);
   });
 

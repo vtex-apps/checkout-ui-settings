@@ -6,7 +6,7 @@ const DropDown = ({ name, disabled = false, options, required }) => {
     name="${name}" 
     ${required ? ' required ' : ''} 
     ${disabled ? ' disabled ' : ''} 
-    id="bash--dropdown-${name}" 
+    id="bash--input-${name}" 
     class="input-large" 
   >
   ${options

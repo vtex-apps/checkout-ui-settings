@@ -4,10 +4,11 @@
 [x] Note field
 [ ] Function to getBestReceiverName() (clientProfile or form field or address...)
 [ ] Address listing - filter duplicate street number.
-[ ] Add Save Address button.
+[x] Address listing - remove null number.
+[x] Add Save Address button.
 [x] Select address - Save to checkout sendAttachment()
 [ ] Select address - prompt user to complete details
-[ ] Detect when adress is invalid for cart items.
+[x] Detect when adress is invalid for cart items.
 [ ] Add address - Save to checkout
 [ ] Add address - Save to masterdata
 [ ] Edit address - Save to checkout
@@ -15,9 +16,10 @@
 [ ] Delivery Method - show delivery fee
 [ ] Detect Furniture delivery
 [ ] Detect TV/Sim delivery
-[ ] Show/Inject Extra Fields forms
+[x] Show/Inject Extra Fields forms
 [?] Prevent duplicate DeliveryContainers
 [ ] Format phone numbers correctly
 [ ] Add Business Name field (shown if addressType === 'business')
-[ ] Prevent Vtex forms from displaying.
+[x] Prevent Vtex forms from displaying.
 [ ] Remove AddressController?
+[ ] Edit > Back - ensure back button goes to address list.

@@ -68,7 +68,7 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-neighborhood').value = neighborhood;
   document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
-  document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-state').value = provinceShortCode(state);
 };
 
 export const populateAddressForm = (address) => {
@@ -90,7 +90,7 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-neighborhood').value = neighborhood;
   document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
-  document.getElementById('bash--dropdown-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-state').value = provinceShortCode(state);
 
   // TODO Furniture, Rica fields.
   // Ensure it happens after they are in the DOM.
@@ -160,9 +160,20 @@ export const addressIsValid = (address) => {
 // TODO move somewhere else?
 export const setAddress = (address) => {
   const { isValid, invalidFields } = addressIsValid(address);
-  console.info('setAddress', { address, isValid, invalidFields });
 
-  if (!isValid) return;
+  if (!isValid) {
+    console.info('setAddress', { address, isValid, invalidFields });
+
+    populateAddressForm(address);
+    $('#bash--address-form').addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    window.postMessage({
+      action: 'setDeliveryView',
+      view: 'address-form',
+    });
+    return;
+  }
 
   const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
 
@@ -184,6 +195,13 @@ export const setAddress = (address) => {
       console.info('setAddress', { result });
     })
     .done(() => clearLoaders());
+};
+
+export const getBestRecipient = () => {
+  const { receiverName } = window.vtexjs.checkout.orderForm?.shippingData?.address;
+  const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+  const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
+  return receiverName || clientProfileName || document.getElementById('client-first-name')?.value;
 };
 
 export default mapGoogleAddress;
