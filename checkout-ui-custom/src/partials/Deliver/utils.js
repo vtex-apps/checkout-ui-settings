@@ -184,6 +184,7 @@ export const setAddress = (address) => {
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
   shippingData.address = address;
+  shippingData.address.number = shippingData.address.number ?? '';
   shippingData.selectedAddresses = [address];
 
   // Start Shimmering
