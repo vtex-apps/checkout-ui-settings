@@ -4,12 +4,13 @@ import AddressSearch from './AddressSearch';
 import FurnitureForm from './FurnitureForm';
 import RICAForm from './RICAForm';
 import TVLicenseForm from './TVLicenseForm';
+import { FURNITURE_FEE_LINK } from '../../utils/const';
 
 const DeliverContainer = ({ hasFurn, hasTV, hasSim }) => {
   const showFurnitureForm = `
-    <section class="bash--delivery-view" data-section="furniture-fields">
+    <section class="bash--extra-fields" data-section="furniture-fields">
       <div class="bash--heading">
-        <h3>Furniture information needed</h3>
+        <h2>Furniture information needed</h2>
       </div>
       <p class="tfg-custom-subtitle">
         We need some more information to prepare delivery of your furniture items to your address.
@@ -19,9 +20,9 @@ const DeliverContainer = ({ hasFurn, hasTV, hasSim }) => {
   `;
 
   const showTVLicenseForm = `
-    <section class="bash--delivery-view" data-section="tv-fields">
+    <section class="bash--extra-fields" data-section="tv-fields">
       <div class="bash--heading">
-        <h3>TV license information needed</h3>
+        <h2>TV license information needed</h2>
         <p class="tfg-custom-subtitle">Please provide your ID number to validate your TV Licence.</p>
       </div>
       ${TVLicenseForm()}
@@ -29,9 +30,9 @@ const DeliverContainer = ({ hasFurn, hasTV, hasSim }) => {
   `;
 
   const showRICAForm = `
-    <section class="bash--delivery-view" data-section="rica-fields">
+    <section class="bash--extra-fields" data-section="rica-fields">
       <div class="bash--heading">
-        <h3>Rica information required</h3>
+        <h2>Rica information required</h2>
         <p class="tfg-custom-subtitle">
           To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as
           it appears on a valid proof of residence.
@@ -50,11 +51,6 @@ const DeliverContainer = ({ hasFurn, hasTV, hasSim }) => {
           <a href="#" data-view="address-search">Add address</a>
         </div>
         ${Addresses()}
-
-        <div class="bash--heading">
-          <h2>Delivery method</h2>
-          <a href="#" data-view="address-search">Furniture shipping costs</a>
-        </div>
       </section>
 
       <section class="bash--delivery-view" data-section="address-search">
@@ -73,14 +69,22 @@ const DeliverContainer = ({ hasFurn, hasTV, hasSim }) => {
         ${AddressForm()}
       </section>
 
-      <div class="bash--heading">
+      <section class="bash--extra-fields" data-section="extra-fields">
+        <div class="bash--heading">
           <h2>Extra fields</h2>
-      </div>
-      <div id="bash--extra-fields">
+        </div>
         ${hasFurn ? showFurnitureForm : '<div></div>'}
         ${hasTV ? showTVLicenseForm : '<div></div>'}
         ${hasSim ? showRICAForm : '<div></div>'}
-      </div>
+      </section>
+
+      <section class="shipping-method" data-section="delivery-options">
+        <div class="shipping-section-title">
+          <h2>Delivery options</h2>
+          ${hasFurn ? FURNITURE_FEE_LINK : '<div></div>'}
+        </div>
+        
+      </section>
 
       <section class="bash--delivery-view" data-section="complete-address">
         <h2>Complete address</h2>

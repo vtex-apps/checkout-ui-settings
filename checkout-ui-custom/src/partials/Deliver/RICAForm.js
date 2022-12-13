@@ -13,7 +13,7 @@ const RICAForm = () => {
       value: '',
     },
     {
-      name: 'Residential address the same as Delivery address',
+      name: 'Residential address the same as delivery address',
       label: 'Proof of residential address',
       type: 'checkbox',
       checked: true,

@@ -105,6 +105,18 @@ const FurnitureForm = () => {
       type: 'dropdown',
       options: liftStairs,
     },
+    {
+      name: 'Is there sufficent corner/passage door space?',
+      label: '',
+      type: 'checkbox',
+      checked: false,
+    },
+    {
+      name: 'Would you like us to assemble your furniture items?',
+      label: '',
+      type: 'checkbox',
+      checked: false,
+    },
   ];
 
   const formFields = fields.map((field) => FormField(field)).join('');
@@ -113,7 +125,6 @@ const FurnitureForm = () => {
   <form id="bash--address-form" method="post">
     ${formFields}
   </form>
-  
   `;
 };
 
