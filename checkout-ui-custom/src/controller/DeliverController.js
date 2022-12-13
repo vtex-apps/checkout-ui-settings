@@ -11,12 +11,16 @@ const DeliverController = (() => {
     hasSim: false,
   };
 
+  const addShippingMethod = () => {
+    $('#delivery-packages-options').clone().appendTo('.shipping-method');
+  };
+
   const setupDeliver = () => {
     if ($('#bash--deliver-container').length) return;
     if (window.vtexjs.checkout.orderForm) {
       const { items } = window.vtexjs.checkout.orderForm;
       const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
-      console.log('{ hasFurniture, hasTVs, hasSimCards }', { hasFurniture, hasTVs, hasSimCards });
+
       state.hasFurn = hasFurniture;
       state.hasTVs = hasTVs;
       state.hasSim = hasSimCards;
@@ -24,7 +28,7 @@ const DeliverController = (() => {
     $('#postalCode-finished-loading').after(DeliverContainer({
       hasFurn: state.hasFurn, hasSim: state.hasSim, hasTV: state.hasTVs,
     }));
-    $('#postalCode-finished-loading').after(DeliverContainer());
+    addShippingMethod();
 
     // Form validation
     $('select, input').off('invalid');
