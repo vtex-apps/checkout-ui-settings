@@ -1,8 +1,6 @@
 import Radio from './Elements/Radio';
 
 const AddressListing = (address) => {
-  console.info('AddressListing', { address });
-
   const { number, street, neighborhood, postalCode, city, receiverName, complement, id } = address;
 
   const addressLine = [`${number ?? ''} ${street}`, neighborhood ?? city, postalCode].join(', ');

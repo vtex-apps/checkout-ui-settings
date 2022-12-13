@@ -1,4 +1,5 @@
 import { clearLoaders } from '../../utils/functions';
+import { upsertAddress } from '../../utils/services';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -73,7 +74,7 @@ const populateAddressFromSearch = (address) => {
 
 export const populateAddressForm = (address) => {
   console.info('populateAddressForm', { address });
-  const { street, neighborhood, postalCode, state, city, receiverName, complement, id } = address;
+  const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressName } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -84,6 +85,7 @@ export const populateAddressForm = (address) => {
 
   // addressId indicates that address is being edited / completed.
   if (id) document.getElementById('bash--input-addressId').value = id;
+  if (id) document.getElementById('bash--input-addressName').value = addressName;
 
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
@@ -184,7 +186,7 @@ export const setAddress = (address) => {
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
   shippingData.address = address;
-  shippingData.address.number = shippingData.address.number ?? '';
+  shippingData.address.number = shippingData.address.number ?? ' ';
   shippingData.selectedAddresses = [address];
 
   // Start Shimmering
@@ -198,11 +200,54 @@ export const setAddress = (address) => {
     .done(() => clearLoaders());
 };
 
+export const submitAddressForm = async (event) => {
+  console.info('SUBMIT');
+  event.preventDefault();
+
+  const form = document.forms['bash--address-form'];
+
+  const fields = [
+    'addressType',
+    'receiverName',
+    'addressId',
+    'postalCode',
+    'city',
+    'state',
+    'country',
+    'street',
+    'neighborhood',
+    'complement',
+  ];
+
+  const address = {
+    isDisposable: false,
+    reference: null,
+    geoCoordinates: [],
+    number: '',
+    country: 'ZAF',
+  };
+
+  for (let f = 0; f < fields.length; f++) {
+    address[fields[f]] = form[fields[f]]?.value || null;
+  }
+
+  const checkoutAddress = await setAddress(address);
+  const savedAddress = await upsertAddress(address);
+
+  console.info({ savedAddress, checkoutAddress });
+
+  // Save address on their masterdata profile.
+  // Needed for addressId.
+
+  // Apply address to the user's checkout.
+  // setAddress(address);
+};
+
 export const getBestRecipient = () => {
   const { receiverName } = window.vtexjs.checkout.orderForm?.shippingData?.address;
   const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
   const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
-  return receiverName || clientProfileName || document.getElementById('client-first-name')?.value;
+  return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
 };
 
 export default mapGoogleAddress;

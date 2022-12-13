@@ -9,10 +9,11 @@
 [x] Select address - Save to checkout sendAttachment()
 [x] Select address - prompt user to complete details
 [x] Detect when adress is invalid for cart items.
+[ ] Create a local store for addresses? (Edit is not immediate.)
 [ ] Add address - Save to checkout
 [ ] Add address - Save to masterdata
 [ ] Edit address - Save to checkout
-[ ] Edit address - Save to masterdata
+[x] Edit address - Save to masterdata
 [ ] Delivery Method - show delivery fee
 [ ] Detect Furniture delivery
 [ ] Detect TV/Sim delivery

@@ -1,5 +1,5 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
-import { parseAttribute, populateAddressForm, setAddress } from '../partials/Deliver/utils';
+import { parseAttribute, populateAddressForm, setAddress, submitAddressForm } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 
 const DeliverController = (() => {
@@ -48,6 +48,8 @@ const DeliverController = (() => {
     const address = parseAttribute($(`#address-${this.value}`).data('address'));
     setAddress(address);
   });
+
+  $(document).on('submit', '#bash--address-form', submitAddressForm);
 
   // Form validation
   window.addEventListener('message', (event) => {

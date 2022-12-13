@@ -11,6 +11,12 @@ const AddressForm = () => {
       required: false,
     },
     {
+      name: 'addressName',
+      type: 'hidden',
+      value: '',
+      required: false,
+    },
+    {
       name: 'street',
       label: 'Street address',
       required: true,

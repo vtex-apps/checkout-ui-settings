@@ -1,4 +1,5 @@
-import { clearLoaders, getAddresses } from '../../utils/functions';
+import { clearLoaders } from '../../utils/functions';
+import { getAddresses } from '../../utils/services';
 import AddressListing from './AddressListing';
 
 const Addresses = () => {
