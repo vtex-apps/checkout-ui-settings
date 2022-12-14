@@ -1,6 +1,12 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
-import { parseAttribute, populateAddressForm, setAddress, submitAddressForm } from '../partials/Deliver/utils';
+import {
+  parseAttribute,
+  populateAddressForm,
+  setAddress,
+  submitAddressForm,
+  submitDeliveryForm,
+} from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
 
@@ -13,7 +19,7 @@ const DeliverController = (() => {
   };
 
   const addShippingMethod = () => {
-    $('#delivery-packages-options').clone().appendTo('.shipping-method');
+    $('#delivery-packages-options').clone().appendTo('#bash-delivery-options');
   };
 
   const setupDeliver = () => {
@@ -34,7 +40,7 @@ const DeliverController = (() => {
     const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
 
     if (showExtraFields) {
-      $('div.bash--delivery-container > section.shipping-method').before(
+      $('#bash-delivery-options').before(
         ExtraFieldsContainer({
           hasFurn: state.hasFurn,
           hasSim: state.hasSim,
@@ -83,6 +89,7 @@ const DeliverController = (() => {
   });
 
   $(document).on('submit', '#bash--address-form', submitAddressForm);
+  $(document).on('submit', '#bash--delivery-form', submitDeliveryForm);
 
   // Form validation
   window.addEventListener('message', (event) => {

@@ -1,7 +1,7 @@
+import { FURNITURE_FEE_LINK } from '../../utils/const';
 import Addresses from './Addresses';
 import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
-import { FURNITURE_FEE_LINK } from '../../utils/const';
 
 const DeliverContainer = ({ hasFurn }) => `
   <div class="bash--delivery-container" data-view="select-address">
@@ -24,30 +24,32 @@ const DeliverContainer = ({ hasFurn }) => `
     
     <section class="bash--delivery-view" data-section="address-form">
       <div class="bash--heading">
-        <h2>Complete address</h2>
+        <h2>Delivery address</h2>
         <a href="#" data-view="address-search">&lt; Back</a>
       </div>
       ${AddressForm()}
     </section>
 
-    <section class="shipping-method" data-section="delivery-options">
+   <form name="bash-delivery-form" method="post">
+
+    <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
       <hr>
       <div class="shipping-section-title">
         <h2>Delivery options</h2>
-        ${hasFurn ? FURNITURE_FEE_LINK : '<div></div>'}
+        ${hasFurn ? FURNITURE_FEE_LINK : ''}
       </div>
     </section>
 
-    <section class="bash--delivery-view" data-section="complete-address">
-      <h2>Complete address</h2>
-      <a href="#" data-view="select-address">&lt; Back</a>
-    </section>
+     <button 
+      class="submit btn-go-to-payment btn btn-large btn-success"
+      id="btn-save-delivery" 
+      type="submit"
+    >
+      Go to payment
+    </button>
 
-    <section class="bash--delivery-view" data-section="edit-address">
-      <h2>Edit address</h2>
-      <a href="#" data-view="select-address">&lt; Back</a>
-    </section>
-    
+   </form>
+
   </div>`;
 
 export default DeliverContainer;

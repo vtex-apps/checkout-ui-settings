@@ -7,7 +7,7 @@ const ExtraFieldsContainer = ({ hasFurn, hasTV, hasSim }) => {
     <div id="furniture-form">
       <hr>
       <div class="bash--heading">
-        <h3>Furniture information needed</h3>
+        <h2>Furniture information needed</h2>
       </div>
       <p class="tfg-custom-subtitle">
         We need some more information to prepare delivery of your furniture items to your address.
@@ -46,10 +46,10 @@ const ExtraFieldsContainer = ({ hasFurn, hasTV, hasSim }) => {
     `;
 
   return `
-  <section class="bash--extra-fields" data-section="delivery-options">
-    ${hasFurn ? showFurnitureForm : '<div></div>'}
-    ${hasTV ? showTVLicenseForm : '<div></div>'}
-    ${hasSim ? showRICAForm : '<div></div>'}
+  <section class="bash--extra-fields bash--delivery-view" data-section="select-address">
+    ${hasFurn ? showFurnitureForm : ''}
+    ${hasTV ? showTVLicenseForm : ''}
+    ${hasSim ? showRICAForm : ''}
   </section>`;
 };
 

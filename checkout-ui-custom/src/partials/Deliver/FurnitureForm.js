@@ -5,7 +5,8 @@ const furnitureForm = {
   buildingType: [
     {
       value: '',
-      label: 'Select',
+      label: 'Please select',
+      disabled: true,
     },
     {
       value: 'freeStanding',
@@ -27,23 +28,33 @@ const furnitureForm = {
 
   parkingDistance: [
     {
+      value: '',
+      label: 'Please select',
+      disabled: true,
+    },
+    {
       value: 15,
-      label: 15,
+      label: '15 meters',
     },
     {
       value: 25,
-      label: 25,
+      label: '25 meters',
     },
     {
       value: 50,
-      label: 50,
+      label: '50 meters',
     },
     {
       value: 100,
-      label: 100,
+      label: '100+ meters',
     },
   ],
   deliveryFloor: [
+    {
+      value: '',
+      label: 'Please select',
+      disabled: true,
+    },
     {
       value: 'ground',
       label: 'Ground',
@@ -62,6 +73,11 @@ const furnitureForm = {
     },
   ],
   liftStairs: [
+    {
+      value: '',
+      label: 'Please select',
+      disabled: true,
+    },
     {
       value: 'lift',
       label: 'Lift',
@@ -106,15 +122,17 @@ const FurnitureForm = () => {
       options: liftStairs,
     },
     {
-      name: 'Is there sufficent corner/passage door space?',
-      label: '',
+      name: 'hasSufficientSpace',
+      label: 'Is there sufficent corner/passage door space?',
+      value: false,
       type: 'checkbox',
       checked: false,
     },
     {
-      name: 'Would you like us to assemble your furniture items?',
-      label: '',
+      name: 'assembleFurniture',
+      label: 'Would you like us to assemble your furniture items?',
       type: 'checkbox',
+      value: false,
       checked: false,
     },
   ];
@@ -122,9 +140,7 @@ const FurnitureForm = () => {
   const formFields = fields.map((field) => FormField(field)).join('');
 
   return `
-  <form id="bash--address-form" method="post">
     ${formFields}
-  </form>
   `;
 };
 

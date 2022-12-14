@@ -118,6 +118,12 @@ export const initGoogleAutocomplete = () => {
 
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
+export const populateExtraFields = (address, fields) => {
+  for (let i = 0; i < fields.length; i++) {
+    document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+  }
+};
+
 export const addressIsValid = (address) => {
   let requiredFields = [];
   const invalidFields = [];
@@ -147,10 +153,18 @@ export const addressIsValid = (address) => {
 
   const requiredRicaFields = ['tvID'];
 
+  // TODO more fields for Rica (sim?)
+
   requiredFields = [...requiredAddressFields];
 
-  if (hasFurniture) requiredFields = [...requiredFields, ...requiredFurnitureFields];
-  if (hasTV || hasSim) requiredFields = [...requiredFields, ...requiredRicaFields];
+  if (hasFurniture) {
+    populateExtraFields(address, requiredFurnitureFields);
+    requiredFields = [...requiredFields, ...requiredFurnitureFields];
+  }
+  if (hasTV || hasSim) {
+    populateExtraFields(address, requiredRicaFields);
+    requiredFields = [...requiredFields, ...requiredRicaFields];
+  }
 
   for (let i = 0; i < requiredFields.length; i++) {
     if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);
@@ -235,6 +249,7 @@ export const submitAddressForm = async (event) => {
   address.addressId = address.addressId || address.addressName;
 
   // Apply the selected address to customers orderForm.
+  // TODO deselect the currently checked address, select this address.
   const checkoutAddress = await setAddress(address);
 
   // Update the localstore, and the API
@@ -243,6 +258,22 @@ export const submitAddressForm = async (event) => {
   console.info({ savedAddress, checkoutAddress });
 
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
+};
+
+export const submitDeliveryForm = (event) => {
+  event.preventDefault();
+
+  const form = document.forms['bash--delivery-form'];
+
+  console.info({ form });
+
+  // Set address in orderForm
+
+  // Save address info locally
+
+  // Send saved address to API
+
+  window.location.hash = 'payment';
 };
 
 export const getBestRecipient = () => {
@@ -269,4 +300,5 @@ export const isSelectedAddress = (address, selectedAddress) => {
 
   return addressObject === selectedAddressObject;
 };
+
 export default mapGoogleAddress;

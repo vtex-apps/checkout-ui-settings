@@ -1,8 +1,8 @@
+import Checkbox from './Checkbox';
 import DropDown from './DropDown';
 import Note from './Note';
 import Radio from './Radio';
 import TextField from './TextField';
-import Checkbox from './Checkbox';
 
 const FormField = ({
   label,
@@ -39,7 +39,11 @@ const FormField = ({
   // TODO add drop downs, etc.
   return `
 <p class="input bash--${type}field-${name.replace(/\s/g, '-')} bash--${type} ${required ? 'required' : 'optional'}">
-  ${label ? `<label id="bash--label-${fieldId}" for="bash--input-${fieldId}">${label}</label>` : ''}
+  ${
+    label && type !== 'checkbox'
+      ? `<label id="bash--label-${fieldId}" for="bash--input-${fieldId}">${label}</label>`
+      : ''
+  }
  ${formField()}
   ${required ? `<span class="bash--field-error">${error}</span>` : ''}
 
