@@ -121,9 +121,8 @@ export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
 export const populateExtraFields = (address, fields) => {
   for (let i = 0; i < fields.length; i++) {
-    if (!document.getElementById(`bash--input-${fields[i]}`).value) {
-      document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
-    }
+    if (!document.getElementById(`bash--input-${fields[i]}`)) continue;
+    if (address[fields[i]]) document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
   }
 };
 
@@ -132,12 +131,19 @@ export const addressIsValid = (address) => {
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
+  const extraFieldsForm = document.forms['bash-delivery-form'];
+
   let requiredFields = [];
   const invalidFields = [];
 
   // TODO more fields for Rica (sim?)
 
   requiredFields = [...requiredAddressFields];
+
+  // Clear the extra fields.
+  if (extraFieldsForm && (hasFurniture || hasTVs || hasSimCards)) {
+    extraFieldsForm.reset();
+  }
 
   if (hasFurniture) {
     populateExtraFields(address, requiredFurnitureFields);
