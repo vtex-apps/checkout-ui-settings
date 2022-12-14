@@ -4,46 +4,53 @@ import TVLicenseForm from './TVLicenseForm';
 
 const ExtraFieldsContainer = ({ hasFurn, hasTV, hasSim }) => {
   const showFurnitureForm = `
-    <section class="bash--delivery-view" data-section="furniture-fields">
+    <div id="furniture-form">
+      <hr>
       <div class="bash--heading">
         <h3>Furniture information needed</h3>
       </div>
       <p class="tfg-custom-subtitle">
         We need some more information to prepare delivery of your furniture items to your address.
+        <br>
+        <br>
+        Please ensure sufficient space to receive the goods and keep in mind 
+        that our couriers aren't able to hoist goods onto balconies.
       </p>
       ${FurnitureForm()}
-    </section>
+    </div>
   `;
 
   const showTVLicenseForm = `
-    <section class="bash--delivery-view" data-section="tv-fields">
+    <div id="tv-license-form">
+      <hr>
       <div class="bash--heading">
         <h3>TV license information needed</h3>
         <p class="tfg-custom-subtitle">Please provide your ID number to validate your TV Licence.</p>
       </div>
       ${TVLicenseForm()}
-    </section>
+    </div>
   `;
 
   const showRICAForm = `
-    <section class="bash--delivery-view" data-section="rica-fields">
+    <div id="rica-form">
+      <hr>
       <div class="bash--heading">
         <h3>Rica information required</h3>
         <p class="tfg-custom-subtitle">
           To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as
           it appears on a valid proof of residence.
         </p>
-        ${RICAForm()}
       </div>
-    </section>
-  `;
+        ${RICAForm()}
+    </div>
+    `;
 
   return `
-  <div id="bash--extra-fields">
+  <section class="bash--extra-fields" data-section="delivery-options">
     ${hasFurn ? showFurnitureForm : '<div></div>'}
     ${hasTV ? showTVLicenseForm : '<div></div>'}
     ${hasSim ? showRICAForm : '<div></div>'}
-  </div>`;
+  </section>`;
 };
 
 export default ExtraFieldsContainer;

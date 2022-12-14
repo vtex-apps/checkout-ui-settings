@@ -1,4 +1,5 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
+import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import { parseAttribute, populateAddressForm, setAddress } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
@@ -26,8 +27,19 @@ const DeliverController = (() => {
       state.hasSim = hasSimCards;
     }
     $('#postalCode-finished-loading').after(DeliverContainer({
-      hasFurn: state.hasFurn, hasSim: state.hasSim, hasTV: state.hasTVs,
+      hasFurn: state.hasFurn,
     }));
+    const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
+
+    if (showExtraFields) {
+      $('div.bash--delivery-container > section.shipping-method').before(
+        ExtraFieldsContainer({
+          hasFurn: state.hasFurn,
+          hasSim: state.hasSim,
+          hasTV: state.hasTVs,
+        }),
+      );
+    }
     addShippingMethod();
 
     // Form validation
