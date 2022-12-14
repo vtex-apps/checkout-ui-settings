@@ -1,5 +1,5 @@
 import { clearLoaders } from '../../utils/functions';
-import { upsertAddress } from '../../utils/services';
+import { addOrUpdateAddress } from '../../utils/services';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -201,15 +201,15 @@ export const setAddress = (address) => {
 };
 
 export const submitAddressForm = async (event) => {
-  console.info('SUBMIT');
   event.preventDefault();
 
   const form = document.forms['bash--address-form'];
 
   const fields = [
+    'addressId',
+    'addressName',
     'addressType',
     'receiverName',
-    'addressId',
     'postalCode',
     'city',
     'state',
@@ -231,16 +231,18 @@ export const submitAddressForm = async (event) => {
     address[fields[f]] = form[fields[f]]?.value || null;
   }
 
+  address.addressName = address.addressName || address.addressId;
+  address.addressId = address.addressId || address.addressName;
+
+  // Apply the selected address to customers orderForm.
   const checkoutAddress = await setAddress(address);
-  const savedAddress = await upsertAddress(address);
+
+  // Update the localstore, and the API
+  const savedAddress = await addOrUpdateAddress(address);
 
   console.info({ savedAddress, checkoutAddress });
 
-  // Save address on their masterdata profile.
-  // Needed for addressId.
-
-  // Apply address to the user's checkout.
-  // setAddress(address);
+  window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
 };
 
 export const getBestRecipient = () => {
@@ -250,4 +252,21 @@ export const getBestRecipient = () => {
   return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
 };
 
+export const isSelectedAddress = (address, selectedAddress) => {
+  const addressObject = JSON.stringify({
+    street: address.street,
+    neighborhood: address.neighborhood,
+    city: address.city,
+    postalCode: address.postalCode,
+  });
+
+  const selectedAddressObject = JSON.stringify({
+    street: selectedAddress.street,
+    neighborhood: selectedAddress.neighborhood,
+    city: selectedAddress.city,
+    postalCode: selectedAddress.postalCode,
+  });
+
+  return addressObject === selectedAddressObject;
+};
 export default mapGoogleAddress;

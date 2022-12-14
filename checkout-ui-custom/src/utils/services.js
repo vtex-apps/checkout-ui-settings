@@ -1,3 +1,5 @@
+import AddressListing from '../partials/Deliver/AddressListing';
+import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
 import { getBestPhoneNumber } from './phoneFields';
 
@@ -18,7 +20,17 @@ const getHeadersByConfig = ({ cookie, cache, json }) => {
 
 // GET addresses
 
+const DB = new CheckoutDB();
+
 export const getAddresses = async () => {
+  // Try to get addresses from users local store.
+  // TODO: When should addresses be reloaded/updated?
+
+  const addresses = await DB.getAddresses();
+  if (addresses.length > 0) return { data: addresses };
+
+  // Fallback to get addresses from API.
+
   const { email } = window.vtexjs.checkout.orderForm?.clientProfileData;
 
   const fields = [
@@ -62,7 +74,12 @@ export const getAddresses = async () => {
     options
   )
     .then((res) => res.json())
-    .then((data) => data)
+    .then((data) => {
+      console.info(data);
+      // Store addresses locally
+      if (data.data) DB.loadAddresses(data.data);
+      return data;
+    })
     .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
 };
 
@@ -90,14 +107,16 @@ const getAddress = async (addressName, fields) => {
 };
 
 // PATCH address
+
 export const upsertAddress = async (address) => {
   let path;
   const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
 
-  if (!address) return Promise.reject(new Error("'No address provided.'"));
+  if (!address) return Promise.reject(new Error('No address provided.'));
 
   console.info({ address });
   // Address already exists (?)
+
   const savedAddress = address.addressName ? await getAddress(address.addressName, '?_fields=id') : {};
 
   console.info({ savedAddress });
@@ -144,6 +163,32 @@ export const upsertAddress = async (address) => {
       return result;
     })
     .catch((error) => catchError(`SAVE_ADDRESS_ERROR: ${error?.message}`));
+};
+
+// export const populateAddressList = () => {
+//   getAddresses().then(({ data: addresses }) => {
+//     // if(addresses.length < 1)... go to Add Address
+//     const addressesHtml = addresses.map((address) => AddressListing(address));
+//     document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
+//     clearLoaders();
+//   });
+// };
+
+export const updateAddressListing = (address) => {
+  let $currentListing = $(`#address-${address.addressName}`);
+  $currentListing.after(AddressListing(address));
+
+  $currentListing.remove();
+  $currentListing = null;
+};
+
+export const addOrUpdateAddress = async (address) => {
+  address.id = address.id || address.addressId;
+
+  DB.addOrUpdateAddress(address).then(() => updateAddressListing(address));
+
+  // Add or update at the API.
+  upsertAddress(address);
 };
 
 export default getAddresses;
