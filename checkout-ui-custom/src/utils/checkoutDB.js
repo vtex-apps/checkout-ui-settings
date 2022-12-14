@@ -1,28 +1,9 @@
-const testAddress = {
-  id: 'SomeID',
-  addressName: 'SomeName',
-  addressType: 'residential',
-  receiverName: 'James Edit Smith',
-  addressId: '6a7a145d365f41d79a51fa47ad24610c',
-  isDisposable: false,
-  postalCode: '0157',
-  city: 'Lyttelton Manor EDIT',
-  state: 'KZN',
-  country: 'ZAF',
-  street: '123123 Amkor Rd EDIt',
-  number: '',
-  neighborhood: 'Lyttelton Manor EDIT',
-  complement: '021 345 9876',
-  reference: null,
-  geoCoordinates: ['1', '2'],
-};
-
 class CheckoutDB {
   constructor() {
     this.indexedDB =
       window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 
-    this.checkoutDB = indexedDB.open('checkoutDB', 1.1);
+    this.checkoutDB = indexedDB.open('checkoutDB', 1.2);
 
     this.checkoutDB.onerror = (event) => {
       console.error('CheckoutDB Error', { event });
@@ -34,6 +15,9 @@ class CheckoutDB {
       const store = db.createObjectStore('addresses', { keyPath: 'addressName' });
       store.createIndex('address_street', ['street'], { unique: false });
       store.createIndex('address_addressName', ['addressName'], { unique: true });
+      store.createIndex('address_street_suburb_city_postal', ['street', 'neighborhood', 'city', 'postalCode'], {
+        unique: true,
+      });
     };
 
     this.checkoutDB.onsuccess = () => {

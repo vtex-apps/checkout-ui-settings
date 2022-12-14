@@ -1,5 +1,6 @@
-import { clearLoaders } from '../../utils/functions';
+import { clearLoaders, getSpecialCategories } from '../../utils/functions';
 import { addOrUpdateAddress } from '../../utils/services';
+import { requiredAddressFields, requiredFurnitureFields, requiredRicaFields, validAddressTypes } from './constants';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -120,38 +121,19 @@ export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
 export const populateExtraFields = (address, fields) => {
   for (let i = 0; i < fields.length; i++) {
-    document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+    if (!document.getElementById(`bash--input-${fields[i]}`).value) {
+      document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+    }
   }
 };
 
+// Runs when you setAddress
 export const addressIsValid = (address) => {
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
   let requiredFields = [];
   const invalidFields = [];
-  const hasFurniture = false;
-  const hasTV = false;
-  const hasSim = false;
-
-  const requiredAddressFields = [
-    'receiverName',
-    'complement',
-    'street',
-    'neighborhood',
-    'state',
-    'city',
-    'country',
-    'postalCode',
-  ];
-
-  const requiredFurnitureFields = [
-    'buildingType',
-    'assembleFurniture',
-    'deliveryFloor',
-    'hasSufficientSpace',
-    'liftOrStairs',
-    'parkingDistance',
-  ];
-
-  const requiredRicaFields = ['tvID'];
 
   // TODO more fields for Rica (sim?)
 
@@ -161,7 +143,8 @@ export const addressIsValid = (address) => {
     populateExtraFields(address, requiredFurnitureFields);
     requiredFields = [...requiredFields, ...requiredFurnitureFields];
   }
-  if (hasTV || hasSim) {
+
+  if (hasTVs || hasSimCards) {
     populateExtraFields(address, requiredRicaFields);
     requiredFields = [...requiredFields, ...requiredRicaFields];
   }
@@ -178,20 +161,20 @@ export const setAddress = (address) => {
   const { isValid, invalidFields } = addressIsValid(address);
 
   if (!isValid) {
-    console.info('setAddress', { address, isValid, invalidFields });
-
     populateAddressForm(address);
     $('#bash--address-form').addClass('show-form-errors');
+    $('#bash--delivery-form')?.addClass('show-form-errors');
     $(`#bash--input-${invalidFields[0]}`).focus();
 
-    window.postMessage({
-      action: 'setDeliveryView',
-      view: 'address-form',
-    });
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-form',
+      });
+    }
+
     return;
   }
-
-  const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
 
   // Fix bad addressType.
   if (address.addressType === 'business') address.addressType = 'commercial';
@@ -266,6 +249,14 @@ export const submitDeliveryForm = (event) => {
   const form = document.forms['bash--delivery-form'];
 
   console.info({ form });
+
+  let fullAddress = {};
+
+  const { address } = window.vtexjs.checkout.orderForm;
+
+  fullAddress = { ...address };
+
+  setAddress(fullAddress);
 
   // Set address in orderForm
 

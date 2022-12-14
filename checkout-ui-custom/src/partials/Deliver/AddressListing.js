@@ -7,12 +7,10 @@ const AddressListing = (address) => {
   const addressLine = [`${number ?? ''} ${street}`, neighborhood ?? city, postalCode].join(', ');
   const contactLine = [receiverName, complement].join(' - ');
 
-  // orderform
   const { address: selectedAddress } = window?.vtexjs?.checkout?.orderForm?.shippingData;
 
+  // TODO - later pull address from DB instead of attribute.
   const addressString = encodeURIComponent(JSON.stringify(address));
-
-  console.info('AddressListing', { address });
 
   return `
 <label id="address-${id}" class="bash--address-listing" data-address="${addressString}">

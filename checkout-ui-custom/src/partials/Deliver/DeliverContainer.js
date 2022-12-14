@@ -34,22 +34,20 @@ const DeliverContainer = ({ hasFurn }) => `
 
     <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
       <hr>
-      <div class="shipping-section-title">
+      <div class="bash--heading">
         <h2>Delivery options</h2>
         ${hasFurn ? FURNITURE_FEE_LINK : ''}
       </div>
+      <button 
+        class="submit btn-go-to-payment btn btn-large btn-success"
+        id="btn-save-delivery" 
+        type="submit"a>
+        Go to payment
+      </button>
     </section>
 
-     <button 
-      class="submit btn-go-to-payment btn btn-large btn-success"
-      id="btn-save-delivery" 
-      type="submit"
-    >
-      Go to payment
-    </button>
-
    </form>
-
+   
   </div>`;
 
 export default DeliverContainer;
