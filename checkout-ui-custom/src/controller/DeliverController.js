@@ -1,15 +1,48 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
+import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import { parseAttribute, populateAddressForm, setAddress, submitAddressForm } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
+import { getSpecialCategories } from '../utils/functions';
 
 const DeliverController = (() => {
   const state = {
-    view: 'list', // list, addNew, add, edit, complete, selected
+    view: 'list',
+    hasFurn: false,
+    hasTVs: false,
+    hasSim: false,
+  };
+
+  const addShippingMethod = () => {
+    $('#delivery-packages-options').clone().appendTo('.shipping-method');
   };
 
   const setupDeliver = () => {
     if ($('#bash--deliver-container').length) return;
-    $('#postalCode-finished-loading').after(DeliverContainer());
+    if (window.vtexjs.checkout.orderForm) {
+      const { items } = window.vtexjs.checkout.orderForm;
+      const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
+      state.hasFurn = hasFurniture;
+      state.hasTVs = hasTVs;
+      state.hasSim = hasSimCards;
+    }
+    $('#postalCode-finished-loading').after(
+      DeliverContainer({
+        hasFurn: state.hasFurn,
+      })
+    );
+    const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
+
+    if (showExtraFields) {
+      $('div.bash--delivery-container > section.shipping-method').before(
+        ExtraFieldsContainer({
+          hasFurn: state.hasFurn,
+          hasSim: state.hasSim,
+          hasTV: state.hasTVs,
+        })
+      );
+    }
+    addShippingMethod();
 
     // Form validation
     $('select, input').off('invalid');
@@ -59,10 +92,7 @@ const DeliverController = (() => {
     switch (data.action) {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
-
         if (data.view === 'address-form') {
-          // init form validation.
-
           if (data.content) {
             const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
             populateAddressForm(address);
