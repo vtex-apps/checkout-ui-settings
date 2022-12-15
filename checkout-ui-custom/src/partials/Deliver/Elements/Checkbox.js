@@ -5,7 +5,9 @@ const Checkbox = ({ name, label, checked }) => `
        <input 
         type='checkbox' 
         name="${name}" 
-        id="tfg-rica-same-address" ${checked ? "checked='checked'" : ''} /> ${label}</label>
+        id="bash--input-${name}" ${checked ? "checked='checked'" : ''}
+        value="true" 
+        /> ${label}</label>
   </p>
   `;
 

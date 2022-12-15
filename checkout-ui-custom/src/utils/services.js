@@ -74,10 +74,11 @@ export const getAddresses = async () => {
     options
   )
     .then((res) => res.json())
-    .then((data) => {
-      console.info(data);
+    .then(async (data) => {
       // Store addresses locally
       if (data.data) DB.loadAddresses(data.data);
+      // return DB.getAddresses();
+      // API can have dups.
       return data;
     })
     .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
@@ -114,12 +115,8 @@ export const upsertAddress = async (address) => {
 
   if (!address) return Promise.reject(new Error('No address provided.'));
 
-  console.info({ address });
   // Address already exists (?)
-
   const savedAddress = address.addressName ? await getAddress(address.addressName, '?_fields=id') : {};
-
-  console.info({ savedAddress });
 
   if (savedAddress?.id) {
     path = `${BASE_URL_API}masterdata/address/${savedAddress.id}`;
@@ -139,8 +136,6 @@ export const upsertAddress = async (address) => {
     newAddress.addressName = address.addressId || `address-${Date.now()}`;
   }
 
-  console.info({ newAddress });
-
   const headers = getHeadersByConfig({ cookie: true, cache: true, json: true });
 
   const options = {
@@ -152,27 +147,14 @@ export const upsertAddress = async (address) => {
 
   await fetch(path, options)
     .then((res) => {
-      console.info({ res, status: res.status });
       if (res.status !== 204) {
         return res.json();
       }
       return res;
     })
-    .then((result) => {
-      console.info({ result });
-      return result;
-    })
+    .then((result) => result)
     .catch((error) => catchError(`SAVE_ADDRESS_ERROR: ${error?.message}`));
 };
-
-// export const populateAddressList = () => {
-//   getAddresses().then(({ data: addresses }) => {
-//     // if(addresses.length < 1)... go to Add Address
-//     const addressesHtml = addresses.map((address) => AddressListing(address));
-//     document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
-//     clearLoaders();
-//   });
-// };
 
 export const updateAddressListing = (address) => {
   let $currentListing = $(`#address-${address.addressName}`);
@@ -185,10 +167,15 @@ export const updateAddressListing = (address) => {
 export const addOrUpdateAddress = async (address) => {
   address.id = address.id || address.addressId;
 
+  // Add or update at local store. Update UI.
   DB.addOrUpdateAddress(address).then(() => updateAddressListing(address));
 
   // Add or update at the API.
   upsertAddress(address);
 };
+
+export const getAddressByName = async (addressName) => DB.getAddress(addressName);
+
+export const clearAddresses = () => DB.clearData();
 
 export default getAddresses;

@@ -34,7 +34,7 @@ const furnitureForm = {
     },
     {
       value: 15,
-      label: '15 meters',
+      label: '15 meters or less',
     },
     {
       value: 25,
@@ -46,7 +46,7 @@ const furnitureForm = {
     },
     {
       value: 100,
-      label: '100+ meters',
+      label: '100 meters or more',
     },
   ],
   deliveryFloor: [
@@ -72,7 +72,7 @@ const furnitureForm = {
       label: '3+',
     },
   ],
-  liftStairs: [
+  liftOrStairs: [
     {
       value: '',
       label: 'Please select',
@@ -90,7 +90,7 @@ const furnitureForm = {
 };
 
 const FurnitureForm = () => {
-  const { buildingType, parkingDistance, deliveryFloor, liftStairs } = furnitureForm;
+  const { buildingType, parkingDistance, deliveryFloor, liftOrStairs } = furnitureForm;
 
   const fields = [
     {
@@ -115,11 +115,11 @@ const FurnitureForm = () => {
       options: deliveryFloor,
     },
     {
-      name: 'liftStairs',
+      name: 'liftOrStairs',
       label: 'Lift or Stairs',
       required: true,
       type: 'dropdown',
-      options: liftStairs,
+      options: liftOrStairs,
     },
     {
       name: 'hasSufficientSpace',

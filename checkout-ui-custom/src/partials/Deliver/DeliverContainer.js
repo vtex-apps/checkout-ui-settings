@@ -4,7 +4,7 @@ import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
 
 const DeliverContainer = ({ hasFurn }) => `
-  <div class="bash--delivery-container" data-view="select-address">
+  <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
   
     <section class="bash--delivery-view" data-section="select-address">
     <div class="bash--heading">
@@ -30,7 +30,7 @@ const DeliverContainer = ({ hasFurn }) => `
       ${AddressForm()}
     </section>
 
-   <form name="bash-delivery-form" method="post">
+   <form id="bash--delivery-form" name="bash--delivery-form" method="post">
 
     <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
       <hr>

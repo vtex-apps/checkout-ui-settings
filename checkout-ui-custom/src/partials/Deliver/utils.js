@@ -74,7 +74,6 @@ const populateAddressFromSearch = (address) => {
 };
 
 export const populateAddressForm = (address) => {
-  console.info('populateAddressForm', { address });
   const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressName } = address;
 
   // Clear any populated fields
@@ -121,8 +120,13 @@ export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
 export const populateExtraFields = (address, fields) => {
   for (let i = 0; i < fields.length; i++) {
-    if (!document.getElementById(`bash--input-${fields[i]}`)) continue;
-    if (address[fields[i]]) document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+    if (
+      document.getElementById(`bash--input-${fields[i]}`) &&
+      address[fields[i]] &&
+      !document.getElementById(`bash--input-${fields[i]}`).value
+    ) {
+      document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+    }
   }
 };
 
@@ -130,8 +134,6 @@ export const populateExtraFields = (address, fields) => {
 export const addressIsValid = (address) => {
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
-
-  const extraFieldsForm = document.forms['bash-delivery-form'];
 
   let requiredFields = [];
   const invalidFields = [];
@@ -141,17 +143,12 @@ export const addressIsValid = (address) => {
   requiredFields = [...requiredAddressFields];
 
   // Clear the extra fields.
-  if (extraFieldsForm && (hasFurniture || hasTVs || hasSimCards)) {
-    extraFieldsForm.reset();
-  }
 
   if (hasFurniture) {
-    populateExtraFields(address, requiredFurnitureFields);
     requiredFields = [...requiredFields, ...requiredFurnitureFields];
   }
 
   if (hasTVs || hasSimCards) {
-    populateExtraFields(address, requiredRicaFields);
     requiredFields = [...requiredFields, ...requiredRicaFields];
   }
 
@@ -164,6 +161,17 @@ export const addressIsValid = (address) => {
 
 // TODO move somewhere else?
 export const setAddress = (address) => {
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
+  if (hasFurniture) {
+    populateExtraFields(address, requiredFurnitureFields);
+  }
+
+  if (hasTVs || hasSimCards) {
+    populateExtraFields(address, requiredRicaFields);
+  }
+
   const { isValid, invalidFields } = addressIsValid(address);
 
   if (!isValid) {
@@ -191,6 +199,8 @@ export const setAddress = (address) => {
   shippingData.address = address;
   shippingData.address.number = shippingData.address.number ?? ' ';
   shippingData.selectedAddresses = [address];
+
+  // Extra fields
 
   // Start Shimmering
   setDeliveryLoading();
@@ -249,26 +259,39 @@ export const submitAddressForm = async (event) => {
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
 };
 
-export const submitDeliveryForm = (event) => {
+export const submitDeliveryForm = async (event) => {
   event.preventDefault();
-
-  const form = document.forms['bash--delivery-form'];
-
-  console.info({ form });
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
   let fullAddress = {};
 
-  const { address } = window.vtexjs.checkout.orderForm;
+  const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
   fullAddress = { ...address };
 
+  if (hasFurniture) {
+    const fields = requiredFurnitureFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
+    }
+  }
+
+  if (hasTVs || hasSimCards) {
+    const fields = requiredRicaFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (!address[fields[i]]) fullAddress[fields[i]] = document.getElementById(`bash--input-${fields[i]}`).value;
+    }
+  }
+
+  // Extra fields are not needed for setAddress...
+  // Set address in orderForm
   setAddress(fullAddress);
 
-  // Set address in orderForm
-
   // Save address info locally
-
   // Send saved address to API
+  const savedAddress = await addOrUpdateAddress(fullAddress);
+  console.info({ savedAddress });
 
   window.location.hash = 'payment';
 };

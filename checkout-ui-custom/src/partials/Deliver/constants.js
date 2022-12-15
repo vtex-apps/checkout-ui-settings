@@ -59,7 +59,7 @@ export const furnitureForm = {
       label: '3+',
     },
   ],
-  liftStairs: [
+  liftOrStairs: [
     {
       value: 'lift',
       label: 'Lift',

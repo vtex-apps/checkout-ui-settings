@@ -39,27 +39,21 @@ class CheckoutDB {
   }
 
   loadAddresses(addresses) {
-    const queries = [];
-    console.info('loadAddresses', { addresses });
-    return Promise.all(addresses.map((address) => this.addOrUpdateAddress(address))).then((loadedAddress) => {
-      console.info({ loadedAddress, queries });
-    });
+    const queries = addresses.map((address) => this.addOrUpdateAddress(address));
+    return Promise.all(queries).then((values) => values);
   }
 
   addOrUpdateAddress(address) {
-    console.info('addOrUpdateAddress', { address });
     const thisDb = this;
     return new Promise((resolve, reject) => {
       const query = thisDb.store().put(address);
 
       query.onsuccess = () => {
-        console.info('addOrUpdateAddress success');
-        resolve(query.result);
+        resolve({ success: true, addressId: query.result });
       };
 
-      query.onerror = () => {
-        console.error('Something wrong with addOrUpdateAddress ? ...');
-        reject(new Error('Address could not be stored locally'));
+      query.onerror = (error) => {
+        reject(new Error({ sucess: false, error: error?.target?.error }));
       };
     });
   }
@@ -69,10 +63,7 @@ class CheckoutDB {
     return new Promise((resolve) => {
       const query = thisDb.store().getAll();
 
-      query.onsuccess = () => {
-        console.info('getAddresses success');
-        resolve(query.result);
-      };
+      query.onsuccess = () => resolve(query.result);
 
       query.onerror = () => {
         console.error('Something wrong with getAddresses ? ...');
@@ -82,23 +73,39 @@ class CheckoutDB {
   }
 
   getAddress(id) {
-    const query = this.addresses.get(id);
-    query.onsuccess = () => {
-      console.info('getAddress', query.result);
-      return query.result;
-    };
+    const thisDb = this;
+    return new Promise((resolve) => {
+      const query = thisDb.store().get(id);
+
+      query.onsuccess = () => resolve(query.result);
+
+      query.onerror = () => {
+        console.error('Something wrong with getAddress ? ...');
+        resolve([]);
+      };
+    });
   }
 
   deleteAddress(id) {
     const query = this.addresses.delete(id);
-    query.onsuccess = () => {
-      console.info('deleteAddress', query.result);
-      return query.result;
-    };
+    query.onsuccess = () => query.result;
   }
 
-  dropDB() {
-    this.indexedDB.deleteDatabase('checkoutDB');
+  clearData() {
+    const thisDb = this;
+    return new Promise((resolve) => {
+      const query = thisDb.store().clear();
+
+      query.onsuccess = () => {
+        console.info('clearData success');
+        resolve(query.result);
+      };
+
+      query.onerror = () => {
+        console.error('Something wrong with clearData ? ...');
+        resolve([]);
+      };
+    });
   }
 }
 

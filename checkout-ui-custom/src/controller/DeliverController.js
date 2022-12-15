@@ -9,6 +9,7 @@ import {
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
+import { getAddressByName } from '../utils/services';
 
 const DeliverController = (() => {
   const state = {
@@ -23,7 +24,8 @@ const DeliverController = (() => {
   };
 
   const setupDeliver = () => {
-    if ($('#bash--deliver-container').length) return;
+    if ($('#bash--delivery-container').length) return;
+
     if (window.vtexjs.checkout.orderForm) {
       const { items } = window.vtexjs.checkout.orderForm;
       const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
@@ -66,6 +68,9 @@ const DeliverController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       console.info('Hash change');
       setupDeliver();
+      $('.bash--delivery-container.hide').removeClass('hide');
+    } else if ($('.bash--delivery-container:not(.hide)').length) {
+      $('.bash--delivery-container:not(.hide)').addClass('hide');
     }
   });
 
@@ -85,7 +90,14 @@ const DeliverController = (() => {
   // Select address
   $(document).on('change', 'input[type="radio"][name="selected-address"]', function () {
     const address = parseAttribute($(`#address-${this.value}`).data('address'));
-    setAddress(address);
+    if (document.forms['bash--delivery-form']) {
+      document.forms['bash--delivery-form'].reset();
+      document.forms['bash--delivery-form'].classList.remove('show-form-errors');
+    }
+
+    getAddressByName(address.addressName).then((addressByName) => {
+      setAddress(addressByName || address);
+    });
   });
 
   $(document).on('submit', '#bash--address-form', submitAddressForm);
@@ -111,6 +123,9 @@ const DeliverController = (() => {
         console.error('Unknown action', data.action);
     }
   });
+
+  // Clear local checkout DB on ext.
+  // window.addEventListener('beforeunload', clearAddresses);
 
   return {
     state,
