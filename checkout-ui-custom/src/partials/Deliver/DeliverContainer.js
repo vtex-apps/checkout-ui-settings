@@ -32,9 +32,11 @@ const DeliverContainer = ({ hasFurn }) => `
 
     <section class="shipping-method" data-section="delivery-options">
       <hr>
-      <div class="shipping-section-title">
-        <h2>Delivery options</h2>
-        ${hasFurn ? FURNITURE_FEE_LINK : '<div></div>'}
+      <div class="bash--heading">
+        <div class="shipping-section-title">
+          <h2>Delivery options</h2>
+          ${hasFurn ? FURNITURE_FEE_LINK : '<div></div>'}
+        </div>
       </div>
     </section>
 
