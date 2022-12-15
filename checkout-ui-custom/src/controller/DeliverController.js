@@ -89,14 +89,17 @@ const DeliverController = (() => {
 
   // Select address
   $(document).on('change', 'input[type="radio"][name="selected-address"]', function () {
-    const address = parseAttribute($(`#address-${this.value}`).data('address'));
+    const address = parseAttribute($(this).parents('.bash--address-listing').data('address'));
+
     if (document.forms['bash--delivery-form']) {
       document.forms['bash--delivery-form'].reset();
       document.forms['bash--delivery-form'].classList.remove('show-form-errors');
     }
 
     getAddressByName(address.addressName).then((addressByName) => {
-      setAddress(addressByName || address);
+      setAddress(addressByName || address, { validateExtraFields: false });
+      $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
+      $(this).attr('checked', true);
     });
   });
 

@@ -1,5 +1,5 @@
 import { clearLoaders, getSpecialCategories } from '../../utils/functions';
-import { addOrUpdateAddress } from '../../utils/services';
+import { addOrUpdateAddress, getAddressByName, updateAddressListing } from '../../utils/services';
 import { requiredAddressFields, requiredFurnitureFields, requiredRicaFields, validAddressTypes } from './constants';
 
 export const setDeliveryLoading = () => {
@@ -131,7 +131,7 @@ export const populateExtraFields = (address, fields) => {
 };
 
 // Runs when you setAddress
-export const addressIsValid = (address) => {
+export const addressIsValid = (address, validateExtraFields = true) => {
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
@@ -144,11 +144,11 @@ export const addressIsValid = (address) => {
 
   // Clear the extra fields.
 
-  if (hasFurniture) {
+  if (hasFurniture && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredFurnitureFields];
   }
 
-  if (hasTVs || hasSimCards) {
+  if ((hasTVs || hasSimCards) && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredRicaFields];
   }
 
@@ -160,7 +160,8 @@ export const addressIsValid = (address) => {
 };
 
 // TODO move somewhere else?
-export const setAddress = (address) => {
+export const setAddress = (address, options = { validateExtraFields: true }) => {
+  const { validateExtraFields } = options;
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
@@ -172,12 +173,12 @@ export const setAddress = (address) => {
     populateExtraFields(address, requiredRicaFields);
   }
 
-  const { isValid, invalidFields } = addressIsValid(address);
+  const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
 
   if (!isValid) {
     populateAddressForm(address);
     $('#bash--address-form').addClass('show-form-errors');
-    $('#bash--delivery-form')?.addClass('show-form-errors');
+    if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');
     $(`#bash--input-${invalidFields[0]}`).focus();
 
     if (requiredAddressFields.includes(invalidFields[0])) {
@@ -200,15 +201,13 @@ export const setAddress = (address) => {
   shippingData.address.number = shippingData.address.number ?? ' ';
   shippingData.selectedAddresses = [address];
 
-  // Extra fields
-
   // Start Shimmering
   setDeliveryLoading();
   window.vtexjs.checkout
     .sendAttachment('shippingData', shippingData)
-    .then((result) => {
+    .then(() => {
       // End shimmer
-      console.info('setAddress', { result });
+      updateAddressListing(shippingData.address);
     })
     .done(() => clearLoaders());
 };
@@ -217,6 +216,27 @@ export const submitAddressForm = async (event) => {
   event.preventDefault();
 
   const form = document.forms['bash--address-form'];
+
+  const storedAddress = await getAddressByName($('[name="selected-address"]:checked').val());
+  console.info({ storedAddress });
+
+  const { isValid, invalidFields } = addressIsValid(storedAddress, true);
+
+  if (!isValid) {
+    populateAddressForm(storedAddress);
+    $('#bash--address-form').addClass('show-form-errors');
+    $('#bash--delivery-form')?.addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-form',
+      });
+    }
+
+    return;
+  }
 
   const fields = [
     'addressId',
@@ -301,24 +321,6 @@ export const getBestRecipient = () => {
   const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
   const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
   return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
-};
-
-export const isSelectedAddress = (address, selectedAddress) => {
-  const addressObject = JSON.stringify({
-    street: address.street,
-    neighborhood: address.neighborhood,
-    city: address.city,
-    postalCode: address.postalCode,
-  });
-
-  const selectedAddressObject = JSON.stringify({
-    street: selectedAddress.street,
-    neighborhood: selectedAddress.neighborhood,
-    city: selectedAddress.city,
-    postalCode: selectedAddress.postalCode,
-  });
-
-  return addressObject === selectedAddressObject;
 };
 
 export default mapGoogleAddress;

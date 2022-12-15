@@ -1,5 +1,22 @@
 import Radio from './Elements/Radio';
-import { isSelectedAddress } from './utils';
+
+const isSelectedAddress = (address, selectedAddress) => {
+  const addressObject = JSON.stringify({
+    street: address.street,
+    neighborhood: address.neighborhood,
+    city: address.city,
+    postalCode: address.postalCode,
+  });
+
+  const selectedAddressObject = JSON.stringify({
+    street: selectedAddress.street,
+    neighborhood: selectedAddress.neighborhood,
+    city: selectedAddress.city,
+    postalCode: selectedAddress.postalCode,
+  });
+
+  return addressObject === selectedAddressObject;
+};
 
 const AddressListing = (address) => {
   const { number, street, neighborhood, postalCode, city, receiverName, complement, id } = address;
@@ -11,8 +28,6 @@ const AddressListing = (address) => {
   const { address: selectedAddress } = window?.vtexjs?.checkout?.orderForm?.shippingData;
 
   const addressString = encodeURIComponent(JSON.stringify(address));
-
-  console.info('AddressListing', { address });
 
   return `
 <label id="address-${id}" class="bash--address-listing" data-address="${addressString}">

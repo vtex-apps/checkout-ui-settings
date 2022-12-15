@@ -6,6 +6,8 @@ import AddressSearch from './AddressSearch';
 const DeliverContainer = ({ hasFurn }) => `
   <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
   
+   <form id="bash--delivery-form" name="bash--delivery-form" method="post">
+
     <section class="bash--delivery-view" data-section="select-address">
     <div class="bash--heading">
         <h2>Delivery address</h2>
@@ -13,6 +15,21 @@ const DeliverContainer = ({ hasFurn }) => `
       </div>
       ${Addresses()}
     </section>
+
+    <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
+      <hr>
+      <div class="bash--heading">
+        <h2>Delivery options</h2>
+        ${hasFurn ? FURNITURE_FEE_LINK : ''}
+      </div>
+      <button 
+        class="submit btn-go-to-payment btn btn-large btn-success"
+        id="btn-save-delivery" 
+        type="submit"a>
+        Go to payment
+      </button>
+    </section>
+   </form>
 
     <section class="bash--delivery-view" data-section="address-search">
       <div class="bash--heading">
@@ -29,24 +46,6 @@ const DeliverContainer = ({ hasFurn }) => `
       </div>
       ${AddressForm()}
     </section>
-
-   <form id="bash--delivery-form" name="bash--delivery-form" method="post">
-
-    <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
-      <hr>
-      <div class="bash--heading">
-        <h2>Delivery options</h2>
-        ${hasFurn ? FURNITURE_FEE_LINK : ''}
-      </div>
-      <button 
-        class="submit btn-go-to-payment btn btn-large btn-success"
-        id="btn-save-delivery" 
-        type="submit"a>
-        Go to payment
-      </button>
-    </section>
-
-   </form>
    
   </div>`;
 

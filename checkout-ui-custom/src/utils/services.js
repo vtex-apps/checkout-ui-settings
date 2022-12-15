@@ -159,7 +159,6 @@ export const upsertAddress = async (address) => {
 export const updateAddressListing = (address) => {
   let $currentListing = $(`#address-${address.addressName}`);
   $currentListing.after(AddressListing(address));
-
   $currentListing.remove();
   $currentListing = null;
 };
