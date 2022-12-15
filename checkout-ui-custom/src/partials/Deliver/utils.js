@@ -205,9 +205,9 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
     .sendAttachment('shippingData', shippingData)
     .then(() => {
       // End shimmer
-      updateAddressListing(shippingData.address);
-      $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
-      $(`input[type="radio"][name="selected-address"][value="${address.addressName}"]`).attr('checked', true);
+      if (address.addressName) {
+        updateAddressListing(shippingData.address);
+      }
     })
     .done(() => clearLoaders());
 };
@@ -217,24 +217,9 @@ export const submitAddressForm = async (event) => {
 
   const form = document.forms['bash--address-form'];
 
-  const storedAddress = await getAddressByName($('#bash--input-addressName').val());
+  const addressName = $('#bash--input-addressName').val();
 
-  const { isValid, invalidFields } = addressIsValid(storedAddress, false);
-
-  if (!isValid) {
-    populateAddressForm(storedAddress);
-    $('#bash--address-form').addClass('show-form-errors');
-    $(`#bash--input-${invalidFields[0]}`).focus();
-
-    if (requiredAddressFields.includes(invalidFields[0])) {
-      window.postMessage({
-        action: 'setDeliveryView',
-        view: 'address-form',
-      });
-    }
-
-    return;
-  }
+  const storedAddress = await getAddressByName(addressName);
 
   const fields = [
     'addressId',
@@ -256,6 +241,7 @@ export const submitAddressForm = async (event) => {
     geoCoordinates: [],
     number: '',
     country: 'ZAF',
+    ...storedAddress,
   };
 
   for (let f = 0; f < fields.length; f++) {
@@ -264,6 +250,22 @@ export const submitAddressForm = async (event) => {
 
   address.addressName = address.addressName || address.addressId;
   address.addressId = address.addressId || address.addressName;
+
+  const { isValid, invalidFields } = addressIsValid(address, false);
+
+  if (!isValid) {
+    $('#bash--address-form').addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-form',
+      });
+    }
+
+    return;
+  }
 
   // Apply the selected address to customers orderForm.
   await setAddress(address, { validateExtraFields: false });

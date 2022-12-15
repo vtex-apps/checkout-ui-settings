@@ -158,12 +158,31 @@ export const upsertAddress = async (address) => {
 
 export const updateAddressListing = (address) => {
   let $currentListing = $(`#address-${address.addressName}`);
-  $currentListing.after(AddressListing(address));
-  $currentListing.remove();
-  $currentListing = null;
+
+  if (!$currentListing.length) {
+    $('#bash-address-list').append(AddressListing(address));
+  } else {
+    $currentListing.after(AddressListing(address));
+    $currentListing.remove();
+    $currentListing = null;
+  }
+
+  $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
+  $(`input[type="radio"][name="selected-address"][value="${address.addressName}"]`).attr('checked', true);
 };
 
 export const addOrUpdateAddress = async (address) => {
+  if (!address.addressName) {
+    const streetStr = address.street
+      .replace(/[^a-zA-Z0-9]/g, ' ')
+      .trim()
+      .replace(/\s/g, '-')
+      .toLowerCase();
+    address.addressName = `${Date.now()}-${streetStr}`;
+  }
+
+  if (!address.addressId) address.addressId = address.addressName;
+
   // Add or update at local store. Update UI.
   DB.addOrUpdateAddress(address).then(() => updateAddressListing(address));
 
