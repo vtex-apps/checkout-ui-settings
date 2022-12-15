@@ -26,4 +26,6 @@
 [ ] Remove AddressController?
 [ ] Edit > Back - ensure back button goes to address list.
 [ ] Ensure that Delivery Fee updates
-[ ] Don't trigger form validtion for extra fields when selecting address
+[x] Don't trigger form validtion for extra fields when selecting address
+[ ] use clearAddresses to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
+[ ] Test Collect address
