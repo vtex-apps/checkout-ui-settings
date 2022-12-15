@@ -74,7 +74,8 @@ const populateAddressFromSearch = (address) => {
 };
 
 export const populateAddressForm = (address) => {
-  const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressName } = address;
+  const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressId, addressName } =
+    address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -84,8 +85,8 @@ export const populateAddressForm = (address) => {
   if (complement) document.getElementById('bash--input-complement').value = complement;
 
   // addressId indicates that address is being edited / completed.
-  if (id) document.getElementById('bash--input-addressId').value = id;
-  if (id) document.getElementById('bash--input-addressName').value = addressName;
+  if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
+  if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
@@ -93,9 +94,6 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
   document.getElementById('bash--input-state').value = provinceShortCode(state);
-
-  // TODO Furniture, Rica fields.
-  // Ensure it happens after they are in the DOM.
 };
 
 export const initGoogleAutocomplete = () => {
@@ -208,6 +206,8 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
     .then(() => {
       // End shimmer
       updateAddressListing(shippingData.address);
+      $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
+      $(`input[type="radio"][name="selected-address"][value="${address.addressName}"]`).attr('checked', true);
     })
     .done(() => clearLoaders());
 };
@@ -217,15 +217,13 @@ export const submitAddressForm = async (event) => {
 
   const form = document.forms['bash--address-form'];
 
-  const storedAddress = await getAddressByName($('[name="selected-address"]:checked').val());
-  console.info({ storedAddress });
+  const storedAddress = await getAddressByName($('#bash--input-addressName').val());
 
-  const { isValid, invalidFields } = addressIsValid(storedAddress, true);
+  const { isValid, invalidFields } = addressIsValid(storedAddress, false);
 
   if (!isValid) {
     populateAddressForm(storedAddress);
     $('#bash--address-form').addClass('show-form-errors');
-    $('#bash--delivery-form')?.addClass('show-form-errors');
     $(`#bash--input-${invalidFields[0]}`).focus();
 
     if (requiredAddressFields.includes(invalidFields[0])) {
@@ -268,13 +266,10 @@ export const submitAddressForm = async (event) => {
   address.addressId = address.addressId || address.addressName;
 
   // Apply the selected address to customers orderForm.
-  // TODO deselect the currently checked address, select this address.
-  const checkoutAddress = await setAddress(address);
+  await setAddress(address, { validateExtraFields: false });
 
   // Update the localstore, and the API
-  const savedAddress = await addOrUpdateAddress(address);
-
-  console.info({ savedAddress, checkoutAddress });
+  await addOrUpdateAddress(address);
 
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
 };
@@ -282,13 +277,14 @@ export const submitAddressForm = async (event) => {
 export const submitDeliveryForm = async (event) => {
   event.preventDefault();
   const { items } = window.vtexjs.checkout.orderForm;
+  const { address } = window.vtexjs.checkout.orderForm.shippingData;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
   let fullAddress = {};
 
-  const { address } = window.vtexjs.checkout.orderForm.shippingData;
+  const dbAddress = await getAddressByName($("[name='selected-address']:checked").val());
 
-  fullAddress = { ...address };
+  fullAddress = { ...address, ...dbAddress };
 
   if (hasFurniture) {
     const fields = requiredFurnitureFields;
@@ -304,14 +300,9 @@ export const submitDeliveryForm = async (event) => {
     }
   }
 
-  // Extra fields are not needed for setAddress...
-  // Set address in orderForm
-  setAddress(fullAddress);
-
   // Save address info locally
   // Send saved address to API
-  const savedAddress = await addOrUpdateAddress(fullAddress);
-  console.info({ savedAddress });
+  await addOrUpdateAddress(fullAddress);
 
   window.location.hash = 'payment';
 };

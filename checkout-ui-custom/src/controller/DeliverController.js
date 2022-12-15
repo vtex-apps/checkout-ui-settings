@@ -74,11 +74,6 @@ const DeliverController = (() => {
     }
   });
 
-  // {
-  //   action: "setDeliverView",
-  //   view: "select-address"
-  // }
-
   // Change view
   $(document).on('click', 'a[data-view]', function (e) {
     e.preventDefault();

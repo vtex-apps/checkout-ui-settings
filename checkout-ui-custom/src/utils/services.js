@@ -115,11 +115,11 @@ export const upsertAddress = async (address) => {
 
   if (!address) return Promise.reject(new Error('No address provided.'));
 
-  // Address already exists (?)
-  const savedAddress = address.addressName ? await getAddress(address.addressName, '?_fields=id') : {};
+  // Address already exists (?) - ID keeps channging?
+  const existingAddress = address.addressName ? await getAddress(address.addressName, '?_fields=id') : {};
 
-  if (savedAddress?.id) {
-    path = `${BASE_URL_API}masterdata/address/${savedAddress.id}`;
+  if (existingAddress?.id) {
+    path = `${BASE_URL_API}masterdata/address/${existingAddress.id}`;
   } else {
     path = `${BASE_URL_API}masterdata/addresses`;
   }
@@ -132,7 +132,7 @@ export const upsertAddress = async (address) => {
     ...address,
   };
 
-  if (!savedAddress.id) {
+  if (!existingAddress.id) {
     newAddress.addressName = address.addressId || `address-${Date.now()}`;
   }
 
@@ -164,8 +164,6 @@ export const updateAddressListing = (address) => {
 };
 
 export const addOrUpdateAddress = async (address) => {
-  address.id = address.id || address.addressId;
-
   // Add or update at local store. Update UI.
   DB.addOrUpdateAddress(address).then(() => updateAddressListing(address));
 
