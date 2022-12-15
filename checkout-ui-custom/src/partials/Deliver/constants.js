@@ -59,7 +59,7 @@ export const furnitureForm = {
       label: '3+',
     },
   ],
-  liftStairs: [
+  liftOrStairs: [
     {
       value: 'lift',
       label: 'Lift',
@@ -70,3 +70,27 @@ export const furnitureForm = {
     },
   ],
 };
+
+export const requiredAddressFields = [
+  'receiverName',
+  'complement',
+  'street',
+  'neighborhood',
+  'state',
+  'city',
+  'country',
+  'postalCode',
+];
+
+export const requiredFurnitureFields = [
+  'buildingType',
+  'assembleFurniture',
+  'deliveryFloor',
+  'hasSufficientSpace',
+  'liftOrStairs',
+  'parkingDistance',
+];
+
+export const requiredRicaFields = ['tvID'];
+
+export const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];

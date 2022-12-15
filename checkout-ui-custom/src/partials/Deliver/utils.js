@@ -1,4 +1,6 @@
-import { clearLoaders } from '../../utils/functions';
+import { clearLoaders, getSpecialCategories } from '../../utils/functions';
+import { addOrUpdateAddress, getAddressByName, updateAddressListing } from '../../utils/services';
+import { requiredAddressFields, requiredFurnitureFields, requiredRicaFields, validAddressTypes } from './constants';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -72,8 +74,8 @@ const populateAddressFromSearch = (address) => {
 };
 
 export const populateAddressForm = (address) => {
-  console.info('populateAddressForm', { address });
-  const { street, neighborhood, postalCode, state, city, receiverName, complement, id } = address;
+  const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressId, addressName } =
+    address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -83,7 +85,8 @@ export const populateAddressForm = (address) => {
   if (complement) document.getElementById('bash--input-complement').value = complement;
 
   // addressId indicates that address is being edited / completed.
-  if (id) document.getElementById('bash--input-addressId').value = id;
+  if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
+  if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = street;
@@ -91,9 +94,6 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-city').value = city;
   document.getElementById('bash--input-postalCode').value = postalCode;
   document.getElementById('bash--input-state').value = provinceShortCode(state);
-
-  // TODO Furniture, Rica fields.
-  // Ensure it happens after they are in the DOM.
 };
 
 export const initGoogleAutocomplete = () => {
@@ -116,39 +116,39 @@ export const initGoogleAutocomplete = () => {
 
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
-export const addressIsValid = (address) => {
+export const populateExtraFields = (address, fields) => {
+  for (let i = 0; i < fields.length; i++) {
+    if (
+      document.getElementById(`bash--input-${fields[i]}`) &&
+      address[fields[i]] &&
+      !document.getElementById(`bash--input-${fields[i]}`).value
+    ) {
+      document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+    }
+  }
+};
+
+// Runs when you setAddress
+export const addressIsValid = (address, validateExtraFields = true) => {
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
   let requiredFields = [];
   const invalidFields = [];
-  const hasFurniture = false;
-  const hasTV = false;
-  const hasSim = false;
 
-  const requiredAddressFields = [
-    'receiverName',
-    'complement',
-    'street',
-    'neighborhood',
-    'state',
-    'city',
-    'country',
-    'postalCode',
-  ];
-
-  const requiredFurnitureFields = [
-    'buildingType',
-    'assembleFurniture',
-    'deliveryFloor',
-    'hasSufficientSpace',
-    'liftOrStairs',
-    'parkingDistance',
-  ];
-
-  const requiredRicaFields = ['tvID'];
+  // TODO more fields for Rica (sim?)
 
   requiredFields = [...requiredAddressFields];
 
-  if (hasFurniture) requiredFields = [...requiredFields, ...requiredFurnitureFields];
-  if (hasTV || hasSim) requiredFields = [...requiredFields, ...requiredRicaFields];
+  // Clear the extra fields.
+
+  if (hasFurniture && validateExtraFields) {
+    requiredFields = [...requiredFields, ...requiredFurnitureFields];
+  }
+
+  if ((hasTVs || hasSimCards) && validateExtraFields) {
+    requiredFields = [...requiredFields, ...requiredRicaFields];
+  }
 
   for (let i = 0; i < requiredFields.length; i++) {
     if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);
@@ -158,24 +158,36 @@ export const addressIsValid = (address) => {
 };
 
 // TODO move somewhere else?
-export const setAddress = (address) => {
-  const { isValid, invalidFields } = addressIsValid(address);
+export const setAddress = (address, options = { validateExtraFields: true }) => {
+  const { validateExtraFields } = options;
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
-  if (!isValid) {
-    console.info('setAddress', { address, isValid, invalidFields });
-
-    populateAddressForm(address);
-    $('#bash--address-form').addClass('show-form-errors');
-    $(`#bash--input-${invalidFields[0]}`).focus();
-
-    window.postMessage({
-      action: 'setDeliveryView',
-      view: 'address-form',
-    });
-    return;
+  if (hasFurniture) {
+    populateExtraFields(address, requiredFurnitureFields);
   }
 
-  const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
+  if (hasTVs || hasSimCards) {
+    populateExtraFields(address, requiredRicaFields);
+  }
+
+  const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
+
+  if (!isValid) {
+    populateAddressForm(address);
+    $('#bash--address-form').addClass('show-form-errors');
+    if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-form',
+      });
+    }
+
+    return;
+  }
 
   // Fix bad addressType.
   if (address.addressType === 'business') address.addressType = 'commercial';
@@ -184,25 +196,125 @@ export const setAddress = (address) => {
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
   shippingData.address = address;
-  shippingData.address.number = shippingData.address.number ?? '';
+  shippingData.address.number = shippingData.address.number ?? ' ';
   shippingData.selectedAddresses = [address];
 
   // Start Shimmering
   setDeliveryLoading();
   window.vtexjs.checkout
     .sendAttachment('shippingData', shippingData)
-    .then((result) => {
+    .then(() => {
       // End shimmer
-      console.info('setAddress', { result });
+      if (address.addressName) {
+        updateAddressListing(shippingData.address);
+      }
     })
     .done(() => clearLoaders());
 };
 
+export const submitAddressForm = async (event) => {
+  event.preventDefault();
+
+  const form = document.forms['bash--address-form'];
+
+  const addressName = $('#bash--input-addressName').val();
+
+  const storedAddress = await getAddressByName(addressName);
+
+  const fields = [
+    'addressId',
+    'addressName',
+    'addressType',
+    'receiverName',
+    'postalCode',
+    'city',
+    'state',
+    'country',
+    'street',
+    'neighborhood',
+    'complement',
+  ];
+
+  const address = {
+    isDisposable: false,
+    reference: null,
+    geoCoordinates: [],
+    number: '',
+    country: 'ZAF',
+    ...storedAddress,
+  };
+
+  for (let f = 0; f < fields.length; f++) {
+    address[fields[f]] = form[fields[f]]?.value || null;
+  }
+
+  address.addressName = address.addressName || address.addressId;
+  address.addressId = address.addressId || address.addressName;
+
+  const { isValid, invalidFields } = addressIsValid(address, false);
+
+  if (!isValid) {
+    $('#bash--address-form').addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-form',
+      });
+    }
+
+    return;
+  }
+
+  // Apply the selected address to customers orderForm.
+  await setAddress(address, { validateExtraFields: false });
+
+  // Update the localstore, and the API
+  await addOrUpdateAddress(address);
+
+  window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
+};
+
+export const submitDeliveryForm = async (event) => {
+  event.preventDefault();
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { address } = window.vtexjs.checkout.orderForm.shippingData;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
+  let fullAddress = {};
+
+  const dbAddress = await getAddressByName($("[name='selected-address']:checked").val());
+
+  fullAddress = { ...address, ...dbAddress };
+
+  if (hasFurniture) {
+    const fields = requiredFurnitureFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
+    }
+  }
+
+  if (hasTVs || hasSimCards) {
+    const fields = requiredRicaFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (!address[fields[i]]) fullAddress[fields[i]] = document.getElementById(`bash--input-${fields[i]}`).value;
+    }
+  }
+
+  // Save address info locally
+  // Send saved address to API
+  await addOrUpdateAddress(fullAddress);
+
+  window.location.hash = 'payment';
+};
+
 export const getBestRecipient = () => {
-  const { receiverName } = window.vtexjs.checkout.orderForm?.shippingData?.address;
-  const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+  const receiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
+  const firstName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;
+  const lastName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;
   const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
-  return receiverName || clientProfileName || document.getElementById('client-first-name')?.value;
+  return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
 };
 
 export default mapGoogleAddress;

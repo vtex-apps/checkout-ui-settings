@@ -9,9 +9,7 @@ const TVLicenseForm = () => {
   };
 
   return `
-  <form id="bash--address-form" method="post">
     ${FormField(field)}
-  </form>
   `;
 };
 

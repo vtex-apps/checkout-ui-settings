@@ -1,4 +1,5 @@
 import FormField from './Elements/FormField';
+import { getBestRecipient } from './utils';
 
 const RICAForm = () => {
   const {
@@ -25,7 +26,7 @@ const RICAForm = () => {
       name: 'nameAndSurname',
       label: 'Full name and surname',
       required: true,
-      value: selectedAddress?.receiverName || '',
+      value: getBestRecipient() || '',
     },
     {
       name: 'street',
@@ -116,10 +117,7 @@ const RICAForm = () => {
   const formFields = fields.map((field) => FormField(field)).join('');
 
   return `
-  <form id="bash--address-form" method="post">
     ${formFields}
-  </form>
-  
   `;
 };
 
