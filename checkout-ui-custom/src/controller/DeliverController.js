@@ -3,6 +3,9 @@ import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
   parseAttribute,
   populateAddressForm,
+  populateFurnitureFields,
+  populateRicaFields,
+  populateTVFields,
   setAddress,
   submitAddressForm,
   submitDeliveryForm,
@@ -50,6 +53,10 @@ const DeliverController = (() => {
           hasTV: state.hasTVs,
         })
       );
+
+      if (state.hasFurn) populateFurnitureFields();
+      if (state.hasSim) populateRicaFields();
+      if (state.hasTVs) populateTVFields();
     }
 
     addShippingMethod();

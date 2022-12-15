@@ -23,10 +23,13 @@
 [ ] Address listing - filter duplicate street number.
 [ ] Format phone numbers correctly
 [ ] Add Business Name field (shown if addressType === 'business') `companyBuilding`
-[ ] Remove AddressController?
+[x] Remove AddressController?
 [ ] Edit > Back - ensure back button goes to address list.
 [ ] Ensure that Delivery Fee updates
 [x] Don't trigger form validtion for extra fields when selecting address
 [ ] use clearAddresses to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
-[ ] Test Collect address
+[x] Test Collect address
 [ ] Populate extra fields on clicking Change (?)
+[ ] Save extra fields to orderForm's "Custom Data" - Rica
+[ ] Save extra fields to orderForm's "Custom Data" - TV
+[ ] Save extra fields to orderForm's "Custom Data" - Furniture

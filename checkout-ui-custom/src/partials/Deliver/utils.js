@@ -1,6 +1,19 @@
+import { FURNITURE_APP, RICA_APP, TV_APP } from '../../utils/const';
 import { clearLoaders, getSpecialCategories } from '../../utils/functions';
-import { addOrUpdateAddress, getAddressByName, updateAddressListing } from '../../utils/services';
-import { requiredAddressFields, requiredFurnitureFields, requiredRicaFields, validAddressTypes } from './constants';
+import {
+  addOrUpdateAddress,
+  getAddressByName,
+  getOrderFormCustomData,
+  sendOrderFormCustomData,
+  updateAddressListing,
+} from '../../utils/services';
+import {
+  requiredAddressFields,
+  requiredFurnitureFields,
+  requiredRicaFields,
+  requiredTVFields,
+  validAddressTypes,
+} from './constants';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -116,14 +129,11 @@ export const initGoogleAutocomplete = () => {
 
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
-export const populateExtraFields = (address, fields) => {
+export const populateExtraFields = (address, fields, prefix = '') => {
   for (let i = 0; i < fields.length; i++) {
-    if (
-      document.getElementById(`bash--input-${fields[i]}`) &&
-      address[fields[i]] &&
-      !document.getElementById(`bash--input-${fields[i]}`).value
-    ) {
-      document.getElementById(`bash--input-${fields[i]}`).value = address[fields[i]];
+    const fieldId = `bash--input-${prefix}${fields[i]}`;
+    if (document.getElementById(fieldId) && address[fields[i]] && !document.getElementById(fieldId).value) {
+      document.getElementById(fieldId).value = address[fields[i]];
     }
   }
 };
@@ -136,17 +146,17 @@ export const addressIsValid = (address, validateExtraFields = true) => {
   let requiredFields = [];
   const invalidFields = [];
 
-  // TODO more fields for Rica (sim?)
-
   requiredFields = [...requiredAddressFields];
-
-  // Clear the extra fields.
 
   if (hasFurniture && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredFurnitureFields];
   }
 
-  if ((hasTVs || hasSimCards) && validateExtraFields) {
+  if (hasTVs && validateExtraFields) {
+    requiredFields = [...requiredFields, ...requiredTVFields];
+  }
+
+  if (hasSimCards && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredRicaFields];
   }
 
@@ -161,14 +171,14 @@ export const addressIsValid = (address, validateExtraFields = true) => {
 export const setAddress = (address, options = { validateExtraFields: true }) => {
   const { validateExtraFields } = options;
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+  const { hasFurniture, hasTVs } = getSpecialCategories(items);
 
   if (hasFurniture) {
     populateExtraFields(address, requiredFurnitureFields);
   }
 
-  if (hasTVs || hasSimCards) {
-    populateExtraFields(address, requiredRicaFields);
+  if (hasTVs) {
+    populateExtraFields(address, requiredRicaFields, 'tv_');
   }
 
   const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
@@ -288,25 +298,62 @@ export const submitDeliveryForm = async (event) => {
 
   fullAddress = { ...address, ...dbAddress };
 
+  const furnitureData = {};
+  const ricaData = {};
+  const tvData = {};
+
   if (hasFurniture) {
     const fields = requiredFurnitureFields;
     for (let i = 0; i < fields.length; i++) {
       if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
+      furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val();
     }
+    const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData);
+    console.info({ furnitureDataSent });
   }
 
-  if (hasTVs || hasSimCards) {
+  // Not saved to address profile.
+  if (hasSimCards) {
     const fields = requiredRicaFields;
     for (let i = 0; i < fields.length; i++) {
-      if (!address[fields[i]]) fullAddress[fields[i]] = document.getElementById(`bash--input-${fields[i]}`).value;
+      ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val();
     }
+    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData);
+    console.info({ ricaDataSent });
   }
 
-  // Save address info locally
-  // Send saved address to API
+  if (hasTVs) {
+    const fields = requiredTVFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
+      tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
+    }
+
+    const tvDataSent = await sendOrderFormCustomData(TV_APP, tvData);
+    console.info({ tvDataSent });
+  }
+
   await addOrUpdateAddress(fullAddress);
 
   window.location.hash = 'payment';
+};
+
+export const populateRicaFields = async () => {
+  const data = await getOrderFormCustomData(RICA_APP);
+  console.info('populateRicaFields', { data });
+  populateExtraFields(data, requiredRicaFields, 'rica_');
+};
+
+export const populateFurnitureFields = async () => {
+  const data = await getOrderFormCustomData(FURNITURE_APP);
+  console.info('populateFurnitureFields', { data });
+  populateExtraFields(data, requiredFurnitureFields);
+};
+
+export const populateTVFields = async () => {
+  const data = await getOrderFormCustomData(TV_APP);
+  console.info('populateTVFields', { data });
+  populateExtraFields(data, requiredTVFields, 'tv');
 };
 
 export const getBestRecipient = () => {

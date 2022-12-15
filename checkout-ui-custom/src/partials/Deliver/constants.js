@@ -91,6 +91,17 @@ export const requiredFurnitureFields = [
   'parkingDistance',
 ];
 
-export const requiredRicaFields = ['tvID'];
+export const requiredRicaFields = [
+  'idOrPassport',
+  'sameAddress',
+  'fullName',
+  'streetAddress',
+  'suburb',
+  'city',
+  'postalCode',
+  'province',
+];
+
+export const requiredTVFields = ['tvID'];
 
 export const validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
