@@ -34,11 +34,12 @@ const DeliverController = (() => {
       state.hasTVs = hasTVs;
       state.hasSim = hasSimCards;
     }
-    $('#postalCode-finished-loading').after(
+    $('.shipping-data .box-step').append(
       DeliverContainer({
         hasFurn: state.hasFurn,
       })
     );
+
     const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
 
     if (showExtraFields) {
@@ -50,6 +51,7 @@ const DeliverController = (() => {
         })
       );
     }
+
     addShippingMethod();
 
     // Form validation
@@ -64,6 +66,17 @@ const DeliverController = (() => {
       });
   };
 
+  // EVENTS
+
+  $(document).ready(() => {
+    if (window.location.hash === STEPS.SHIPPING) {
+      setupDeliver();
+      $('.bash--delivery-container.hide').removeClass('hide');
+    } else if ($('.bash--delivery-container:not(.hide)').length) {
+      $('.bash--delivery-container:not(.hide)').addClass('hide');
+    }
+  });
+
   $(window).on('hashchange', () => {
     if (window.location.hash === STEPS.SHIPPING) {
       console.info('Hash change');
@@ -71,6 +84,19 @@ const DeliverController = (() => {
       $('.bash--delivery-container.hide').removeClass('hide');
     } else if ($('.bash--delivery-container:not(.hide)').length) {
       $('.bash--delivery-container:not(.hide)').addClass('hide');
+    }
+  });
+
+  // Define which tab is active ;/
+  $(window).on('orderFormUpdated.vtex', () => {
+    const { addressType } = window.vtexjs.checkout.orderForm.shippingData.address;
+    if (addressType === 'search') {
+      $('#shipping-data:not(collection-active)').addClass('collection-active');
+      $('.delivery-active').removeClass('delivery-active');
+    } else {
+      setupDeliver();
+      $('#shipping-data:not(delivery-active)').addClass('delivery-active');
+      $('.collection-active').removeClass('collection-active');
     }
   });
 

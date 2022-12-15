@@ -29,3 +29,4 @@
 [x] Don't trigger form validtion for extra fields when selecting address
 [ ] use clearAddresses to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
 [ ] Test Collect address
+[ ] Populate extra fields on clicking Change (?)

@@ -310,8 +310,9 @@ export const submitDeliveryForm = async (event) => {
 };
 
 export const getBestRecipient = () => {
-  const { receiverName } = window.vtexjs.checkout.orderForm?.shippingData?.address;
-  const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+  const receiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
+  const firstName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;
+  const lastName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;
   const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
   return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
 };
