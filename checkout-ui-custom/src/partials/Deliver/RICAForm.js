@@ -1,51 +1,59 @@
 import FormField from './Elements/FormField';
+import { getBestRecipient } from './utils';
 
 const RICAForm = () => {
   const {
     shippingData: { selectedAddress },
   } = window.vtexjs.checkout.orderForm;
 
+  // use rica_ prefix to ensure fields are unique
+
   const fields = [
     {
-      name: 'ricaIdPassport',
+      name: 'rica_idOrPassport',
       label: 'ID or Passport number',
       required: true,
       value: '',
+      minLength: 8,
+      maxLength: 13,
     },
     {
-      name: 'Residential address the same as delivery address',
-      label: 'Proof of residential address',
+      name: 'rica_sameAddress',
+      label: 'Residential address the same as delivery address',
       type: 'checkbox',
       checked: true,
     },
     // for rest of the fields check if
     // same as residential address is checked?
     // if checked prefill the fields otherwise don't
+  ];
+
+  const conditionalFields = [
     {
-      name: 'nameAndSurname',
+      name: 'rica_fullName',
       label: 'Full name and surname',
       required: true,
-      value: selectedAddress?.receiverName || '',
+      value: getBestRecipient() || '',
     },
     {
-      name: 'street',
+      name: 'rica_streetAddress',
       label: 'Street address',
       required: true,
       value: selectedAddress?.street || '',
     },
     {
-      name: 'neighborhood',
+      name: 'rica_suburb',
       label: 'Suburb',
       value: selectedAddress?.neighborhood || '',
     },
     {
-      name: 'city',
+      name: 'rica_city',
       label: 'City',
       required: true,
       value: selectedAddress?.city || '',
     },
     {
-      name: 'postalCode',
+      name: 'rica_postalCode',
       label: 'Postal code',
       value: selectedAddress?.postalCode || '',
       type: 'tel',
@@ -53,13 +61,14 @@ const RICAForm = () => {
       maxLength: 4,
     },
     {
-      name: 'state',
+      name: 'rica_province',
       label: 'Province',
       type: 'dropdown',
       options: [
         {
           value: '',
           label: 'Select',
+          disabled: true,
         },
         {
           value: 'EC',
@@ -100,26 +109,28 @@ const RICAForm = () => {
       ],
     },
     {
-      name: 'country',
+      type: 'note',
+      required: false,
+      name: 'rica-country-display',
       label: 'Country',
-      type: 'dropdown',
-      disabled: true,
-      options: [
-        {
-          value: 'ZAF',
-          label: 'South Africa',
-        },
-      ],
+      value: 'South Africa',
+    },
+    {
+      type: 'hidden',
+      required: true,
+      name: 'country',
+      value: 'ZAF',
     },
   ];
 
   const formFields = fields.map((field) => FormField(field)).join('');
+  const conditionalFormFields = conditionalFields.map((field) => FormField(field)).join('');
 
   return `
-  <form id="bash--address-form" method="post">
     ${formFields}
-  </form>
-  
+    <div class="rica-conditional-fields">
+    ${conditionalFormFields}
+    </div>
   `;
 };
 

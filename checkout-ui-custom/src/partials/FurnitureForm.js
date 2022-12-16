@@ -2,11 +2,11 @@ const furnitureForm = {
   buildingType: ['Free standing', 'House in complex', 'Townhouse', 'Apartment'],
   parkingDistance: [15, 25, 50, 100],
   deliveryFloor: ['Ground', '1', '2', '3+'],
-  liftStairs: ['Lift', 'Stairs'],
+  liftOrStairs: ['Lift', 'Stairs'],
 };
 
 const FurnitureForm = () => {
-  const { buildingType, parkingDistance, deliveryFloor, liftStairs } = furnitureForm;
+  const { buildingType, parkingDistance, deliveryFloor, liftOrStairs } = furnitureForm;
   // Building type selector
   let buildingTypeInput = `
     <p class="input tfg-custom-input tfg-building-type">
@@ -59,18 +59,18 @@ const FurnitureForm = () => {
   `;
 
   // Lift/Stairs selector
-  let liftStairsInput = `
+  let liftOrStairsInput = `
   <p class="input tfg-custom-input tfg-lift-stairs">
     <label>Lift or stairs</label>
     <select class="input-xlarge tfg-custom-selector" id="tfg-lift-stairs">
       <option disabled selected value="">Please select</option>
   `;
 
-  liftStairs.forEach((value) => {
-    liftStairsInput += `<option value="${value}">${value}</option>`;
+  liftOrStairs.forEach((value) => {
+    liftOrStairsInput += `<option value="${value}">${value}</option>`;
   });
 
-  liftStairsInput += `
+  liftOrStairsInput += `
     </select>
   </p>
   `;
@@ -85,7 +85,7 @@ const FurnitureForm = () => {
       ${buildingTypeInput}
       ${parkingDistanceInput}
       ${deliveryFloorInput}
-      ${liftStairsInput}
+      ${liftOrStairsInput}
       <p class="tfg-custom-checkbox">
         <label class="tfg-checkbox-label">
           <input type='checkbox' id="tfg-sufficient-space"/>

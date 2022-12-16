@@ -7,7 +7,6 @@ const AddressSearch = () => {
   }, 500);
 
   return FormField({
-    label: 'Add a new address',
     name: 'address-search',
     placeholder: 'Start typing an address...',
     autoComplete: 'off',
