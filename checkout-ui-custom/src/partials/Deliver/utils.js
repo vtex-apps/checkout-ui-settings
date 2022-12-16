@@ -364,4 +364,29 @@ export const getBestRecipient = () => {
   return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
 };
 
+export const setCartClasses = () => {
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
+  const $container = '#shipping-data';
+
+  if (hasFurniture) {
+    $(`${$container}:not(.has-furniture)`).addClass('has-furniture');
+  } else {
+    $(`${$container}.has-furniture`).removeClass('has-furniture');
+  }
+
+  if (hasTVs) {
+    $(`${$container}:not(.has-tv)`).addClass('has-tv');
+  } else {
+    $(`${$container}.has-tv`).removeClass('has-tv');
+  }
+
+  if (hasSimCards) {
+    $(`${$container}:not(.has-rica)`).addClass('has-rica');
+  } else {
+    $(`${$container}.has-rica`).removeClass('has-rica');
+  }
+};
+
 export default mapGoogleAddress;

@@ -7,6 +7,7 @@ import {
   populateRicaFields,
   populateTVFields,
   setAddress,
+  setCartClasses,
   submitAddressForm,
   submitDeliveryForm,
 } from '../partials/Deliver/utils';
@@ -105,6 +106,8 @@ const DeliverController = (() => {
       $('#shipping-data:not(delivery-active)').addClass('delivery-active');
       $('.collection-active').removeClass('collection-active');
     }
+
+    setCartClasses();
   });
 
   // Change view
