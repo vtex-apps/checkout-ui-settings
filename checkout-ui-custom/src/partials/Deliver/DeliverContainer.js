@@ -47,7 +47,27 @@ const DeliverContainer = ({ hasFurn }) => `
       </div>
       ${AddressForm()}
     </section>
-   
+
+    <section class="shipping-method" data-section="delivery-options">
+      <hr>
+      <div class="bash--heading">
+        <div class="shipping-section-title">
+          <h2>Delivery options</h2>
+          ${hasFurn ? FURNITURE_FEE_LINK : '<div></div>'}
+        </div>
+      </div>
+    </section>
+
+    <section class="bash--delivery-view" data-section="complete-address">
+      <h2>Complete address</h2>
+      <a href="#" data-view="select-address">&lt; Back</a>
+    </section>
+
+    <section class="bash--delivery-view" data-section="edit-address">
+      <h2>Edit address</h2>
+      <a href="#" data-view="select-address">&lt; Back</a>
+    </section>
+    
   </div>`;
 
 export default DeliverContainer;

@@ -7,7 +7,7 @@ const Checkbox = ({ name, label, checked }) => `
         name="${name}" 
         id="bash--input-${name}" ${checked ? "checked='checked'" : ''}
         value="true" 
-        /> ${label}</label>
+        /> ${label} </label>
   </p>
   `;
 
