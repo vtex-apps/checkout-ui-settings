@@ -389,4 +389,18 @@ export const setCartClasses = () => {
   }
 };
 
+export const updateDeliveryFeeDisplay = () => {
+  if (!window.vtexjs) return;
+
+  const { value: shippingFee } = window.vtexjs.checkout.orderForm.totalizers.find((item) => item.id === 'Shipping');
+
+  let feeText = 'Free';
+
+  if (shippingFee > 0) feeText = `R${(shippingFee / 100).toFixed(2).replace('.00', '')}`;
+
+  if ($('#bash--delivery-fee').length > 0) {
+    document.getElementById('bash--delivery-fee').innerHTML = feeText;
+  }
+};
+
 export default mapGoogleAddress;

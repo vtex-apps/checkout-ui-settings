@@ -10,6 +10,7 @@ import {
   setCartClasses,
   submitAddressForm,
   submitDeliveryForm,
+  updateDeliveryFeeDisplay,
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
@@ -21,10 +22,6 @@ const DeliverController = (() => {
     hasFurn: false,
     hasTVs: false,
     hasSim: false,
-  };
-
-  const addShippingMethod = () => {
-    $('#delivery-packages-options').clone().appendTo('#bash-delivery-options');
   };
 
   const setupDeliver = () => {
@@ -60,8 +57,6 @@ const DeliverController = (() => {
       if (state.hasTVs) populateTVFields();
     }
 
-    addShippingMethod();
-
     // Form validation
     $('select, input').off('invalid');
     $('select, input')
@@ -89,6 +84,8 @@ const DeliverController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       console.info('Hash change');
       setupDeliver();
+      setCartClasses();
+
       $('.bash--delivery-container.hide').removeClass('hide');
     } else if ($('.bash--delivery-container:not(.hide)').length) {
       $('.bash--delivery-container:not(.hide)').addClass('hide');
@@ -108,6 +105,7 @@ const DeliverController = (() => {
     }
 
     setCartClasses();
+    updateDeliveryFeeDisplay();
   });
 
   // Change view

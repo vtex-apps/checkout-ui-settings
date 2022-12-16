@@ -2,6 +2,7 @@ import { FURNITURE_FEE_LINK } from '../../utils/const';
 import Addresses from './Addresses';
 import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
+import DeliveryOptions from './DeliveryOptions';
 
 const DeliverContainer = ({ hasFurn }) => `
   <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
@@ -18,54 +19,35 @@ const DeliverContainer = ({ hasFurn }) => `
 
     <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
       <hr>
-      <div class="bash--heading">
-        <h2>Delivery options</h2>
+      <div class="bash--heading sub-heading">
+        <h3>Delivery method</h3>
         ${hasFurn ? FURNITURE_FEE_LINK : ''}
       </div>
+      ${DeliveryOptions()}
       <button 
         class="submit btn-go-to-payment btn btn-large btn-success"
         id="btn-save-delivery" 
-        type="submit"a>
-        Go to payment
+        type="submit">
+          Go to payment
       </button>
     </section>
    </form>
 
     <section class="bash--delivery-view" data-section="address-search">
-      <div class="bash--heading">
-        <h2>Add a new delivery address</h2>
+      <div class="bash--heading sub-heading">
+        <h3>Add a new delivery address</h3>
         <a href="#" data-view="select-address">&lt; Back</a>
       </div>
       ${AddressSearch()} 
     </section>
     
     <section class="bash--delivery-view" data-section="address-form">
-       <div class="bash--heading">
-        <h2>Delivery address</h2>
+       <div class="bash--heading sub-heading">
+        <h3>Delivery address</h3>
         <a href="#" class="back-button--search" data-view="address-search">&lt; Back</a>
         <a href="#" class="back-button--select" data-view="select-address">&lt; Back</a>
       </div>
       ${AddressForm()}
-    </section>
-
-    <section class="shipping-method" data-section="delivery-options">
-      <hr>
-      <div class="bash--heading">
-        <div class="shipping-section-title">
-          <h2>Delivery options</h2>
-          ${hasFurn ? FURNITURE_FEE_LINK : '<div></div>'}
-        </div>
-      </div>
-    </section>
-
-    <section class="bash--delivery-view" data-section="complete-address">
-      <h2>Complete address</h2>
-      <a href="#" data-view="select-address">&lt; Back</a>
-    </section>
-
-    <section class="bash--delivery-view" data-section="edit-address">
-      <h2>Edit address</h2>
-      <a href="#" data-view="select-address">&lt; Back</a>
     </section>
     
   </div>`;
