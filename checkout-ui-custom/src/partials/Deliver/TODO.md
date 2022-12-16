@@ -1,3 +1,13 @@
+[ ] Address listing - filter duplicate street number.
+[ ] Format phone numbers correctly
+[ ] Add Business Name field (shown if addressType === 'business') `companyBuilding`
+[ ] Ensure that Delivery Fee updates
+[ ] use clearAddresses to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
+[ ] Populate extra fields on clicking Change (?)
+[ ] Ensure that "can't collect" message appears when necessary.
+[ ] Style headings
+
+[x] Remove AddressController?
 [x] Radio option
 [x] Select box
 [x] Hidden field
@@ -20,13 +30,9 @@
 [x] Prevent duplicate DeliveryContainers
 [x] Prevent Vtex forms from displaying.
 [x] Prevent Vtex forms from displaying after clicking [Edit].
-[ ] Address listing - filter duplicate street number.
-[ ] Format phone numbers correctly
-[ ] Add Business Name field (shown if addressType === 'business') `companyBuilding`
-[ ] Remove AddressController?
-[ ] Edit > Back - ensure back button goes to address list.
-[ ] Ensure that Delivery Fee updates
+[x] Edit > Back - ensure back button goes to address list.
 [x] Don't trigger form validtion for extra fields when selecting address
-[ ] use clearAddresses to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
-[ ] Test Collect address
-[ ] Populate extra fields on clicking Change (?)
+[x] Test Collect address
+[x] Save extra fields to orderForm's "Custom Data" - Rica
+[x] Save extra fields to orderForm's "Custom Data" - TV
+[x] Save extra fields to orderForm's "Custom Data" - Furniture

@@ -23,7 +23,7 @@ const ExtraFieldsContainer = ({ hasFurn, hasTV, hasSim }) => {
   const showTVLicenseForm = `
     <div id="tv-license-form">
       <hr>
-      <div class="bash--heading">
+      <div class="bash--heading" style="flex-direction: column; align-items: flex-start;">
         <h3>TV license information needed</h3>
         <p class="tfg-custom-subtitle">Please provide your ID number to validate your TV Licence.</p>
       </div>
@@ -34,12 +34,12 @@ const ExtraFieldsContainer = ({ hasFurn, hasTV, hasSim }) => {
   const showRICAForm = `
     <div id="rica-form">
       <hr>
-      <div class="bash--heading">
+      <div class="bash--heading" style="flex-direction: column; align-items: flex-start;">
         <h3>Rica information required</h3>
         <p class="tfg-custom-subtitle">
           To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as
           it appears on a valid proof of residence.
-        </p>
+        </p> 
       </div>
         ${RICAForm()}
     </div>

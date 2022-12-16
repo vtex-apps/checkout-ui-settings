@@ -194,4 +194,37 @@ export const getAddressByName = async (addressName) => DB.getAddress(addressName
 
 export const clearAddresses = () => DB.clearData();
 
+//  OrderForm CustomData
+
+export const sendOrderFormCustomData = async (appId, data) => {
+  const { orderFormId } = window.vtexjs.checkout.orderForm;
+
+  const path = `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`;
+  const body = JSON.stringify(data);
+
+  const options = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body,
+  };
+  return fetch(path, options);
+};
+
+export const getOrderFormCustomData = async (appId) => {
+  const { customData } = window.vtexjs.checkout.orderForm;
+  let fields = {};
+
+  if (customData && customData.customApps && customData.customApps.length > 0) {
+    customData.customApps.forEach((app) => {
+      if (app.id === appId) {
+        fields = app.fields;
+      }
+    });
+  }
+
+  return fields;
+};
+
 export default getAddresses;

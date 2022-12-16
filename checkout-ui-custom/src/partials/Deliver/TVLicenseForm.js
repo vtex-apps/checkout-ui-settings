@@ -1,11 +1,15 @@
 import FormField from './Elements/FormField';
 
 const TVLicenseForm = () => {
+  // use tv_ prefix to ensure fields are unique
+
   const field = {
-    name: 'tvLicense',
+    name: 'tv_tvID',
     label: 'SA ID number',
     required: true,
     value: '',
+    minLength: 8,
+    maxLength: 13,
   };
 
   return `

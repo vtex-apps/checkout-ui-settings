@@ -3,7 +3,11 @@ import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
   parseAttribute,
   populateAddressForm,
+  populateFurnitureFields,
+  populateRicaFields,
+  populateTVFields,
   setAddress,
+  setCartClasses,
   submitAddressForm,
   submitDeliveryForm,
 } from '../partials/Deliver/utils';
@@ -50,6 +54,10 @@ const DeliverController = (() => {
           hasTV: state.hasTVs,
         })
       );
+
+      if (state.hasFurn) populateFurnitureFields();
+      if (state.hasSim) populateRicaFields();
+      if (state.hasTVs) populateTVFields();
     }
 
     addShippingMethod();
@@ -98,6 +106,8 @@ const DeliverController = (() => {
       $('#shipping-data:not(delivery-active)').addClass('delivery-active');
       $('.collection-active').removeClass('collection-active');
     }
+
+    setCartClasses();
   });
 
   // Change view
@@ -135,7 +145,7 @@ const DeliverController = (() => {
     switch (data.action) {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
-        if (data.view === 'address-form') {
+        if (data.view === 'address-form' || data.view === 'address-edit') {
           if (data.content) {
             const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
             populateAddressForm(address);
