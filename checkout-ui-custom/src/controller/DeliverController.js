@@ -145,7 +145,7 @@ const DeliverController = (() => {
     switch (data.action) {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
-        if (data.view === 'address-form') {
+        if (data.view === 'address-form' || data.view === 'address-edit') {
           if (data.content) {
             const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
             populateAddressForm(address);
