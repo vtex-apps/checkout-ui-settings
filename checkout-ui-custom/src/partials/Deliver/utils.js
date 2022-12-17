@@ -167,6 +167,16 @@ export const addressIsValid = (address, validateExtraFields = true) => {
   return { isValid: !invalidFields.length, invalidFields };
 };
 
+export const showHideLiftOrStairs = (floor) => {
+  if (floor && floor !== 'ground') {
+    $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');
+    $('#bash--input-liftOrStairs').attr('required', 'required');
+  } else {
+    $('.bash--dropdownfield-liftOrStairs').slideUp();
+    $('#bash--input-liftOrStairs').removeAttr('required');
+  }
+};
+
 // TODO move somewhere else?
 export const setAddress = (address, options = { validateExtraFields: true }) => {
   const { validateExtraFields } = options;
@@ -175,6 +185,7 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
 
   if (hasFurniture) {
     populateExtraFields(address, requiredFurnitureFields);
+    showHideLiftOrStairs(address.deliveryFloor);
   }
 
   if (hasTVs) {

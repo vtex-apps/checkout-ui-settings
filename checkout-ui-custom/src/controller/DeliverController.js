@@ -8,6 +8,7 @@ import {
   populateTVFields,
   setAddress,
   setCartClasses,
+  showHideLiftOrStairs,
   submitAddressForm,
   submitDeliveryForm,
   updateDeliveryFeeDisplay,
@@ -143,13 +144,7 @@ const DeliverController = (() => {
 
   // Furniture - enable/disable liftOrStairs
   $(document).on('change', '#bash--input-deliveryFloor', function () {
-    if (this.value !== 'ground') {
-      $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');
-      $('#bash--input-liftOrStairs').attr('required', 'required');
-    } else {
-      $('.bash--dropdownfield-liftOrStairs').slideUp();
-      $('#bash--input-liftOrStairs').removeAttr('required');
-    }
+    showHideLiftOrStairs(this.value);
   });
 
   $(document).on('submit', '#bash--address-form', submitAddressForm);
