@@ -141,6 +141,17 @@ const DeliverController = (() => {
     }
   });
 
+  // Furniture - enable/disable liftOrStairs
+  $(document).on('change', '#bash--input-deliveryFloor', function () {
+    if (this.value !== 'ground') {
+      $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');
+      $('#bash--input-liftOrStairs').attr('required', 'required');
+    } else {
+      $('.bash--dropdownfield-liftOrStairs').slideUp();
+      $('#bash--input-liftOrStairs').removeAttr('required');
+    }
+  });
+
   $(document).on('submit', '#bash--address-form', submitAddressForm);
   $(document).on('submit', '#bash--delivery-form', submitDeliveryForm);
 
