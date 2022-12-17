@@ -1,4 +1,4 @@
-import { FURNITURE_APP, RICA_APP, TV_APP } from '../../utils/const';
+import { FURNITURE_APP, RICA_APP, STEPS, TV_APP } from '../../utils/const';
 import { clearLoaders, getSpecialCategories } from '../../utils/functions';
 import {
   addOrUpdateAddress,
@@ -442,7 +442,7 @@ export const submitDeliveryForm = async (event) => {
 
   await addOrUpdateAddress(fullAddress);
 
-  window.location.hash = 'payment';
+  window.location.hash = STEPS.PAYMENT;
   clearLoaders();
 };
 

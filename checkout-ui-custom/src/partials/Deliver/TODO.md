@@ -4,6 +4,7 @@
 [ ] use clearAddresses() to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
 [ ] Populate extra fields on clicking Change (?)
 [ ] Ensure that "can't collect" message appears when necessary.
+[ ] Why does /#/payment keep going back to shipping?
 
 [x] Ensure that Delivery Fee updates
 [x] Style headings
