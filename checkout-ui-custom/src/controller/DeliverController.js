@@ -1,6 +1,7 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
+  clearRicaFields,
   parseAttribute,
   populateAddressForm,
   populateFurnitureFields,
@@ -136,9 +137,10 @@ const DeliverController = (() => {
   // Rica - show/hide address fields
   $(document).on('change', '#bash--input-rica_sameAddress', function () {
     if (this.checked) {
-      $('.rica-conditional-fields').slideUp();
+      $('.rica-conditional-fields').slideUp(() => populateRicaFields());
     } else {
-      $('.rica-conditional-fields').slideDown();
+      clearRicaFields();
+      $('.rica-conditional-fields').slideDown(() => $('#bash--input-rica_fullName').focus());
     }
   });
 

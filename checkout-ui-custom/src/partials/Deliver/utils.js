@@ -72,6 +72,14 @@ const provinceShortCode = (province) => {
   }
 };
 
+export const getBestRecipient = () => {
+  const receiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
+  const firstName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;
+  const lastName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;
+  const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
+  return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
+};
+
 const populateAddressFromSearch = (address) => {
   const { street, neighborhood, postalCode, state, city } = address;
 
@@ -129,13 +137,57 @@ export const initGoogleAutocomplete = () => {
 
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
-export const populateExtraFields = (address, fields, prefix = '') => {
+export const populateExtraFields = (address, fields, prefix = '', override = false) => {
   for (let i = 0; i < fields.length; i++) {
     const fieldId = `bash--input-${prefix}${fields[i]}`;
-    if (document.getElementById(fieldId) && address[fields[i]] && !document.getElementById(fieldId).value) {
+    if (
+      document.getElementById(fieldId) &&
+      (address[fields[i]] || override) &&
+      (!document.getElementById(fieldId).value || override)
+    ) {
       document.getElementById(fieldId).value = address[fields[i]];
     }
   }
+};
+
+export const populateRicaFields = async () => {
+  const { address } = window.vtexjs.checkout.orderForm.shippingData;
+
+  address.fullName = getBestRecipient();
+  address.streetAddress = address.street;
+  address.suburb = address.neighborhood;
+  address.province = address.state;
+  populateExtraFields(address, requiredRicaFields, 'rica_');
+
+  const data = await getOrderFormCustomData(RICA_APP);
+  console.info('populateRicaFields', { data });
+  if (data.streetAddress) populateExtraFields(data, requiredRicaFields, 'rica_', true);
+};
+
+export const clearRicaFields = () => {
+  const clearedRica = {
+    idOrPassport: '',
+    // sameAddress: '', // not necessary
+    fullName: '',
+    streetAddress: '',
+    suburb: '',
+    city: '',
+    postalCode: '',
+    province: '',
+  };
+  populateExtraFields(clearedRica, requiredRicaFields, 'rica_', true);
+};
+
+export const populateFurnitureFields = async () => {
+  const data = await getOrderFormCustomData(FURNITURE_APP);
+  console.info('populateFurnitureFields', { data });
+  populateExtraFields(data, requiredFurnitureFields);
+};
+
+export const populateTVFields = async () => {
+  const data = await getOrderFormCustomData(TV_APP);
+  console.info('populateTVFields', { data });
+  populateExtraFields(data, requiredTVFields, 'tv');
 };
 
 // Runs when you setAddress
@@ -177,20 +229,58 @@ export const showHideLiftOrStairs = (floor) => {
   }
 };
 
+export const setCartClasses = () => {
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+
+  const $container = '#shipping-data';
+
+  if (hasFurniture) {
+    $(`${$container}:not(.has-furniture)`).addClass('has-furniture');
+  } else {
+    $(`${$container}.has-furniture`).removeClass('has-furniture');
+  }
+
+  if (hasTVs) {
+    $(`${$container}:not(.has-tv)`).addClass('has-tv');
+  } else {
+    $(`${$container}.has-tv`).removeClass('has-tv');
+  }
+
+  if (hasSimCards) {
+    $(`${$container}:not(.has-rica)`).addClass('has-rica');
+  } else {
+    $(`${$container}.has-rica`).removeClass('has-rica');
+  }
+};
+
+export const updateDeliveryFeeDisplay = () => {
+  if (!window.vtexjs) return;
+
+  const { value: shippingFee } = window.vtexjs.checkout.orderForm.totalizers.find((item) => item.id === 'Shipping');
+
+  let feeText = 'Free';
+
+  if (shippingFee > 0) feeText = `R${(shippingFee / 100).toFixed(2).replace('.00', '')}`;
+
+  if ($('#bash--delivery-fee').length > 0) {
+    document.getElementById('bash--delivery-fee').innerHTML = feeText;
+  }
+};
+
 // TODO move somewhere else?
 export const setAddress = (address, options = { validateExtraFields: true }) => {
   const { validateExtraFields } = options;
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs } = getSpecialCategories(items);
+  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
   if (hasFurniture) {
     populateExtraFields(address, requiredFurnitureFields);
     showHideLiftOrStairs(address.deliveryFloor);
   }
 
-  if (hasTVs) {
-    populateExtraFields(address, requiredRicaFields, 'tv_');
-  }
+  if (hasTVs) populateExtraFields(address, requiredTVFields, 'tv_');
+  if (hasSimCards) populateRicaFields();
 
   const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
 
@@ -236,10 +326,11 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
 export const submitAddressForm = async (event) => {
   event.preventDefault();
 
+  // Prevent false positive for invalid selects.
+  $('select').change();
+
   const form = document.forms['bash--address-form'];
-
   const addressName = $('#bash--input-addressName').val();
-
   const storedAddress = await getAddressByName(addressName);
 
   const fields = [
@@ -303,6 +394,9 @@ export const submitDeliveryForm = async (event) => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
+  // Prevent false positive for invalid selects.
+  $('select').change();
+
   let fullAddress = {};
 
   setDeliveryLoading();
@@ -350,71 +444,6 @@ export const submitDeliveryForm = async (event) => {
 
   window.location.hash = 'payment';
   clearLoaders();
-};
-
-export const populateRicaFields = async () => {
-  const data = await getOrderFormCustomData(RICA_APP);
-  console.info('populateRicaFields', { data });
-  populateExtraFields(data, requiredRicaFields, 'rica_');
-};
-
-export const populateFurnitureFields = async () => {
-  const data = await getOrderFormCustomData(FURNITURE_APP);
-  console.info('populateFurnitureFields', { data });
-  populateExtraFields(data, requiredFurnitureFields);
-};
-
-export const populateTVFields = async () => {
-  const data = await getOrderFormCustomData(TV_APP);
-  console.info('populateTVFields', { data });
-  populateExtraFields(data, requiredTVFields, 'tv');
-};
-
-export const getBestRecipient = () => {
-  const receiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
-  const firstName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;
-  const lastName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;
-  const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
-  return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
-};
-
-export const setCartClasses = () => {
-  const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
-
-  const $container = '#shipping-data';
-
-  if (hasFurniture) {
-    $(`${$container}:not(.has-furniture)`).addClass('has-furniture');
-  } else {
-    $(`${$container}.has-furniture`).removeClass('has-furniture');
-  }
-
-  if (hasTVs) {
-    $(`${$container}:not(.has-tv)`).addClass('has-tv');
-  } else {
-    $(`${$container}.has-tv`).removeClass('has-tv');
-  }
-
-  if (hasSimCards) {
-    $(`${$container}:not(.has-rica)`).addClass('has-rica');
-  } else {
-    $(`${$container}.has-rica`).removeClass('has-rica');
-  }
-};
-
-export const updateDeliveryFeeDisplay = () => {
-  if (!window.vtexjs) return;
-
-  const { value: shippingFee } = window.vtexjs.checkout.orderForm.totalizers.find((item) => item.id === 'Shipping');
-
-  let feeText = 'Free';
-
-  if (shippingFee > 0) feeText = `R${(shippingFee / 100).toFixed(2).replace('.00', '')}`;
-
-  if ($('#bash--delivery-fee').length > 0) {
-    document.getElementById('bash--delivery-fee').innerHTML = feeText;
-  }
 };
 
 export default mapGoogleAddress;
