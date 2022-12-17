@@ -34,7 +34,7 @@ const DeliverContainer = ({ hasFurn }) => `
    </form>
 
     <section class="bash--delivery-view" data-section="address-search">
-      <div class="bash--heading sub-heading">
+      <div class="bash--heading">
         <h3>Add a new delivery address</h3>
         <a href="#" data-view="select-address">&lt; Back</a>
       </div>
@@ -42,7 +42,7 @@ const DeliverContainer = ({ hasFurn }) => `
     </section>
     
     <section class="bash--delivery-view" data-section="address-form">
-       <div class="bash--heading sub-heading">
+       <div class="bash--heading">
         <h3>Delivery address</h3>
         <a href="#" class="back-button--search" data-view="address-search">&lt; Back</a>
         <a href="#" class="back-button--select" data-view="select-address">&lt; Back</a>

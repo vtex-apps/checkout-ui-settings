@@ -1,11 +1,11 @@
 [ ] Address listing - filter duplicate street number.
 [ ] Format phone numbers correctly
 [ ] Add Business Name field (shown if addressType === 'business') `companyBuilding`
-[ ] Ensure that Delivery Fee updates
+[x] Ensure that Delivery Fee updates
 [ ] use clearAddresses to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
 [ ] Populate extra fields on clicking Change (?)
 [ ] Ensure that "can't collect" message appears when necessary.
-[ ] Style headings
+[x Style headings
 
 [x] Remove AddressController?
 [x] Radio option

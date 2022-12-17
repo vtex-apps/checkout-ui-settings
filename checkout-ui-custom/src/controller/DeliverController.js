@@ -132,6 +132,15 @@ const DeliverController = (() => {
     });
   });
 
+  // Rica - show/hide address fields
+  $(document).on('change', '#bash--input-rica_sameAddress', function () {
+    if (this.checked) {
+      $('.rica-conditional-fields').slideUp();
+    } else {
+      $('.rica-conditional-fields').slideDown();
+    }
+  });
+
   $(document).on('submit', '#bash--address-form', submitAddressForm);
   $(document).on('submit', '#bash--delivery-form', submitDeliveryForm);
 

@@ -294,6 +294,8 @@ export const submitDeliveryForm = async (event) => {
 
   let fullAddress = {};
 
+  setDeliveryLoading();
+
   const dbAddress = await getAddressByName($("[name='selected-address']:checked").val());
 
   fullAddress = { ...address, ...dbAddress };
@@ -336,6 +338,7 @@ export const submitDeliveryForm = async (event) => {
   await addOrUpdateAddress(fullAddress);
 
   window.location.hash = 'payment';
+  clearLoaders();
 };
 
 export const populateRicaFields = async () => {
