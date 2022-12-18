@@ -231,7 +231,7 @@ export const showHideLiftOrStairs = (floor) => {
 
 export const setCartClasses = () => {
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+  const { hasFurniture, hasTVs, hasSimCards, hasNormal } = getSpecialCategories(items);
 
   const $container = '#shipping-data';
 
@@ -251,6 +251,12 @@ export const setCartClasses = () => {
     $(`${$container}:not(.has-rica)`).addClass('has-rica');
   } else {
     $(`${$container}.has-rica`).removeClass('has-rica');
+  }
+
+  if (hasNormal) {
+    $(`${$container}:not(.has-normal)`).addClass('has-normal');
+  } else {
+    $(`${$container}.has-normal`).removeClass('has-normal');
   }
 };
 
