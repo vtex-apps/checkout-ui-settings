@@ -19,6 +19,8 @@ const isSelectedAddress = (address, selectedAddress) => {
 };
 
 const AddressListing = (address) => {
+  if (!address) return '';
+
   const { street, neighborhood, postalCode, city, receiverName, complement, addressName } = address;
 
   const addressLine = [street, neighborhood ?? city, postalCode].join(', ');
