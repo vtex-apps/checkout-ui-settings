@@ -8,7 +8,7 @@ const DeliveryOptions = () => `
   })}
    
    <div id="bash--delivery-option-text" class="bash--delivery-option-text">
-      <span class="normal-delivery">Deliver within 3 - 5 working days</span>
+      <span class="normal-delivery">Deliver within 3 - 5 days</span>
    </div>
 
   <div id="bash--delivery-fee" class="bash--delivery-fee">

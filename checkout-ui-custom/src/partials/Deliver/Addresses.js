@@ -5,10 +5,13 @@ import AddressListing from './AddressListing';
 const Addresses = () => {
   getAddresses()
     .then(({ data: addresses }) => {
-      // if(addresses.length < 1)... go to Add Address
       const addressesHtml = addresses.map((address) => AddressListing(address));
       document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
       clearLoaders();
+      if (addresses.length < 1) {
+        window.postMessage({ action: 'setDeliveryView', view: 'address-search' });
+        $('#bash--input-address-search').focus();
+      }
     })
     .catch((e) => {
       console.error('ERROR getAddresses', e);
