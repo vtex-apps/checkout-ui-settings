@@ -1,5 +1,5 @@
-import { FurnitureForm, MixedProducts, RICAForm, TVIDForm, TVorRICAMsg } from '../partials';
-import { FURNITURE_CAT, FURNITURE_FEE_LINK, TIMEOUT_500 } from '../utils/const';
+import { MixedProducts, TVorRICAMsg } from '../partials';
+import { FURNITURE_CAT, TIMEOUT_500 } from '../utils/const';
 import { addBorderTop, getSpecialCategories } from '../utils/functions';
 
 const ViewController = (() => {
@@ -31,31 +31,10 @@ const ViewController = (() => {
   };
 
   const showCustomSections = () => {
-    const tvRICAStepExists = $('#tfg-custom-rica-msg').length > 0;
-    const tvIDStepExists = $('#tfg-custom-tvid-step').length > 0;
-    const furnitureStepExists = $('#tfg-custom-furniture-step').length > 0;
     const tvOrRICAMsgStepExists = $('#tfg-custom-tvrica-msg').length > 0;
     const mixedProductsMsgExits = $('#tfg-custom-mixed-msg').length > 0;
 
     let addBorder = false;
-
-    if (state.showRICAForm && !tvRICAStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(RICAForm());
-      $('#tfg-rica-same-address').trigger('change');
-      addBorder = true;
-    }
-
-    if (state.showTVIDForm && !tvIDStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(TVIDForm());
-      addBorder = true;
-    }
-
-    if (state.showFurnitureForm && !furnitureStepExists) {
-      $('.vtex-omnishipping-1-x-deliveryGroup').prepend(FurnitureForm());
-      $('.vtex-omnishipping-1-x-deliveryGroup p.vtex-omnishipping-1-x-shippingSectionTitle').append(FURNITURE_FEE_LINK);
-      $('div.subheader').css('display', 'none');
-      addBorder = true;
-    }
 
     if (state.showTVorRICAMsg || state.showMixedProductsMsg) {
       if ($('.vtex-omnishipping-1-x-deliveryChannelsWrapper.custom-disabled').length < 1) {
