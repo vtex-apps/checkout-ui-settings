@@ -104,7 +104,7 @@ const AddressController = (() => {
   });
 
   $(document).on('click', '#force-shipping-fields, #edit-address-button', () => {
-    ViewController.setDataInCustomFields();
+    // ViewController.setDataInCustomFields();
     ViewController.setView('edit-address');
   });
 

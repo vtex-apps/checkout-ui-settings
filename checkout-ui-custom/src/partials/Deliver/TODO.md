@@ -1,4 +1,4 @@
-[ ] Why does /#/payment keep going back to shipping with Furniture order?
+[x] Why does /#/payment keep going back to shipping with Furniture order?
 [ ] Test new user who has no addresses - show 'address-search' when no addresses exist.
 [ ] Ensure that "can't collect" message appears when necessary (see has-funiture, has-tv classes on #shipping-data).
 [ ] Address listing - filter duplicate street number.
