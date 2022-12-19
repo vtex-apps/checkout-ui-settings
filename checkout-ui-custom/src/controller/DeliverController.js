@@ -96,8 +96,17 @@ const DeliverController = (() => {
 
   // Define which tab is active ;/
   $(window).on('orderFormUpdated.vtex', () => {
+    const { items } = window.vtexjs.checkout.orderForm;
     const { addressType } = window.vtexjs.checkout.orderForm.shippingData.address;
+    const { hasTVs, hasSimCards } = getSpecialCategories(items);
+
     if (addressType === 'search') {
+      // User has Collect enabled, but has Rica or TV products.
+      if (hasTVs || hasSimCards) {
+        if (window.location.hash !== STEPS.SHIPPING) window.location.hash = STEPS.SHIPPING;
+        setTimeout(() => document.getElementById('shipping-option-delivery')?.click(), 2000);
+        return;
+      }
       $('#shipping-data:not(collection-active)').addClass('collection-active');
       $('.delivery-active').removeClass('delivery-active');
     } else {

@@ -214,30 +214,26 @@ const getSpecialCategories = (items) => {
   let hasTVs = false;
   let hasSimCards = false;
   let hasFurniture = false;
-  let hasNormal = false;
+  let hasFurnitureMixed = false;
 
   items.forEach((item) => {
     const itemCategories = item.productCategoryIds.split('/');
     categories.push(itemCategories);
     itemCategories.forEach((category) => {
       if (!category) return;
-      if (tvCategories.includes(category)) {
-        hasTVs = true;
-      } else if (simCardCategories.includes(category)) {
-        hasSimCards = true;
-      } else if (furnitureCategories.includes(category)) {
-        hasFurniture = true;
-      } else {
-        hasNormal = true;
-      }
+      if (tvCategories.includes(category)) hasTVs = true;
+      if (simCardCategories.includes(category)) hasSimCards = true;
+      if (furnitureCategories.includes(category)) hasFurniture = true;
     });
   });
+
+  hasFurnitureMixed = items.length > 1 && hasFurniture && !categories.every((c) => c === FURNITURE_CAT);
 
   return {
     hasFurniture,
     hasSimCards,
     hasTVs,
-    hasNormal,
+    hasFurnitureMixed,
     categories,
   };
 };

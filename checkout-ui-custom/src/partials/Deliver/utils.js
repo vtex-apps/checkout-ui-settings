@@ -230,7 +230,7 @@ export const addressIsValid = (address, validateExtraFields = true) => {
 
 export const setCartClasses = () => {
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards, hasNormal } = getSpecialCategories(items);
+  const { hasFurniture, hasTVs, hasSimCards, hasFurnitureMixed } = getSpecialCategories(items);
 
   const $container = '#shipping-data';
 
@@ -252,10 +252,10 @@ export const setCartClasses = () => {
     $(`${$container}.has-rica`).removeClass('has-rica');
   }
 
-  if (hasNormal) {
-    $(`${$container}:not(.has-normal)`).addClass('has-normal');
+  if (hasFurnitureMixed) {
+    $(`${$container}:not(.has-furniture-mixed)`).addClass('has-furniture-mixed');
   } else {
-    $(`${$container}.has-normal`).removeClass('has-normal');
+    $(`${$container}.has-furniture-mixed`).removeClass('has-furniture-mixed');
   }
 };
 

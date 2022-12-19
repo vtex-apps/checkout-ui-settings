@@ -1,10 +1,16 @@
 import { FURNITURE_FEE_LINK } from '../../utils/const';
+import MixedProducts from '../MixedProducts';
+import TVorRICAMsg from '../TVorRICAMsg';
 import Addresses from './Addresses';
 import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
 import DeliveryOptions from './DeliveryOptions';
 
 const DeliverContainer = ({ hasFurn }) => `
+<div id="bash--shipping-messages">
+${TVorRICAMsg()}
+${MixedProducts()}
+</div>
   <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
   
    <form id="bash--delivery-form" name="bash--delivery-form" method="post">
