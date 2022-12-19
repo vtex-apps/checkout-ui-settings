@@ -86,7 +86,11 @@ const populateAddressFromSearch = (address) => {
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
 
-  document.getElementById('bash--input-number').value = '';
+  // Clear hidden ID fields to prevent overwriting existing.
+  document.getElementById('bash--input-addressId').value = '';
+  document.getElementById('bash--input-addressName').value = '';
+
+  document.getElementById('bash--input-number').value = '  ';
   document.getElementById('bash--input-street').value = street ?? '';
   document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
   document.getElementById('bash--input-city').value = city ?? '';
@@ -95,8 +99,21 @@ const populateAddressFromSearch = (address) => {
 };
 
 export const populateAddressForm = (address) => {
-  const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressId, addressName } =
-    address;
+  const {
+    street,
+    companyBuilding,
+    neighborhood,
+    postalCode,
+    state,
+    city,
+    receiverName,
+    complement,
+    id,
+    addressId,
+    addressName,
+  } = address;
+
+  console.info('populateAddressForm', { address });
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -110,6 +127,7 @@ export const populateAddressForm = (address) => {
   if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
   document.getElementById('bash--input-number').value = '';
+  document.getElementById('bash--input-companyBuilding').value = companyBuilding ?? '';
   document.getElementById('bash--input-street').value = street ?? '';
   document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
   document.getElementById('bash--input-city').value = city ?? '';
@@ -354,6 +372,7 @@ export const submitAddressForm = async (event) => {
     'street',
     'neighborhood',
     'complement',
+    'companyBuilding',
   ];
 
   const address = {
