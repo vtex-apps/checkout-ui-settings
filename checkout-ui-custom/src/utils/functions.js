@@ -214,6 +214,7 @@ const getSpecialCategories = (items) => {
   let hasTVs = false;
   let hasSimCards = false;
   let hasFurniture = false;
+  let hasFurnitureMixed = false;
 
   items.forEach((item) => {
     const itemCategories = item.productCategoryIds.split('/');
@@ -226,10 +227,13 @@ const getSpecialCategories = (items) => {
     });
   });
 
+  hasFurnitureMixed = items.length > 1 && hasFurniture && !categories.every((c) => c === FURNITURE_CAT);
+
   return {
     hasFurniture,
     hasSimCards,
     hasTVs,
+    hasFurnitureMixed,
     categories,
   };
 };

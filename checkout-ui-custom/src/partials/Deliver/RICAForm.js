@@ -22,6 +22,7 @@ const RICAForm = () => {
       label: 'Residential address the same as delivery address',
       type: 'checkbox',
       checked: true,
+      required: false,
     },
     // for rest of the fields check if
     // same as residential address is checked?
@@ -128,7 +129,7 @@ const RICAForm = () => {
 
   return `
     ${formFields}
-    <div class="rica-conditional-fields">
+    <div class="rica-conditional-fields hide">
     ${conditionalFormFields}
     </div>
   `;

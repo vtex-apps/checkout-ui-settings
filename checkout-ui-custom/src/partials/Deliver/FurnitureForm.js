@@ -117,7 +117,7 @@ const FurnitureForm = () => {
     {
       name: 'liftOrStairs',
       label: 'Lift or Stairs',
-      required: true,
+      required: false,
       type: 'dropdown',
       options: liftOrStairs,
     },

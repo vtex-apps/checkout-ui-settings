@@ -36,17 +36,13 @@ const FormField = ({
     }
   };
 
-  // TODO add drop downs, etc.
+  const separateLabel = `<label id="bash--label-${fieldId}" for="bash--input-${fieldId}">${label}</label>`;
+
   return `
 <p class="input bash--${type}field-${name.replace(/\s/g, '-')} bash--${type} ${required ? 'required' : 'optional'}">
-  ${
-    label && type !== 'checkbox'
-      ? `<label id="bash--label-${fieldId}" for="bash--input-${fieldId}">${label}</label>`
-      : ''
-  }
- ${formField()}
-  ${required ? `<span class="bash--field-error">${error}</span>` : ''}
-
+  ${label && type !== 'checkbox' ? separateLabel : ''}
+  ${formField()}
+  <span class="bash--field-error">${error}</span>
 </p>  
 `;
 };

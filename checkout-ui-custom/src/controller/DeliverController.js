@@ -1,6 +1,7 @@
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
+  clearRicaFields,
   parseAttribute,
   populateAddressForm,
   populateFurnitureFields,
@@ -8,8 +9,10 @@ import {
   populateTVFields,
   setAddress,
   setCartClasses,
+  showHideLiftOrStairs,
   submitAddressForm,
   submitDeliveryForm,
+  updateDeliveryFeeDisplay,
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
@@ -21,10 +24,6 @@ const DeliverController = (() => {
     hasFurn: false,
     hasTVs: false,
     hasSim: false,
-  };
-
-  const addShippingMethod = () => {
-    $('#delivery-packages-options').clone().appendTo('#bash-delivery-options');
   };
 
   const setupDeliver = () => {
@@ -60,8 +59,6 @@ const DeliverController = (() => {
       if (state.hasTVs) populateTVFields();
     }
 
-    addShippingMethod();
-
     // Form validation
     $('select, input').off('invalid');
     $('select, input')
@@ -89,6 +86,8 @@ const DeliverController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       console.info('Hash change');
       setupDeliver();
+      setCartClasses();
+
       $('.bash--delivery-container.hide').removeClass('hide');
     } else if ($('.bash--delivery-container:not(.hide)').length) {
       $('.bash--delivery-container:not(.hide)').addClass('hide');
@@ -97,8 +96,17 @@ const DeliverController = (() => {
 
   // Define which tab is active ;/
   $(window).on('orderFormUpdated.vtex', () => {
+    const { items } = window.vtexjs.checkout.orderForm;
     const { addressType } = window.vtexjs.checkout.orderForm.shippingData.address;
+    const { hasTVs, hasSimCards } = getSpecialCategories(items);
+
     if (addressType === 'search') {
+      // User has Collect enabled, but has Rica or TV products.
+      if (hasTVs || hasSimCards) {
+        if (window.location.hash !== STEPS.SHIPPING) window.location.hash = STEPS.SHIPPING;
+        setTimeout(() => document.getElementById('shipping-option-delivery')?.click(), 2000);
+        return;
+      }
       $('#shipping-data:not(collection-active)').addClass('collection-active');
       $('.delivery-active').removeClass('delivery-active');
     } else {
@@ -108,6 +116,7 @@ const DeliverController = (() => {
     }
 
     setCartClasses();
+    updateDeliveryFeeDisplay();
   });
 
   // Change view
@@ -132,6 +141,21 @@ const DeliverController = (() => {
       $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
       $(this).attr('checked', true);
     });
+  });
+
+  // Rica - show/hide address fields
+  $(document).on('change', '#bash--input-rica_sameAddress', function () {
+    if (this.checked) {
+      $('.rica-conditional-fields').slideUp(() => populateRicaFields());
+    } else {
+      clearRicaFields();
+      $('.rica-conditional-fields').slideDown(() => $('#bash--input-rica_fullName').focus());
+    }
+  });
+
+  // Furniture - enable/disable liftOrStairs
+  $(document).on('change', '#bash--input-deliveryFloor', function () {
+    showHideLiftOrStairs(this.value);
   });
 
   $(document).on('submit', '#bash--address-form', submitAddressForm);
