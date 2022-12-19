@@ -87,10 +87,10 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--address-form').reset();
 
   document.getElementById('bash--input-number').value = '';
-  document.getElementById('bash--input-street').value = street;
-  document.getElementById('bash--input-neighborhood').value = neighborhood;
-  document.getElementById('bash--input-city').value = city;
-  document.getElementById('bash--input-postalCode').value = postalCode;
+  document.getElementById('bash--input-street').value = street ?? '';
+  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
+  document.getElementById('bash--input-city').value = city ?? '';
+  document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
 };
 
@@ -102,18 +102,18 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--address-form').reset();
 
   // Only overwrite defaults if values exist.
-  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName;
-  if (complement) document.getElementById('bash--input-complement').value = complement;
+  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
+  if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
 
   // addressId indicates that address is being edited / completed.
   if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
   if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
   document.getElementById('bash--input-number').value = '';
-  document.getElementById('bash--input-street').value = street;
-  document.getElementById('bash--input-neighborhood').value = neighborhood;
-  document.getElementById('bash--input-city').value = city;
-  document.getElementById('bash--input-postalCode').value = postalCode;
+  document.getElementById('bash--input-street').value = street ?? '';
+  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
+  document.getElementById('bash--input-city').value = city ?? '';
+  document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
 };
 
@@ -132,6 +132,7 @@ export const initGoogleAutocomplete = () => {
     // Set view to add-address
     populateAddressFromSearch(address);
     window.postMessage({ action: 'setDeliveryView', view: 'address-form' });
+    input.value = '';
   });
 };
 

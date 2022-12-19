@@ -6,7 +6,9 @@ const Addresses = () => {
   getAddresses()
     .then(({ data: addresses }) => {
       const addressesHtml = addresses.map((address) => AddressListing(address));
-      document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
+      if (document.getElementById('bash-address-list')) {
+        document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
+      }
       clearLoaders();
       if (addresses.length < 1) {
         window.postMessage({ action: 'setDeliveryView', view: 'address-search' });
