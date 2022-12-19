@@ -261,9 +261,11 @@ export const setCartClasses = () => {
 };
 
 export const updateDeliveryFeeDisplay = () => {
-  if (!window.vtexjs) return;
+  if (!window.vtexjs.checkout.orderForm.totalizers) return;
 
-  const { value: shippingFee } = window.vtexjs.checkout.orderForm.totalizers.find((item) => item.id === 'Shipping');
+  const { value: shippingFee } = window.vtexjs.checkout.orderForm.totalizers.find((item) => item.id === 'Shipping') || {
+    value: 5000,
+  };
 
   let feeText = 'Free';
 

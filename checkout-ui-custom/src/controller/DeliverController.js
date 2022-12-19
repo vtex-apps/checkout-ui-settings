@@ -30,7 +30,7 @@ const DeliverController = (() => {
     if ($('#bash--delivery-container').length) return;
 
     if (window.vtexjs.checkout.orderForm) {
-      const { items } = window.vtexjs.checkout.orderForm;
+      const items = window.vtexjs.checkout.orderForm?.items;
       const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
       state.hasFurn = hasFurniture;
@@ -96,8 +96,8 @@ const DeliverController = (() => {
 
   // Define which tab is active ;/
   $(window).on('orderFormUpdated.vtex', () => {
-    const { items } = window.vtexjs.checkout.orderForm;
-    const { addressType } = window.vtexjs.checkout.orderForm.shippingData.address;
+    const items = window.vtexjs.checkout.orderForm?.items;
+    const addressType = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
     const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
     if (addressType === 'search') {

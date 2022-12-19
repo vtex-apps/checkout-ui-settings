@@ -26,7 +26,7 @@ ${MixedProducts()}
     <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
       <hr>
       <div class="bash--heading sub-heading">
-        <h3>Delivery method</h3>
+        <h3>Delivery options</h3>
         ${hasFurn ? FURNITURE_FEE_LINK : ''}
       </div>
       ${DeliveryOptions()}
