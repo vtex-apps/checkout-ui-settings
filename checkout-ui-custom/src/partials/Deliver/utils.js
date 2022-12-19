@@ -166,6 +166,7 @@ export const populateRicaFields = async () => {
 
 export const clearRicaFields = () => {
   const clearedRica = {
+    idOrPassport: '', // TODO populate with users ID
     fullName: '',
     streetAddress: '',
     suburb: '',

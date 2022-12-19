@@ -1,12 +1,14 @@
 [x] Why does /#/payment keep going back to shipping with Furniture order?
 [ ] Test new user who has no addresses - show 'address-search' when no addresses exist.
 [ ] Checkbox fields - make sure correct values are passed (based on checked status) when submitted.
+[ ] Add Business Name field (shown if addressType === 'business') `companyBuilding`
 [x] Ensure that "can't collect" message appears when necessary (see has-funiture, has-tv classes on #shipping-data).
 [ ] Address listing - filter duplicate street number.
 [ ] Format phone numbers correctly
-[ ] Add Business Name field (shown if addressType === 'business') `companyBuilding`
 [ ] use clearAddresses() to clear addresses at an appropriate time (ensure that next user has their own data and not someone elses!)
 [ ] Populate extra fields on clicking Change (?)
+[ ] Rica - Prevent clearing of ID field on changing "Same as delivery address"
+[ ] Address search styling.
 
 [x] Ensure that Delivery Fee updates
 [x] Style headings
