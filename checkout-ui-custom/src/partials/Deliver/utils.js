@@ -166,8 +166,6 @@ export const populateRicaFields = async () => {
 
 export const clearRicaFields = () => {
   const clearedRica = {
-    idOrPassport: '',
-    // sameAddress: '', // not necessary
     fullName: '',
     streetAddress: '',
     suburb: '',
@@ -178,10 +176,21 @@ export const clearRicaFields = () => {
   populateExtraFields(clearedRica, requiredRicaFields, 'rica_', true);
 };
 
+export const showHideLiftOrStairs = (floor) => {
+  if (floor && floor !== 'ground') {
+    $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');
+    $('#bash--input-liftOrStairs').attr('required', 'required');
+  } else {
+    $('.bash--dropdownfield-liftOrStairs').slideUp();
+    $('#bash--input-liftOrStairs').removeAttr('required');
+  }
+};
+
 export const populateFurnitureFields = async () => {
   const data = await getOrderFormCustomData(FURNITURE_APP);
   console.info('populateFurnitureFields', { data });
   populateExtraFields(data, requiredFurnitureFields);
+  showHideLiftOrStairs(data?.deliveryFloor);
 };
 
 export const populateTVFields = async () => {
@@ -217,16 +226,6 @@ export const addressIsValid = (address, validateExtraFields = true) => {
   }
 
   return { isValid: !invalidFields.length, invalidFields };
-};
-
-export const showHideLiftOrStairs = (floor) => {
-  if (floor && floor !== 'ground') {
-    $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');
-    $('#bash--input-liftOrStairs').attr('required', 'required');
-  } else {
-    $('.bash--dropdownfield-liftOrStairs').slideUp();
-    $('#bash--input-liftOrStairs').removeAttr('required');
-  }
 };
 
 export const setCartClasses = () => {
