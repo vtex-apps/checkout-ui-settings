@@ -19,9 +19,9 @@ const isSelectedAddress = (address, selectedAddress) => {
 };
 
 const AddressListing = (address) => {
-  const { number, street, neighborhood, postalCode, city, receiverName, complement, addressName } = address;
+  const { street, neighborhood, postalCode, city, receiverName, complement, addressName } = address;
 
-  const addressLine = [`${number ?? ''} ${street}`, neighborhood ?? city, postalCode].join(', ');
+  const addressLine = [street, neighborhood ?? city, postalCode].join(', ');
   const contactLine = [receiverName, complement].join(' - ');
 
   // orderform
