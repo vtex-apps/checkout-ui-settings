@@ -2,6 +2,7 @@ import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
   clearRicaFields,
+  customShippingDataIsValid,
   parseAttribute,
   populateAddressForm,
   populateFurnitureFields,
@@ -116,6 +117,14 @@ const DeliverController = (() => {
 
     setCartClasses();
     updateDeliveryFeeDisplay();
+
+    if (window.location.hash === STEPS.PAYMENT) {
+      if (!items) return;
+      const isValid = customShippingDataIsValid();
+      if (!isValid) {
+        window.location.hash = STEPS.SHIPPING;
+      }
+    }
   });
 
   // Change view

@@ -212,7 +212,7 @@ export const sendOrderFormCustomData = async (appId, data) => {
   return fetch(path, options);
 };
 
-export const getOrderFormCustomData = async (appId) => {
+export const getOrderFormCustomData = (appId) => {
   const { customData } = window.vtexjs.checkout.orderForm;
   let fields = {};
 

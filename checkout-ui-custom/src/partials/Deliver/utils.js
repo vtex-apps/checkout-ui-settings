@@ -183,7 +183,7 @@ export const populateRicaFields = async () => {
   address.province = address.state;
   populateExtraFields(address, requiredRicaFields, 'rica_');
 
-  const data = await getOrderFormCustomData(RICA_APP);
+  const data = getOrderFormCustomData(RICA_APP);
   if (data.streetAddress) populateExtraFields(data, requiredRicaFields, 'rica_', true);
 };
 
@@ -211,13 +211,13 @@ export const showHideLiftOrStairs = (floor) => {
 };
 
 export const populateFurnitureFields = async () => {
-  const data = await getOrderFormCustomData(FURNITURE_APP);
+  const data = getOrderFormCustomData(FURNITURE_APP);
   populateExtraFields(data, requiredFurnitureFields);
   showHideLiftOrStairs(data?.deliveryFloor);
 };
 
 export const populateTVFields = async () => {
-  const data = await getOrderFormCustomData(TV_APP);
+  const data = getOrderFormCustomData(TV_APP);
   populateExtraFields(data, requiredTVFields, 'tv');
 };
 
@@ -295,6 +295,33 @@ export const updateDeliveryFeeDisplay = () => {
   if ($('#bash--delivery-fee').length > 0) {
     document.getElementById('bash--delivery-fee').innerHTML = feeText;
   }
+};
+
+export const customShippingDataIsValid = () => {
+  const items = window.vtexjs.checkout.orderForm?.items;
+  const { hasTVs, hasSimCards, hasFurniture } = getSpecialCategories(items);
+
+  let valid = true;
+
+  if (hasTVs) {
+    const data = getOrderFormCustomData(TV_APP);
+    console.info('TV', { data }, !data.tvID);
+    if (!data.tvID) valid = false;
+  }
+
+  if (hasSimCards) {
+    const data = getOrderFormCustomData(RICA_APP);
+    console.info('RICA', { data });
+    if (!data.idOrPassport || !data.streetAddress || !data.postalCode) valid = false;
+  }
+
+  if (hasFurniture) {
+    const data = getOrderFormCustomData(FURNITURE_APP);
+    console.info('FURN', { data });
+    if (!data.buildingType || !data.parkingDistance || !data.deliveryFloor) valid = false;
+  }
+
+  return valid;
 };
 
 // TODO move somewhere else?
