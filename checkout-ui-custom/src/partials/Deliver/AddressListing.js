@@ -27,7 +27,9 @@ const AddressListing = (address) => {
   const contactLine = [receiverName, complement].join(' - ');
 
   // orderform
-  const { address: selectedAddress } = window?.vtexjs?.checkout?.orderForm?.shippingData;
+  const selectedAddress = window?.vtexjs?.checkout?.orderForm?.shippingData?.address;
+
+  if (!selectedAddress) return '';
 
   const addressString = encodeURIComponent(JSON.stringify(address));
 

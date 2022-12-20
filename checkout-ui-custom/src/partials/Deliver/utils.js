@@ -86,38 +86,58 @@ const populateAddressFromSearch = (address) => {
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
 
-  document.getElementById('bash--input-number').value = '';
-  document.getElementById('bash--input-street').value = street;
-  document.getElementById('bash--input-neighborhood').value = neighborhood;
-  document.getElementById('bash--input-city').value = city;
-  document.getElementById('bash--input-postalCode').value = postalCode;
+  // Clear hidden ID fields to prevent overwriting existing.
+  document.getElementById('bash--input-addressId').value = '';
+  document.getElementById('bash--input-addressName').value = '';
+
+  document.getElementById('bash--input-number').value = '  ';
+  document.getElementById('bash--input-street').value = street ?? '';
+  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
+  document.getElementById('bash--input-city').value = city ?? '';
+  document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
 };
 
 export const populateAddressForm = (address) => {
-  const { street, neighborhood, postalCode, state, city, receiverName, complement, id, addressId, addressName } =
-    address;
+  const {
+    street,
+    companyBuilding,
+    neighborhood,
+    postalCode,
+    state,
+    city,
+    receiverName,
+    complement,
+    id,
+    addressId,
+    addressName,
+  } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
 
   // Only overwrite defaults if values exist.
-  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName;
-  if (complement) document.getElementById('bash--input-complement').value = complement;
+  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
+  if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
 
   // addressId indicates that address is being edited / completed.
   if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
   if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
   document.getElementById('bash--input-number').value = '';
-  document.getElementById('bash--input-street').value = street;
-  document.getElementById('bash--input-neighborhood').value = neighborhood;
-  document.getElementById('bash--input-city').value = city;
-  document.getElementById('bash--input-postalCode').value = postalCode;
+  document.getElementById('bash--input-companyBuilding').value = companyBuilding ?? '';
+  document.getElementById('bash--input-street').value = street ?? '';
+  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
+  document.getElementById('bash--input-city').value = city ?? '';
+  document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+
+  $(':invalid').trigger('change');
 };
 
 export const initGoogleAutocomplete = () => {
+  if (!window.google) return;
+
   const input = document.getElementById('bash--input-address-search');
   const autocomplete = new window.google.maps.places.Autocomplete(input, {
     componentRestrictions: { country: 'ZA' },
@@ -132,6 +152,7 @@ export const initGoogleAutocomplete = () => {
     // Set view to add-address
     populateAddressFromSearch(address);
     window.postMessage({ action: 'setDeliveryView', view: 'address-form' });
+    input.value = '';
   });
 };
 
@@ -148,10 +169,13 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
       document.getElementById(fieldId).value = address[fields[i]];
     }
   }
+  $(':invalid').trigger('change');
 };
 
 export const populateRicaFields = async () => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
+
+  if (document.getElementById('bash--input-rica_streetAddress').value) return;
 
   address.fullName = getBestRecipient();
   address.streetAddress = address.street;
@@ -160,7 +184,6 @@ export const populateRicaFields = async () => {
   populateExtraFields(address, requiredRicaFields, 'rica_');
 
   const data = await getOrderFormCustomData(RICA_APP);
-  console.info('populateRicaFields', { data });
   if (data.streetAddress) populateExtraFields(data, requiredRicaFields, 'rica_', true);
 };
 
@@ -189,14 +212,12 @@ export const showHideLiftOrStairs = (floor) => {
 
 export const populateFurnitureFields = async () => {
   const data = await getOrderFormCustomData(FURNITURE_APP);
-  console.info('populateFurnitureFields', { data });
   populateExtraFields(data, requiredFurnitureFields);
   showHideLiftOrStairs(data?.deliveryFloor);
 };
 
 export const populateTVFields = async () => {
   const data = await getOrderFormCustomData(TV_APP);
-  console.info('populateTVFields', { data });
   populateExtraFields(data, requiredTVFields, 'tv');
 };
 
@@ -353,6 +374,7 @@ export const submitAddressForm = async (event) => {
     'street',
     'neighborhood',
     'complement',
+    'companyBuilding',
   ];
 
   const address = {

@@ -96,10 +96,7 @@ class CheckoutDB {
     return new Promise((resolve) => {
       const query = thisDb.store().clear();
 
-      query.onsuccess = () => {
-        console.info('clearData success');
-        resolve(query.result);
-      };
+      query.onsuccess = () => resolve(query.result);
 
       query.onerror = () => {
         console.error('Something wrong with clearData ? ...');

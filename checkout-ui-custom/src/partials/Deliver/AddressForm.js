@@ -34,6 +34,12 @@ const AddressForm = () => {
     },
     {
       name: 'number',
+      required: false,
+      value: '  ',
+      type: 'hidden',
+    },
+    {
+      name: 'companyBuilding',
       label: 'Building/Complex and number',
       required: false,
       value: '',
