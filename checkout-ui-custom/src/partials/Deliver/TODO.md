@@ -10,7 +10,7 @@
 - Ensure that when order items are not available, error is shown.
 
 [ ] Check that Shipping summary displays the latest address info (eg. after editing selectedAddress)
-[ ] Add shippingValid check at Payment section - take user to Shipping if invalid.
+[x] Add shippingValid check at Payment section - take user to Shipping if invalid.
 
 [x] Rica - Uncheck Same address, press Go to Payment (makes invalid), Check Same address, Press Submit - stuck because of invalid fields.
 [x] Building/Complex number missing after adding - `companyBuilding`
