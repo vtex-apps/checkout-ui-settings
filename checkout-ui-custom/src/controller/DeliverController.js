@@ -59,16 +59,16 @@ const DeliverController = (() => {
       if (state.hasTVs) populateTVFields();
     }
 
-    // Form validation
-    $('select, input').off('invalid');
-    $('select, input')
-      .on('invalid', function () {
-        $(this[0]).parents('form').addClass('show-form-errors');
-        $(this)[0].setCustomValidity(' ');
-      })
-      .on('change keyUp', function () {
-        $(this)[0].setCustomValidity('');
+    const fieldsToValidate = 'select, input';
+    $(fieldsToValidate).on('invalid', function () {
+      const field = this;
+      $(field)[0].setCustomValidity(' ');
+      $(field).parents('form').addClass('show-form-errors');
+      $(field).off('change keyUp');
+      $(field).on('change keyUp', () => {
+        $(field)[0].setCustomValidity('');
       });
+    });
   };
 
   // EVENTS
@@ -84,7 +84,6 @@ const DeliverController = (() => {
 
   $(window).on('hashchange', () => {
     if (window.location.hash === STEPS.SHIPPING) {
-      console.info('Hash change');
       setupDeliver();
       setCartClasses();
 

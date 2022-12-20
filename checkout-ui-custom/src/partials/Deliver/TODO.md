@@ -5,20 +5,14 @@
 [ ] Populate extra fields on clicking Change (?)
 [ ] Rica - Prevent clearing of ID field on changing "Same as delivery address"
 [ ] Address search styling.
-[ ] Building number missing after adding
-[ ] Add address - sometimes replaces other address
-Added normal
-Then added furniture
-Then Add new address
-Replaced old address instead of adding new one.
-
+[x] Building/Complex number missing after adding
+[x] Add address - sometimes replaces other address
 [ ] Order item availability - Postal code validation - "this item can't be shipped"
 
 - Ensure that when order items are not available, error is shown.
 
 [ ] Check that Shipping summary displays the latest address info (eg. after editing selectedAddress)
-[ ] Rica - Uncheck Same address, press Go to Payment (makes invalid), Check Same address, Press Submit - stuck because of invalid fields.
-
+[x] Rica - Uncheck Same address, press Go to Payment (makes invalid), Check Same address, Press Submit - stuck because of invalid fields.
 [ ] Add shippingValid check at Payment section - take user to Shipping if invalid.
 [x] Address-search - clear field after adding
 [x] Address-search - applying partial address shows "undefined" values

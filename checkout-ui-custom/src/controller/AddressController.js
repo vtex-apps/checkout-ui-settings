@@ -1,6 +1,6 @@
 import AddressTypeField from '../partials/AddressTypeField';
 import { STEPS, TIMEOUT_500 } from '../utils/const';
-import { clearLoaders, getAddresses, getSpecialCategories } from '../utils/functions';
+import { clearLoaders, getSpecialCategories } from '../utils/functions';
 import { getBestPhoneNumber } from '../utils/phoneFields';
 import setTranslations from '../utils/translations';
 import setReceiverPhoneNumber from '../utils/vtex';
@@ -65,9 +65,6 @@ const AddressController = (() => {
 
   const runCustomization = () => {
     if (!window.vtexjs.checkout.orderForm) return;
-
-    const addresses = getAddresses();
-    console.info({ addresses });
 
     checkCollectTab();
 

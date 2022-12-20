@@ -113,8 +113,6 @@ export const populateAddressForm = (address) => {
     addressName,
   } = address;
 
-  console.info('populateAddressForm', { address });
-
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
 
@@ -133,9 +131,13 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-city').value = city ?? '';
   document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+
+  $(':invalid').trigger('change');
 };
 
 export const initGoogleAutocomplete = () => {
+  if (!window.google) return;
+
   const input = document.getElementById('bash--input-address-search');
   const autocomplete = new window.google.maps.places.Autocomplete(input, {
     componentRestrictions: { country: 'ZA' },
@@ -167,10 +169,13 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
       document.getElementById(fieldId).value = address[fields[i]];
     }
   }
+  $(':invalid').trigger('change');
 };
 
 export const populateRicaFields = async () => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
+
+  if (document.getElementById('bash--input-rica_streetAddress').value) return;
 
   address.fullName = getBestRecipient();
   address.streetAddress = address.street;
@@ -179,7 +184,6 @@ export const populateRicaFields = async () => {
   populateExtraFields(address, requiredRicaFields, 'rica_');
 
   const data = await getOrderFormCustomData(RICA_APP);
-  console.info('populateRicaFields', { data });
   if (data.streetAddress) populateExtraFields(data, requiredRicaFields, 'rica_', true);
 };
 
@@ -208,14 +212,12 @@ export const showHideLiftOrStairs = (floor) => {
 
 export const populateFurnitureFields = async () => {
   const data = await getOrderFormCustomData(FURNITURE_APP);
-  console.info('populateFurnitureFields', { data });
   populateExtraFields(data, requiredFurnitureFields);
   showHideLiftOrStairs(data?.deliveryFloor);
 };
 
 export const populateTVFields = async () => {
   const data = await getOrderFormCustomData(TV_APP);
-  console.info('populateTVFields', { data });
   populateExtraFields(data, requiredTVFields, 'tv');
 };
 
