@@ -305,19 +305,16 @@ export const customShippingDataIsValid = () => {
 
   if (hasTVs) {
     const data = getOrderFormCustomData(TV_APP);
-    console.info('TV', { data }, !data.tvID);
     if (!data.tvID) valid = false;
   }
 
   if (hasSimCards) {
     const data = getOrderFormCustomData(RICA_APP);
-    console.info('RICA', { data });
     if (!data.idOrPassport || !data.streetAddress || !data.postalCode) valid = false;
   }
 
   if (hasFurniture) {
     const data = getOrderFormCustomData(FURNITURE_APP);
-    console.info('FURN', { data });
     if (!data.buildingType || !data.parkingDistance || !data.deliveryFloor) valid = false;
   }
 
