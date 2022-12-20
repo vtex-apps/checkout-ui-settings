@@ -188,8 +188,9 @@ export const populateRicaFields = async () => {
 };
 
 export const clearRicaFields = () => {
+  const idOrPassport = $('#bash--input-rica_idOrPassport').val();
   const clearedRica = {
-    idOrPassport: '', // TODO populate with users ID
+    idOrPassport: idOrPassport ?? '', // TODO populate with users ID
     fullName: '',
     streetAddress: '',
     suburb: '',
