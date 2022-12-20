@@ -14,6 +14,7 @@ import {
   requiredTVFields,
   validAddressTypes,
 } from './constants';
+import { DeliveryError } from './DeliveryError';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -172,10 +173,10 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
   $(':invalid').trigger('change');
 };
 
-export const populateRicaFields = async () => {
+export const populateRicaFields = () => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
-  if (document.getElementById('bash--input-rica_streetAddress').value) return;
+  if (document.getElementById('bash--input-rica_streetAddress')?.value) return;
 
   address.fullName = getBestRecipient();
   address.streetAddress = address.street;
@@ -321,6 +322,13 @@ export const customShippingDataIsValid = () => {
   return valid;
 };
 
+export const populateDeliveryError = (errors = []) => {
+  if ($('#bash-delivery-error-container').length < 1) return;
+  const errorsHtml = errors.length > 0 ? errors.map((error) => DeliveryError(error)) : '';
+  $('#bash-delivery-error-container').html(errorsHtml);
+  if (errors.length > 0) $('html, body').animate({ scrollTop: $('#bash-delivery-error-container').offset().top }, 400);
+};
+
 // TODO move somewhere else?
 export const setAddress = (address, options = { validateExtraFields: true }) => {
   const { validateExtraFields } = options;
@@ -350,7 +358,7 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
       });
     }
 
-    return;
+    return { success: false, error: 'Invalid address details.' };
   }
 
   // Fix bad addressType.
@@ -365,13 +373,28 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
 
   // Start Shimmering
   setDeliveryLoading();
-  window.vtexjs.checkout
+  return window.vtexjs.checkout
     .sendAttachment('shippingData', shippingData)
-    .then(() => {
-      // End shimmer
+    .then((orderForm) => {
+      const { messages } = orderForm;
+      const errors = messages.filter((msg) => msg.status === 'error');
+
+      if (errors.length > 0) {
+        populateDeliveryError(errors);
+        window.postMessage({
+          action: 'setDeliveryView',
+          view: 'address-form',
+        });
+
+        return { success: false, errors };
+      }
+
       if (address.addressName) {
         updateAddressListing(shippingData.address);
+        return { success: true };
       }
+
+      return { success: false, error: 'No addressName' };
     })
     .done(() => clearLoaders());
 };
@@ -434,7 +457,9 @@ export const submitAddressForm = async (event) => {
   }
 
   // Apply the selected address to customers orderForm.
-  await setAddress(address, { validateExtraFields: false });
+  const setAddressResponse = await setAddress(address, { validateExtraFields: false });
+  const { success } = setAddressResponse;
+  if (!success) return;
 
   // Update the localstore, and the API
   await addOrUpdateAddress(address);
