@@ -1,6 +1,8 @@
 import AddressListing from '../partials/Deliver/AddressListing';
+import { setDeliveryLoading } from '../partials/Deliver/utils';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
+import { clearLoaders } from './functions';
 import { getBestPhoneNumber } from './phoneFields';
 
 // API Functions
@@ -225,6 +227,23 @@ export const getOrderFormCustomData = (appId) => {
   }
 
   return fields;
+};
+
+export const removeFromCart = (index) => {
+  setDeliveryLoading();
+  return window.vtexjs.checkout
+    .updateItems([
+      {
+        index: `${index}`,
+        quantity: 0,
+      },
+    ])
+    .then((orderForm) => {
+      console.info('ITEM REMOVED', { orderForm });
+    })
+    .done(() => {
+      clearLoaders();
+    });
 };
 
 export default getAddresses;

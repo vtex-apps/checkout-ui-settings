@@ -5,6 +5,7 @@ import {
   customShippingDataIsValid,
   parseAttribute,
   populateAddressForm,
+  populateDeliveryError,
   populateFurnitureFields,
   populateRicaFields,
   populateTVFields,
@@ -17,7 +18,7 @@ import {
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
-import { getAddressByName } from '../utils/services';
+import { getAddressByName, removeFromCart } from '../utils/services';
 
 const DeliverController = (() => {
   const state = {
@@ -99,6 +100,12 @@ const DeliverController = (() => {
     const items = window.vtexjs.checkout.orderForm?.items;
     const addressType = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
     const { hasTVs, hasSimCards } = getSpecialCategories(items);
+    const { messages } = window.vtexjs.checkout.orderForm;
+
+    if (window.location.hash === STEPS.SHIPPING) {
+      const errors = messages.filter((msg) => msg.status === 'error');
+      if (errors) populateDeliveryError(errors);
+    }
 
     if (addressType === 'search') {
       // User has Collect enabled, but has Rica or TV products.
@@ -164,6 +171,11 @@ const DeliverController = (() => {
 
   $(document).on('submit', '#bash--address-form', submitAddressForm);
   $(document).on('submit', '#bash--delivery-form', submitDeliveryForm);
+
+  $(document).on('click', '.remove-cart-item', function (e) {
+    e.preventDefault();
+    removeFromCart($(this).data('index'));
+  });
 
   // Form validation
   window.addEventListener('message', (event) => {
