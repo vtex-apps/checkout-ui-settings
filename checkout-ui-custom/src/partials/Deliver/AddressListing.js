@@ -1,4 +1,5 @@
 import Radio from './Elements/Radio';
+import { formatPhoneNumber, prependZero } from './utils';
 
 const isSelectedAddress = (address, selectedAddress) => {
   const addressObject = JSON.stringify({
@@ -24,7 +25,7 @@ const AddressListing = (address) => {
   const { street, neighborhood, postalCode, city, receiverName, complement, addressName } = address;
 
   const addressLine = [street, neighborhood ?? city, postalCode].join(', ');
-  const contactLine = [receiverName, complement].join(' - ');
+  const contactLine = [receiverName, formatPhoneNumber(prependZero(complement))].join(' - ');
 
   // orderform
   const selectedAddress = window?.vtexjs?.checkout?.orderForm?.shippingData?.address;
