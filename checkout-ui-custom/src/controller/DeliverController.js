@@ -118,12 +118,8 @@ const DeliverController = (() => {
     setCartClasses();
     updateDeliveryFeeDisplay();
 
-    if (window.location.hash === STEPS.PAYMENT) {
-      if (!items) return;
-      const isValid = customShippingDataIsValid();
-      if (!isValid) {
-        window.location.hash = STEPS.SHIPPING;
-      }
+    if (window.location.hash === STEPS.PAYMENT && !customShippingDataIsValid()) {
+      window.location.hash = STEPS.SHIPPING;
     }
   });
 
