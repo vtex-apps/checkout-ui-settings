@@ -160,6 +160,7 @@ export const initGoogleAutocomplete = () => {
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
 
 export const populateExtraFields = (address, fields, prefix = '', override = false) => {
+  if (!address) return;
   for (let i = 0; i < fields.length; i++) {
     const fieldId = `bash--input-${prefix}${fields[i]}`;
     if (
@@ -176,7 +177,7 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
 export const populateRicaFields = () => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
-  if (document.getElementById('bash--input-rica_streetAddress')?.value) return;
+  if (document.getElementById('bash--input-rica_streetAddress')?.value || !address) return;
 
   address.fullName = getBestRecipient();
   address.streetAddress = address.street;
@@ -389,12 +390,9 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
         return { success: false, errors };
       }
 
-      if (address.addressName) {
-        updateAddressListing(shippingData.address);
-        return { success: true };
-      }
+      if (address.addressName) updateAddressListing(shippingData.address);
 
-      return { success: false, error: 'No addressName' };
+      return { success: true };
     })
     .done(() => clearLoaders());
 };
@@ -443,6 +441,7 @@ export const submitAddressForm = async (event) => {
   const { isValid, invalidFields } = addressIsValid(address, false);
 
   if (!isValid) {
+    console.error({ invalidFields });
     $('#bash--address-form').addClass('show-form-errors');
     $(`#bash--input-${invalidFields[0]}`).focus();
 
@@ -459,7 +458,10 @@ export const submitAddressForm = async (event) => {
   // Apply the selected address to customers orderForm.
   const setAddressResponse = await setAddress(address, { validateExtraFields: false });
   const { success } = setAddressResponse;
-  if (!success) return;
+  if (!success) {
+    console.error('Set address error', { setAddressResponse });
+    return;
+  }
 
   // Update the localstore, and the API
   await addOrUpdateAddress(address);
