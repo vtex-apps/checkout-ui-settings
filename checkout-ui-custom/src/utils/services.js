@@ -194,7 +194,7 @@ export const addOrUpdateAddress = async (address) => {
 
 export const getAddressByName = async (addressName) => DB.getAddress(addressName);
 
-export const clearAddresses = () => DB.clearData();
+export const clearAddresses = async () => DB.clearData();
 
 //  OrderForm CustomData
 

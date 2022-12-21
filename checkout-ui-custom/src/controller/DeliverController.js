@@ -75,9 +75,12 @@ const DeliverController = (() => {
 
   // EVENTS
 
+  $(window).unload(() => {
+    clearAddresses();
+  });
+
   $(document).ready(() => {
     clearAddresses();
-
     if (window.location.hash === STEPS.SHIPPING) {
       setupDeliver();
       $('.bash--delivery-container.hide').removeClass('hide');
