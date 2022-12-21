@@ -18,7 +18,7 @@ import {
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
-import { getAddressByName, removeFromCart } from '../utils/services';
+import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 
 const DeliverController = (() => {
   const state = {
@@ -76,6 +76,8 @@ const DeliverController = (() => {
   // EVENTS
 
   $(document).ready(() => {
+    clearAddresses();
+
     if (window.location.hash === STEPS.SHIPPING) {
       setupDeliver();
       $('.bash--delivery-container.hide').removeClass('hide');

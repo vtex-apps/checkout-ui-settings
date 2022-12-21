@@ -8,8 +8,6 @@ const TVLicenseForm = () => {
     label: 'SA ID number',
     required: true,
     value: '',
-    minLength: 8,
-    maxLength: 13,
   };
 
   return `

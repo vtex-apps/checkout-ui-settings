@@ -14,8 +14,6 @@ const RICAForm = () => {
       label: 'ID or Passport number',
       required: true,
       value: '',
-      minLength: 8,
-      maxLength: 13,
     },
     {
       name: 'rica_sameAddress',
