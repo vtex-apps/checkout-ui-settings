@@ -190,8 +190,9 @@ export const populateRicaFields = () => {
 };
 
 export const clearRicaFields = () => {
+  const idOrPassport = $('#bash--input-rica_idOrPassport').val();
   const clearedRica = {
-    idOrPassport: '', // TODO populate with users ID
+    idOrPassport: idOrPassport ?? '', // TODO populate with users ID
     fullName: '',
     streetAddress: '',
     suburb: '',
@@ -526,5 +527,19 @@ export const submitDeliveryForm = async (event) => {
   window.location.hash = STEPS.PAYMENT;
   clearLoaders();
 };
+
+// some presaved addresses still have a missing zero,
+// this adds a zero to the phone number, if it's not there.
+export const prependZero = (tel) => {
+  let phoneNumber = tel.replace(/\s/g, '');
+  if (phoneNumber.length === 9 && phoneNumber[0] !== '0') {
+    phoneNumber = `0${phoneNumber}`;
+  }
+
+  return phoneNumber;
+};
+
+// add spaces between 3rd and 6th digit
+export const formatPhoneNumber = (value) => [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');
 
 export default mapGoogleAddress;
