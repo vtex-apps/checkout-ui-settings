@@ -494,10 +494,16 @@ export const submitDeliveryForm = async (event) => {
   if (hasFurniture) {
     const fields = requiredFurnitureFields;
     for (let i = 0; i < fields.length; i++) {
+      if (fields[i] === 'hasSufficientSpace' || fields[i] === 'assembleFurniture') {
+        const fieldValue = $(`#bash--input-${fields[i]}`).is(':checked');
+        $(`#bash--input-${fields[i]}`).val(fieldValue);
+        furnitureData[fields[i]] = fieldValue;
+      }
+      // check business/residential for the normal address
       if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
       furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val();
     }
-    const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData);
+    const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData, true, false);
     console.info({ furnitureDataSent });
   }
 
@@ -505,9 +511,15 @@ export const submitDeliveryForm = async (event) => {
   if (hasSimCards) {
     const fields = requiredRicaFields;
     for (let i = 0; i < fields.length; i++) {
+      if (fields[i] === 'sameAddress') {
+        const isFieldChecked = $(`#bash--input-${fields[i]}`).is(':checked');
+        console.log('isFieldChecked', isFieldChecked);
+        ricaData[fields[i]] = isFieldChecked;
+      }
       ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val();
     }
-    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData);
+
+    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, false, true);
     console.info({ ricaDataSent });
   }
 
