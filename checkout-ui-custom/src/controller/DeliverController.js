@@ -170,12 +170,14 @@ const DeliverController = (() => {
   });
 
   // address type - change building/complex label to either business
-  $(document).on('change', $('input').attr('addressType'), () => {
-    const getCheckedValue = document.querySelector('input[name="addressType"]:checked').value;
-    if (getCheckedValue === 'business' || getCheckedValue === 'commercial') {
-      $('#bash--label-companyBuilding').text('Business name');
-    } else {
-      $('#bash--label-companyBuilding').text('Building/Complex and number');
+  $(document).on('change', document.querySelector('input[name="addressType"]'), () => {
+    if (document.querySelector('input[name="addressType"]') !== undefined) {
+      const getCheckedValue = document.querySelector('input[name="addressType"]:checked').value;
+      if (getCheckedValue === 'business' || getCheckedValue === 'commercial') {
+        $('#bash--label-companyBuilding').text('Business name');
+      } else {
+        $('#bash--label-companyBuilding').text('Building/Complex and number');
+      }
     }
   });
 
