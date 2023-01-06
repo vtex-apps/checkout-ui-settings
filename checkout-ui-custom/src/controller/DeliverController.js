@@ -169,6 +169,17 @@ const DeliverController = (() => {
     }
   });
 
+  // address type - change building/complex label to either business
+  $(document).on('change', 'input[name="addressType"]', function () {
+    if ($(this).is(':checked')) {
+      if ($(this).val() === 'business') {
+        $('#bash--label-companyBuilding').text('Business name');
+      } else {
+        $('#bash--label-companyBuilding').text('Building/Complex and number');
+      }
+    }
+  });
+
   // Furniture - enable/disable liftOrStairs
   $(document).on('change', '#bash--input-deliveryFloor', function () {
     showHideLiftOrStairs(this.value);

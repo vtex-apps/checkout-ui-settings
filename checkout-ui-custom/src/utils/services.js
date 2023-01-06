@@ -1,3 +1,4 @@
+/* eslint-disable no-new-wrappers */
 import AddressListing from '../partials/Deliver/AddressListing';
 import { setDeliveryLoading } from '../partials/Deliver/utils';
 import CheckoutDB from './checkoutDB';
@@ -196,13 +197,26 @@ export const getAddressByName = async (addressName) => DB.getAddress(addressName
 
 export const clearAddresses = async () => DB.clearData();
 
-//  OrderForm CustomData
-
-export const sendOrderFormCustomData = async (appId, data) => {
+/**
+ * OrderForm CustomData
+ * @param {Object} data - custom data.
+ * @param {string} appId - unique app id.
+ * @param {boolean} furniture - boolean value for sending furniture.
+ * @param {boolean} rica - boolean value for sending rica fields.
+ */
+export const sendOrderFormCustomData = async (appId, data, furniture, rica) => {
   const { orderFormId } = window.vtexjs.checkout.orderForm;
 
+  if (!furniture) furniture = false;
+  if (!rica) rica = false;
+
   const path = `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`;
-  const body = JSON.stringify(data);
+  const body = JSON.stringify({
+    ...data,
+    ...(furniture && { assembleFurniture: new Boolean(data.assembleFurniture) }),
+    ...(furniture && { hasSufficientSpace: new Boolean(data.hasSufficientSpace) }),
+    ...(rica && { sameAddress: new Boolean(data.sameAddress) }),
+  });
 
   const options = {
     method: 'PUT',
