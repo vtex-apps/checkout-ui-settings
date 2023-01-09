@@ -578,6 +578,18 @@ const formattedPhoneNumber = (value, isBackSpace) => {
       const newValue = [value.slice(0, 3), value.slice(3)].join(' ');
       return isBackSpace ? newValue.trim() : newValue;
     }
+    // Eg. 72 123 4567
+  } else {
+    if (value.length >= 5) {
+      // 'xx xxx *'
+      const newValue = [value.slice(0, 2), value.slice(2, 5), value.slice(5)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // 'xx *'
+    if (value.length >= 2) {
+      const newValue = [value.slice(0, 2), value.slice(2)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
   }
 
   if (isBackSpace) return value.trim();
@@ -596,7 +608,7 @@ export const preparePhoneField = (input) => {
   const phoneInput = document.querySelector(input);
   if (!phoneInput) return;
   phoneInput.setAttribute('maxlength', 12);
-  phoneInput.value = formattedPhoneNumber(prependZero(phoneInput.value));
+  phoneInput.value = formattedPhoneNumber(phoneInput.value);
 
   $(document).off('keyup', input); // preventbubble
   $(document).on('keyup', input, function (e) {
