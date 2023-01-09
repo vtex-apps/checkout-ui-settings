@@ -15,6 +15,7 @@ import {
   submitAddressForm,
   submitDeliveryForm,
   updateDeliveryFeeDisplay,
+  preparePhoneField
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
@@ -202,6 +203,7 @@ const DeliverController = (() => {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
         if (data.view === 'address-form' || data.view === 'address-edit') {
+          preparePhoneField('#bash--input-complement');
           if (data.content) {
             const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
             populateAddressForm(address);
