@@ -6,9 +6,11 @@ import DeliveryErrorContainer from './DeliveryError';
 import DeliveryOptions from './DeliveryOptions';
 import MixedProducts from './MixedProducts';
 import TVorRICAMsg from './TVorRICAMsg';
+import Alert from './Elements/Alert';
 
 const DeliverContainer = ({ hasFurn }) => `
 <div id="bash--shipping-messages">
+${Alert()}
 ${TVorRICAMsg()}
 ${MixedProducts()}
 ${DeliveryErrorContainer()}

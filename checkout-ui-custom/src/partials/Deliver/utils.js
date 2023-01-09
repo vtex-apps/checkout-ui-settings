@@ -15,6 +15,7 @@ import {
   validAddressTypes,
 } from './constants';
 import { DeliveryError } from './DeliveryError';
+import { Alert } from './Elements/Alert';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -398,6 +399,15 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
     .done(() => clearLoaders());
 };
 
+export const showAlertBox = () => {
+  $('.alert-container').addClass('show');
+  $('#bash-alert-container').html(Alert({ text: 'Address added' }));
+  // After 3 seconds, remove the show class
+  setTimeout(() => {
+    $('.alert-container').removeClass('show');
+  }, 3000);
+};
+
 export const submitAddressForm = async (event) => {
   event.preventDefault();
 
@@ -466,8 +476,12 @@ export const submitAddressForm = async (event) => {
 
   // Update the localstore, and the API
   await addOrUpdateAddress(address);
-
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
+
+  showAlertBox();
+  // setTimeout(() => {
+  //   $('.alert-container').remove();
+  // }, 4000);
 };
 
 export const submitDeliveryForm = async (event) => {
