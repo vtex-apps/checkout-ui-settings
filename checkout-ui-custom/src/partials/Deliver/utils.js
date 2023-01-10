@@ -554,4 +554,74 @@ export const prependZero = (tel) => {
 // add spaces between 3rd and 6th digit
 export const formatPhoneNumber = (value) => [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');
 
+/**
+ * formattedPhoneNumber
+ * Add spaces to help guide the user how the number should look.
+ * Adds space after 3rd and 6th digits only.
+ * xxx xxx xxxxxxxxx
+ * @param value - string value
+ * @returns string
+ */
+const formattedPhoneNumber = (value, isBackSpace) => {
+  value = value.replace(/[^0-9+*#]+/g, '').trim();
+
+  // Eg. 072 123 4567
+  if (value[0] === '0') {
+    if (value.length >= 6) {
+      // 'xxx xxx *'
+      const newValue = [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');
+
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // 'xxx *'
+    if (value.length >= 3) {
+      const newValue = [value.slice(0, 3), value.slice(3)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // Eg. 72 123 4567
+  } else {
+    if (value.length >= 5) {
+      // 'xx xxx *'
+      const newValue = [value.slice(0, 2), value.slice(2, 5), value.slice(5)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // 'xx *'
+    if (value.length >= 2) {
+      const newValue = [value.slice(0, 2), value.slice(2)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+  }
+
+  if (isBackSpace) return value.trim();
+
+  return value;
+};
+
+/**
+ * preparePhoneField
+ * When phone fields are loaded onto the DOM
+ * Prepare them for proper display and validation.
+ *
+ * @param  input - string css selector to the element.
+ */
+export const preparePhoneField = (input) => {
+  const phoneInput = document.querySelector(input);
+  if (!phoneInput) return;
+  phoneInput.setAttribute('maxlength', 12);
+  phoneInput.value = formattedPhoneNumber(phoneInput.value);
+
+  $(document).off('keyup', input); // preventbubble
+  $(document).on('keyup', input, function (e) {
+    const $phoneInput = $(this);
+    const value = $phoneInput.val().replace(/[^0-9+*#]+/g, '');
+
+    const isBackSpace = e.keyCode === 8;
+    const displayValue = formattedPhoneNumber(value, isBackSpace);
+
+    $phoneInput.parent('.text').removeClass('error');
+    $phoneInput.parent('.text').find('span.error').hide();
+    $phoneInput.val(displayValue);
+  });
+};
+
 export default mapGoogleAddress;
