@@ -402,10 +402,10 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
 export const showAlertBox = () => {
   $('.alert-container').addClass('show');
   $('#bash-alert-container').html(Alert({ text: 'Address added' }));
-  // After 3 seconds, remove the show class
+  // After 5 seconds, remove the element
   setTimeout(() => {
-    $('.alert-container').removeClass('show');
-  }, 3000);
+    $('.alert-container').remove();
+  }, 5000);
 };
 
 export const submitAddressForm = async (event) => {
@@ -479,9 +479,6 @@ export const submitAddressForm = async (event) => {
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
 
   showAlertBox();
-  // setTimeout(() => {
-  //   $('.alert-container').remove();
-  // }, 4000);
 };
 
 export const submitDeliveryForm = async (event) => {

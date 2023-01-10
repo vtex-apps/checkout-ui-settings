@@ -9,14 +9,13 @@ import TVorRICAMsg from './TVorRICAMsg';
 import Alert from './Elements/Alert';
 
 const DeliverContainer = ({ hasFurn }) => `
-<div id="bash--shipping-messages">
-${Alert()}
-${TVorRICAMsg()}
-${MixedProducts()}
-${DeliveryErrorContainer()}
-</div>
   <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
-  
+    <div id="bash--shipping-messages">
+      ${Alert()}
+      ${TVorRICAMsg()}
+      ${MixedProducts()}
+      ${DeliveryErrorContainer()}
+    </div>
    <form id="bash--delivery-form" name="bash--delivery-form" method="post">
 
     <section class="bash--delivery-view" data-section="select-address">
