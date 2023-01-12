@@ -495,6 +495,14 @@ export const submitDeliveryForm = async (event) => {
 
   fullAddress = { ...address, ...dbAddress };
 
+  const setAddressResponse = await setAddress(fullAddress, { validateExtraFields: false });
+  const { success } = setAddressResponse;
+  if (!success) {
+    console.error('Set address error', { setAddressResponse });
+    clearLoaders();
+    return;
+  }
+
   const furnitureData = {};
   const ricaData = {};
   const tvData = {};
