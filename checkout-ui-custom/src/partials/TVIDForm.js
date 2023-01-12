@@ -4,7 +4,7 @@ const TVIDForm = () => `
         <p class="tfg-custom-subtitle">Please provide your ID number to validate your TV Licence.</p>
         <p class="input tfg-custom-input tfg-tv-licence">
             <label>SA ID number</label>
-            <input id="tfg-tv-licence" type="text" class="input-xlarge tfg-input">
+            <input id="tfg-tv-licence" type="tel" class="input-xlarge tfg-input">
         </p>
     </div>
 `;

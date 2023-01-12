@@ -17,6 +17,7 @@
   "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
   "license": "VTEX",
   "dependencies": {
+    "classnames": "^2.3.2",
     "concurrently": "^7.3.0"
   },
   "devDependencies": {

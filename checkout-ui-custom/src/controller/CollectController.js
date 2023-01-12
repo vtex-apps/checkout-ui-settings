@@ -1,4 +1,4 @@
-import { InputError, PickupComplementField } from '../templates';
+import { InputError, PickupComplementField } from '../partials';
 import { AD_TYPE, STEPS, TIMEOUT_750 } from '../utils/const';
 import { isValidNumberBash } from '../utils/functions';
 
@@ -23,16 +23,6 @@ const CollectController = (() => {
     }
   };
 
-  const bindingEvents = () => {
-    // eslint-disable-next-line func-names
-    $(document).on('keyup', 'div.shipping-container #custom-pickup-complement', function () {
-      /* Forzamos el cambio del valor de placeholder para que no marque undefined */
-      if (!$(this).val()) {
-        $(this).attr('placeholder', '');
-      }
-    });
-  };
-
   const checkFields = (fields) => {
     fields.forEach((field) => {
       let isValid = true;
@@ -45,7 +35,6 @@ const CollectController = (() => {
           break;
         case 'custom-pickup-complement':
           isValid = isValidNumberBash($(`#${field}`).val());
-
           parent = '#box-pickup-complement';
           break;
         default:
@@ -64,16 +53,13 @@ const CollectController = (() => {
   };
 
   const checkForm = () => {
-    // Reset state & clear errors
     $('span.help.error').remove();
     state.validForm = true;
-
     checkFields(['pickup-receiver', 'custom-pickup-complement']);
   };
 
   const saveCollectFields = () => {
     checkForm();
-
     if (state.validForm) {
       let collectPhone = $('#custom-pickup-complement').val().replace(/\s/g, '');
 
@@ -187,7 +173,6 @@ const CollectController = (() => {
         }
 
         changeTranslations();
-        bindingEvents();
       }
 
       /* If it has been redirected because of missing values, the click is forced to show the errors */
@@ -222,6 +207,7 @@ const CollectController = (() => {
   /* We need this observer to detect the change in the deliver and collect buttons */
   const runCollectObserver = () => {
     if (state.runningObserver) return;
+
     const elementToObserveChange = document.querySelector('.shipping-container .box-step');
     const observerConfig = { attributes: false, childList: true, characterData: false };
     const observer = new MutationObserver(() => {
@@ -243,11 +229,9 @@ const CollectController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {};
-
   return {
-    init: publicInit,
     state,
+    init: () => {},
   };
 })();
 

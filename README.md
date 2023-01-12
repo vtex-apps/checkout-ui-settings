@@ -39,10 +39,11 @@ _Detail of the parameters to be configured_:
   if there are products with this category identifier in the cart, the message associated to this requirement will be displayed next to the form requested by TFG.
 
 - **furnitureForm**
+
   - **buildingType**: string array with available values to appear in the selector of buildingType
   - **parkingDistance**: string array with available values to appear in the selector of parkingDistance
   - **deliveryFloor**: string array with available values to appear in the selector of deliveryFloor
-  - **liftStairs**: string array with available values to appear in the selector of liftStairs
+  - **liftOrStairs**: string array with available values to appear in the selector of liftOrStairs
 
 - **RICAMsg**: text that will appear when the conditions for RICA products are complied with
 - **MixedProductsMsg**: text that will appear when in the cart there are furniture category products next to other categories
@@ -51,129 +52,139 @@ An example configuration:
 
 ```js
 function setAppConfiguration(config) {
-  config.furnitureId = "1";
-  config.tvId = "2";
-  config.simCardId = "3";
+  config.furnitureId = '1'
+  config.tvId = '2'
+  config.simCardId = '3'
   config.furnitureForm = {
-      buildingType: [
-        'Free standing',
-        'House in complex',
-        'Townhouse',
-        'Apartment'
-      ],
-      parkingDistance: [15, 25, 50, 100],
-      deliveryFloor: ['Ground', '1', '2', '3+'],
-      liftStairs: ['Lift', 'Stairs']
-  };
+    buildingType: [
+      'Free standing',
+      'House in complex',
+      'Townhouse',
+      'Apartment',
+    ],
+    parkingDistance: [15, 25, 50, 100],
+    deliveryFloor: ['Ground', '1', '2', '3+'],
+    liftOrStairs: ['Lift', 'Stairs'],
+  }
   config.RICAMsg =
-    "You can't collect this order in store because your cart contains items which require either RICA or TV License validation.";
+    "You can't collect this order in store because your cart contains items which require either RICA or TV License validation."
   config.MixedProductsMsg =
-    "We'll ship your furniture and other items in your cart to the selected address. Only the furniture delivery fee will apply.";
+    "We'll ship your furniture and other items in your cart to the selected address. Only the furniture delivery fee will apply."
 }
 ```
+
 ### App configuration into orderForm
+
 if you need to add or update the configuration of orderForm, first get the current configuration, then update it
 
 #### Get request:
+
 ```js
+const options = {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-VTEX-API-AppKey': 'ApiKey',
+    'X-VTEX-API-AppToken': 'AppToken',
+  },
+}
 
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-VTEX-API-AppKey': 'ApiKey',
-      'X-VTEX-API-AppToken': 'AppToken'
-    }
-  };
-
-  fetch('https://accountname.environment.com.br/api/checkout/pvt/configuration/orderForm', options)
-    .then(response => response.json())
-    .then(response => console.log(response))
-    .catch(err => console.error(err));
+fetch(
+  'https://accountname.environment.com.br/api/checkout/pvt/configuration/orderForm',
+  options
+)
+  .then((response) => response.json())
+  .then((response) => console.log(response))
+  .catch((err) => console.error(err))
 ```
 
 #### Post request:
-```js
 
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-VTEX-API-AppKey': 'ApiKey',
-      'X-VTEX-API-AppToken': 'AppToken'
+```js
+const options = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-VTEX-API-AppKey': 'ApiKey',
+    'X-VTEX-API-AppToken': 'AppToken',
+  },
+  body: JSON.stringify({
+    paymentConfiguration: {
+      requiresAuthenticationForPreAuthorizedPaymentOption: false,
+      allowInstallmentsMerge: null,
+      blockPaymentSession: null,
+      paymentSystemToCheckFirstInstallment: null,
+      defaultPaymentSystemToApplyOnUserOrderForm: null,
     },
-    body: JSON.stringify({
-      "paymentConfiguration": {
-          "requiresAuthenticationForPreAuthorizedPaymentOption": false,
-          "allowInstallmentsMerge": null,
-          "blockPaymentSession": null,
-          "paymentSystemToCheckFirstInstallment": null,
-          "defaultPaymentSystemToApplyOnUserOrderForm": null
+    taxConfiguration: null,
+    minimumQuantityAccumulatedForItems: 1,
+    decimalDigitsPrecision: 2,
+    minimumValueAccumulated: 0,
+    apps: [
+      {
+        fields: [
+          'idOrPassport',
+          'sameAddress',
+          'fullName',
+          'streetAddress',
+          'suburb',
+          'city',
+          'postalCode',
+          'province',
+          'country',
+        ],
+        id: 'ricafields',
+        major: 1,
       },
-      "taxConfiguration": null,
-      "minimumQuantityAccumulatedForItems": 1,
-      "decimalDigitsPrecision": 2,
-      "minimumValueAccumulated": 0,
-      "apps": [
-          {
-              "fields": [
-                  "idOrPassport",
-                  "sameAddress",
-                  "fullName",
-                  "streetAddress",
-                  "suburb",
-                  "city",
-                  "postalCode",
-                  "province",
-                  "country"
-              ],
-              "id": "ricafields",
-              "major": 1
-          },{
-              "fields": [
-                  "tvID"
-              ],
-              "id": "tvfields",
-              "major": "1"
-          },{
-              "fields": [
-                  "furnitureReady",
-                  "buildingType",
-                  "parkingDistance",
-                  "deliveryFloor",
-                  "liftOrStairs",
-                  "hasSufficientSpace",
-                  "assembleFurniture"
-              ],
-              "id": "furniturefields",
-              "major": "1"
-          }
-      ],
-      "allowMultipleDeliveries": true,
-      "allowManualPrice": false,
-      "savePersonalDataAsOptIn": false,
-      "maxNumberOfWhiteLabelSellers": null,
-      "maskFirstPurchaseData": null,
-      "recaptchaValidation": "never",
-      "maskStateOnAddress": true
-  })
+      {
+        fields: ['tvID'],
+        id: 'tvfields',
+        major: '1',
+      },
+      {
+        fields: [
+          'furnitureReady',
+          'buildingType',
+          'parkingDistance',
+          'deliveryFloor',
+          'liftOrStairs',
+          'hasSufficientSpace',
+          'assembleFurniture',
+        ],
+        id: 'furniturefields',
+        major: '1',
+      },
+    ],
+    allowMultipleDeliveries: true,
+    allowManualPrice: false,
+    savePersonalDataAsOptIn: false,
+    maxNumberOfWhiteLabelSellers: null,
+    maskFirstPurchaseData: null,
+    recaptchaValidation: 'never',
+    maskStateOnAddress: true,
+  }),
 }
 ```
+
 #### Vtex documentation:
+
 - [get the orderForm configuration](https://developers.vtex.com/vtex-rest-api/reference/getorderformconfiguration)
 - [update the orderForm configuration](https://developers.vtex.com/vtex-rest-api/reference/updateorderformconfiguration)
 
 ## How to use?
+
 Once the application has been installed and configured, there are no further steps to be taken.
 The behavior required by TFG will be produced automatically in the checkout when the conditions of the configured products are satisfied. The additional fields in the shipping address will also be displayed automatically.
 
 ## Dependencies
-- ```vtex.checkout-ui-custom@0.7.13```
-- ```vtex.checkout-ui-settings-server@0.4.2-hkignore.europe-0```
+
+- `vtex.checkout-ui-custom@0.7.13`
+- `vtex.checkout-ui-settings-server@0.4.2-hkignore.europe-0`
 
 ## Development
+
 - into main folder run `npm i`
 - run `vtex link`
 - in another terminal, run `cd checkout-ui-custom`
@@ -181,7 +192,9 @@ The behavior required by TFG will be produced automatically in the checkout when
 - run `npm run watch`
 
 ## Checkout styles setup
+
 the styles of this application are stored in the app [tfg-custom-checkout](https://github.com/TFG-Labs/tfg-custom-checkout), please refer to its [documentation](https://github.com/TFG-Labs/tfg-custom-checkout/blob/main/README.md#checkout-styles-setup) to review the process.
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

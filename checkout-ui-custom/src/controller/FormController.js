@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import { InputError } from '../templates';
+import { InputError } from '../partials';
 import { FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
 import { checkoutSendCustomData, isValidNumberBash, saveAddress, setRicaFields } from '../utils/functions';
 import ViewController from './ViewController';
@@ -128,6 +128,9 @@ const FormController = (() => {
 
     console.log('!! saveShippingForm - state', state);
 
+    if (!state.validForm) {
+      // Click edit
+    }
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
@@ -177,7 +180,11 @@ const FormController = (() => {
 
   const runCustomization = () => {
     // If user has no addresses, and has Deliver selected.
-    if ($('div.address-list').length < 1 && $('#shipping-option-delivery').hasClass('shp-method-option-active')) {
+    if (
+      $('div.address-list').length < 1 &&
+      $('#shipping-option-delivery').hasClass('shp-method-option-active') &&
+      $('body').data('delivery-view') !== 'address-list'
+    ) {
       $('body:not(.has-no-addresses)').addClass('has-no-addresses');
     } else {
       $('body.has-no-addresses').removeClass('has-no-addresses');
@@ -239,7 +246,7 @@ const FormController = (() => {
     }
   );
 
-  $(document).on('change', '.vtex-omnishipping-1-x-addressForm input', function () {
+  $(document).on('change keyup', '.vtex-omnishipping-1-x-addressForm input, #tfg-tv-licence', function () {
     if ($(this).val()) {
       $(this).parent().removeClass('error');
       $(this).next('span.help.error').remove();
@@ -267,11 +274,9 @@ const FormController = (() => {
     runCustomization();
   });
 
-  const publicInit = () => {};
-
   return {
-    init: publicInit,
     state,
+    init: () => {},
   };
 })();
 

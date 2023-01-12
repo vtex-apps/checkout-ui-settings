@@ -64,4 +64,9 @@ export const preparePhoneField = (input) => {
   });
 };
 
+export const getBestPhoneNumber = () =>
+  window.vtexjs.checkout.orderForm?.shippingData?.address?.complement ||
+  window.vtexjs.checkout.orderForm?.clientProfileData?.phone ||
+  document?.getElementById('client-phone')?.value;
+
 export default { validatePhoneNumber };
