@@ -38,7 +38,7 @@ const defaultConfig = {
 const appConfig = {
   ...config,
   mode: 'production',
-  entry: ['./src/app.checkout6-custom.js'],
+  entry: ['./src/checkout6-custom.js'],
   output: {
     filename: 'checkout6-custom.js',
     path: path.resolve(__dirname, '../node/templates'),
