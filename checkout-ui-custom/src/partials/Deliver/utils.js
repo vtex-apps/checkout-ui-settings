@@ -356,7 +356,7 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
     if (requiredAddressFields.includes(invalidFields[0])) {
       window.postMessage({
         action: 'setDeliveryView',
-        view: 'address-form',
+        view: 'address-edit',
       });
     }
 
@@ -495,10 +495,10 @@ export const submitDeliveryForm = async (event) => {
 
   fullAddress = { ...address, ...dbAddress };
 
-  const setAddressResponse = await setAddress(fullAddress, { validateExtraFields: false });
-  const { success } = setAddressResponse;
-  if (!success) {
-    console.error('Set address error', { setAddressResponse });
+  // Final check to validate that the selected address has no validation errors.
+  const { success: didSetAddress } = await setAddress(fullAddress, { validateExtraFields: false });
+  if (!didSetAddress) {
+    console.error('Delivery Form - Address Validation error');
     clearLoaders();
     return;
   }
