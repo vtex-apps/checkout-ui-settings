@@ -476,14 +476,22 @@ export const submitDeliveryForm = async (event) => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
-  // Prevent false positive for invalid selects.
+  // Prevent false positive validation errors for invalid selects.
   $('select').change();
 
   let fullAddress = {};
 
+  const selectedAddressRadio = "[name='selected-address']:checked";
+
+  // Prevent sending without having selected an address.
+  if ($(selectedAddressRadio).length < 1) {
+    $('html, body').animate({ scrollTop: $('#bash--delivery-form').offset().top }, 400);
+    return;
+  }
+
   setDeliveryLoading();
 
-  const dbAddress = await getAddressByName($("[name='selected-address']:checked").val());
+  const dbAddress = await getAddressByName($(selectedAddressRadio).val());
 
   fullAddress = { ...address, ...dbAddress };
 
