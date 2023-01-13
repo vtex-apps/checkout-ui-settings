@@ -45,7 +45,7 @@ const DeliverContainer = ({ hasFurn }) => `
     <section class="bash--delivery-view" data-section="address-search">
       <div class="bash--heading">
         <h3>Add a new delivery address</h3>
-        <a href="#" data-view="select-address">&lt; Back</a>
+        <a href='#' data-view='select-address' id='back-button-select-address'>&lt; Back</a>
       </div>
       ${AddressSearch()} 
     </section>

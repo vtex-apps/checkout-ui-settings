@@ -9,10 +9,15 @@ const Addresses = () => {
       if (document.getElementById('bash-address-list')) {
         document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');
       }
+      if ($('#back-button-select-address').hasClass('inactive')) {
+        $('#back-button-select-address').show();
+      }
       clearLoaders();
       if (addresses.length < 1) {
         window.postMessage({ action: 'setDeliveryView', view: 'address-search' });
         $('#bash--input-address-search').focus();
+        $('#back-button-select-address').hide();
+        $('#back-button-select-address').addClass('inactive');
       }
     })
     .catch((e) => {

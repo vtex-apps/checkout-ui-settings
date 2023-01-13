@@ -181,6 +181,17 @@ const DeliverController = (() => {
     }
   });
 
+  // switching to between shipping options
+  // hide delivery container when switching to collect
+  $(document).on('click', '#shipping-option-pickup-in-point, #shipping-option-delivery', function () {
+    const clickedButton = $(this).attr('id');
+    if (clickedButton === 'shipping-option-pickup-in-point') {
+      $('#bash--delivery-container').hide();
+    } else {
+      $('#bash--delivery-container').show();
+    }
+  });
+
   // Furniture - enable/disable liftOrStairs
   $(document).on('change', '#bash--input-deliveryFloor', function () {
     showHideLiftOrStairs(this.value);
