@@ -401,12 +401,12 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
 
 export const showAlertBox = () => {
   $('.alert-container').addClass('show');
-  $('#bash-alert-container').html(Alert({ text: 'Address added' }));
   $('.alert-container').slideDown();
+  const alertText = $('[data-view="address-form"]').length > 0 ? 'Address added' : 'Address updated';
+  $('#bash-alert-container').html(Alert({ text: alertText }));
   // After 5 seconds, remove the element
   setTimeout(() => {
     $('.alert-container').slideUp();
-    $('.alert-container').remove();
   }, 5000);
 };
 
