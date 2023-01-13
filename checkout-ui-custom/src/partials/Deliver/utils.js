@@ -357,7 +357,7 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
     if (requiredAddressFields.includes(invalidFields[0])) {
       window.postMessage({
         action: 'setDeliveryView',
-        view: 'address-form',
+        view: 'address-edit',
       });
     }
 
@@ -489,16 +489,32 @@ export const submitDeliveryForm = async (event) => {
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
   const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
 
-  // Prevent false positive for invalid selects.
+  // Prevent false positive validation errors for invalid selects.
   $('select').change();
 
   let fullAddress = {};
 
+  const selectedAddressRadio = "[name='selected-address']:checked";
+
+  // Prevent sending without having selected an address.
+  if ($(selectedAddressRadio).length < 1) {
+    $('html, body').animate({ scrollTop: $('#bash--delivery-form').offset().top }, 400);
+    return;
+  }
+
   setDeliveryLoading();
 
-  const dbAddress = await getAddressByName($("[name='selected-address']:checked").val());
+  const dbAddress = await getAddressByName($(selectedAddressRadio).val());
 
   fullAddress = { ...address, ...dbAddress };
+
+  // Final check to validate that the selected address has no validation errors.
+  const { success: didSetAddress } = await setAddress(fullAddress, { validateExtraFields: false });
+  if (!didSetAddress) {
+    console.error('Delivery Form - Address Validation error');
+    clearLoaders();
+    return;
+  }
 
   const furnitureData = {};
   const ricaData = {};
