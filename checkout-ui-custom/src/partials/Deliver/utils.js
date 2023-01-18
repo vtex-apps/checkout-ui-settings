@@ -304,6 +304,7 @@ export const updateDeliveryFeeDisplay = () => {
 export const customShippingDataIsValid = () => {
   const items = window.vtexjs.checkout.orderForm?.items;
   const { hasTVs, hasSimCards, hasFurniture } = getSpecialCategories(items);
+  const addressType = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
 
   let valid = true;
 
@@ -317,7 +318,7 @@ export const customShippingDataIsValid = () => {
     if (!data.idOrPassport || !data.streetAddress || !data.postalCode) valid = false;
   }
 
-  if (hasFurniture) {
+  if (hasFurniture && addressType !== 'search') {
     const data = getOrderFormCustomData(FURNITURE_APP);
     if (!data.buildingType || !data.parkingDistance || !data.deliveryFloor) valid = false;
   }
