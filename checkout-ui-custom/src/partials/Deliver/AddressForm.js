@@ -15,6 +15,7 @@ const AddressForm = () => {
       type: 'hidden',
       value: '',
       required: false,
+      maxLength: 50,
     },
     {
       name: 'street',
@@ -43,17 +44,20 @@ const AddressForm = () => {
       label: 'Building/Complex and number',
       required: false,
       value: '',
+      maxLength: 100,
     },
     {
       name: 'neighborhood',
       label: 'Suburb',
       value: '',
+      maxLength: 750,
     },
     {
       name: 'city',
       label: 'City',
       required: true,
       value: '',
+      maxLength: 750,
     },
     {
       name: 'postalCode',
