@@ -1,6 +1,6 @@
 import { InputError, PickupComplementField } from '../partials';
 import { AD_TYPE, STEPS, TIMEOUT_750 } from '../utils/const';
-import { isValidNumberBash } from '../utils/functions';
+import { getSpecialCategories, isValidNumberBash } from '../utils/functions';
 
 const CollectController = (() => {
   const state = {
@@ -21,6 +21,75 @@ const CollectController = (() => {
     if (state.pickupSelected) {
       $('label.shp-pickup-receiver__label').text("Recipient's name");
     }
+  };
+
+  const pickupMap = () => {
+
+    // Pickup Point Map
+    if ($('#change-pickup-button').length) {
+      $('<button class="vtex-omnishipping-1-x-pickupPointChange button-change-pickup-point btn btn-link" id="tfg-pickup-button" type="button">Available pickup points</button>').appendTo('.vtex-omnishipping-1-x-PickupPoint');
+      $('#change-pickup-button').remove();
+    }
+
+    if ($('.btn-ask-for-geolocation-cta').length) {
+      $('.btn-ask-for-geolocation-cta').remove();
+      $('<button class="vtex-omnishipping-1-x-pickupPointChange" id="find-pickups-manualy-button-denied" type="button">Available pickup points</button>').appendTo('.vtex-omnishipping-1-x-cta');
+    }
+
+    $('#pkpmodal-close').unbind().click(function () {
+      $('#tfg-pickup-map').remove()
+    })
+
+    const iframeFunctions = function () {
+      $('<div class="tfg-pickup-map" id="tfg-pickup-map"><div class="tfg-pickup-map-content"><button class="pkpmodal-close" type="button"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" > <rect x="0.0341797" y="12.4351" width="17.8693" height="2" rx="1" transform="rotate(-45 0.0341797 12.4351)" fill="currentColor" /> <rect x="1.41422" width="17.8693" height="2" rx="1" transform="rotate(45 1.41422 0)" fill="currentColor" /> </svg> </button></div></div>').appendTo($('body'))
+      const iframe = document.createElement('iframe');
+      iframe.src = 'http://localhost:3000/';
+      iframe.width = '100%';
+      iframe.height = '98%';
+      iframe.id = 'map';
+      $(iframe).appendTo('.tfg-pickup-map-content');
+      const connection = window.Penpal.connectToChild({
+        iframe,
+        methods: {
+          sendAttachment: (data) => {
+            console.log(data)
+            window.vtexjs.checkout.sendAttachment('shippingData', data);
+            $('#tfg-pickup-map').remove()
+          },
+          getCheckoutJS: () => {
+            return window.vtexjs.checkout.orderForm;
+          },
+          getSpecialFields: () => {
+            console.log(getSpecialCategories(window.vtexjs.checkout.orderForm.items))
+            return getSpecialCategories(window.vtexjs.checkout.orderForm.items)
+          },
+          getAvailablePickupPoints: async (salesChannel, dataRequest) => {
+            console.log('why are you like this');
+            // const returnValue = await fetch(`/api/checkout/pub/orderForms/simulation?sc=${salesChannel}&rnbBehavior=0`, {
+            //   method: 'POST',
+            //   headers: new Headers({
+            //     'Content-Type': 'application/json; charset=UTF-8',
+            //   }),
+            //   body: JSON.stringify(dataRequest)
+            // })
+            // return returnValue;
+          }
+        },
+      });
+
+      $('#tfg-pickup-map').click(function (e) {
+        e.stopPropagation()
+        $('#tfg-pickup-map').remove()
+      });
+
+      $('.pkpmodal-close').click(function (e) {
+        e.stopPropagation()
+        $('#tfg-pickup-map').remove()
+      });
+    }
+
+    $("#tfg-pickup-button").unbind().click(iframeFunctions);
+    $('#find-pickups-manualy-button-denied').unbind().click(iframeFunctions);
   };
 
   const checkFields = (fields) => {
@@ -162,6 +231,7 @@ const CollectController = (() => {
       state.pickupSelected = $('div.ask-for-geolocation').length === 0;
 
       if (state.inCollect) {
+        pickupMap()
         if (state.pickupSelected) {
           $('button.shp-pickup-receiver__btn').trigger('click');
           $('div.shp-pickup-receiver').addClass('show');
