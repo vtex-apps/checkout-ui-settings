@@ -543,7 +543,6 @@ export const submitDeliveryForm = async (event) => {
     for (let i = 0; i < fields.length; i++) {
       if (fields[i] === 'sameAddress') {
         const isFieldChecked = $(`#bash--input-${fields[i]}`).is(':checked');
-        console.log('isFieldChecked', isFieldChecked);
         ricaData[fields[i]] = isFieldChecked;
       }
       ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val();

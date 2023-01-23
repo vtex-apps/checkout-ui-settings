@@ -181,7 +181,7 @@ export const addOrUpdateAddress = async (address) => {
       .trim()
       .replace(/\s/g, '-')
       .toLowerCase();
-    address.addressName = `${Date.now()}-${streetStr}`;
+    address.addressName = `${Date.now()}-${streetStr}`.substring(0, 50);
   }
 
   if (!address.addressId) address.addressId = address.addressName;
