@@ -94,7 +94,7 @@ const DeliverController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       setupDeliver();
       setCartClasses();
-
+      $('.bash--delivery-container').css('display', 'flex');
       $('.bash--delivery-container.hide').removeClass('hide');
     } else if ($('.bash--delivery-container:not(.hide)').length) {
       $('.bash--delivery-container:not(.hide)').addClass('hide');

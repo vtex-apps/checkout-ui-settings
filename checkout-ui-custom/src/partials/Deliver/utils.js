@@ -565,6 +565,8 @@ export const submitDeliveryForm = async (event) => {
 
   await addOrUpdateAddress(fullAddress);
 
+  // after submitting hide the delivery container
+  $('.bash--delivery-container').css('display', 'none');
   window.location.hash = STEPS.PAYMENT;
   clearLoaders();
 };
