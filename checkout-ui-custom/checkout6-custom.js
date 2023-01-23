@@ -1,466 +1,1592 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
-/******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./src/checkout6-custom.js":
-/*!*********************************!*\
-  !*** ./src/checkout6-custom.js ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _controller_CollectController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./controller/CollectController */ \"./src/controller/CollectController.js\");\n/* harmony import */ var _controller_DeliverController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./controller/DeliverController */ \"./src/controller/DeliverController.js\");\n/* harmony import */ var _controller_FormController__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./controller/FormController */ \"./src/controller/FormController.js\");\n/* harmony import */ var _controller_ViewController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./controller/ViewController */ \"./src/controller/ViewController.js\");\n// // import AddressController from './controller/AddressController';\n\n\n\n // // AddressController.init();\n\n_controller_ViewController__WEBPACK_IMPORTED_MODULE_3__[\"default\"].init();\n_controller_FormController__WEBPACK_IMPORTED_MODULE_2__[\"default\"].init();\n_controller_CollectController__WEBPACK_IMPORTED_MODULE_0__[\"default\"].init();\n_controller_DeliverController__WEBPACK_IMPORTED_MODULE_1__[\"default\"].init();\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/checkout6-custom.js?");
-
-/***/ }),
-
-/***/ "./src/controller/CollectController.js":
-/*!*********************************************!*\
-  !*** ./src/controller/CollectController.js ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _partials__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../partials */ \"./src/partials/index.js\");\n/* harmony import */ var _utils_const__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/const */ \"./src/utils/const.js\");\n/* harmony import */ var _utils_functions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/functions */ \"./src/utils/functions.js\");\n\n\n\n\nconst CollectController = (() => {\n  const state = {\n    inCollect: false,\n    pickupSelected: false,\n    validForm: false,\n    runningObserver: false\n  };\n\n  const changeTranslations = () => {\n    $('p.vtex-omnishipping-1-x-shippingSectionTitle').text('Collect options');\n    $('#change-pickup-button').text('Available pickup points');\n    $('h2.vtex-omnishipping-1-x-geolocationTitle.ask-for-geolocation-title').text('Find nearby Click & Collect points');\n    $('h3.vtex-omnishipping-1-x-subtitle.ask-for-geolocation-subtitle').text(\"Search for addresses that you frequently use and we'll locate stores nearby.\");\n\n    if (state.pickupSelected) {\n      $('label.shp-pickup-receiver__label').text(\"Recipient's name\");\n    }\n  };\n\n  const checkFields = fields => {\n    fields.forEach(field => {\n      let isValid = true;\n      let parent;\n\n      switch (field) {\n        case 'pickup-receiver':\n          isValid = !($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val());\n          parent = '.shp-pickup-receiver';\n          break;\n\n        case 'custom-pickup-complement':\n          isValid = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.isValidNumberBash)($(`#${field}`).val());\n          parent = '#box-pickup-complement';\n          break;\n\n        default:\n          break;\n      }\n\n      if (!isValid) {\n        $(parent).addClass('error');\n        $(parent).append((0,_partials__WEBPACK_IMPORTED_MODULE_0__.InputError)());\n        $(`${parent} span.error`).show();\n        state.validForm = false;\n      } else {\n        $(parent).removeClass('error');\n      }\n    });\n  };\n\n  const checkForm = () => {\n    $('span.help.error').remove();\n    state.validForm = true;\n    checkFields(['pickup-receiver', 'custom-pickup-complement']);\n  };\n\n  const saveCollectFields = () => {\n    checkForm();\n\n    if (state.validForm) {\n      let collectPhone = $('#custom-pickup-complement').val().replace(/\\s/g, '');\n\n      if (collectPhone.length === 9 && collectPhone[0] !== '0') {\n        collectPhone = `0${collectPhone}`;\n      }\n\n      localStorage.setItem('saving-shipping-collect', true);\n      $('#btn-go-to-payment').trigger('click');\n      setTimeout(() => {\n        window.vtexjs.checkout.getOrderForm().then(orderForm => {\n          const {\n            address\n          } = orderForm.shippingData;\n          address.complement = collectPhone;\n          return window.vtexjs.checkout.calculateShipping(address);\n        }).done(() => {\n          localStorage.removeItem('saving-shipping-collect');\n        });\n      }, _utils_const__WEBPACK_IMPORTED_MODULE_1__.TIMEOUT_750);\n    }\n  }; //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils\n\n\n  const setInputPhone = () => {\n    const phoneInput = document.querySelector('input#custom-pickup-complement');\n\n    if (phoneInput) {\n      phoneInput.setAttribute('placeholder', '');\n    }\n  };\n\n  const prePopulateReceiverName = () => {\n    const {\n      firstName,\n      lastName\n    } = window.vtexjs.checkout.orderForm?.clientProfileData;\n    const firstNameInput = $('#client-first-name').val();\n    const lastNameInput = $('#client-last-name').val();\n    const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');\n\n    if ($('input#pickup-receiver').val() === '') {\n      $('input#pickup-receiver').val(receiverName.trim());\n      window.vtexjs.checkout.getOrderForm().then(orderForm => {\n        const {\n          shippingData\n        } = orderForm;\n        shippingData.address.receiverName = receiverName.trim();\n        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);\n      });\n    }\n  };\n\n  const addCustomPhoneInput = () => {\n    /* Set orderForm value if exists */\n    const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';\n\n    if ($('input#custom-pickup-complement').length === 0) {\n      $('.btn-go-to-payment-wrapper').before(_partials__WEBPACK_IMPORTED_MODULE_0__.PickupComplementField);\n      setInputPhone();\n\n      if (phoneNumber) {\n        $('input#custom-pickup-complement').val(phoneNumber);\n      }\n    } else if ($('input#custom-pickup-complement').val() === '') {\n      $('input#custom-pickup-complement').val(phoneNumber);\n      window.vtexjs.checkout.getOrderForm().then(orderForm => {\n        const {\n          shippingData\n        } = orderForm;\n        shippingData.address.complement = phoneNumber;\n        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);\n      });\n    }\n\n    prePopulateReceiverName();\n  }; //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils\n\n\n  const addCustomBtnPayment = () => {\n    if ($('#custom-go-to-payment').length <= 0) {\n      const nativePaymentBtn = $('#btn-go-to-payment');\n      const customPaymentBtn = nativePaymentBtn.clone(false);\n      $(nativePaymentBtn).hide();\n      $(customPaymentBtn).data('bind', '');\n      $(customPaymentBtn).removeAttr('id').attr('id', 'custom-go-to-payment');\n      $(customPaymentBtn).removeAttr('data-bind');\n      $(customPaymentBtn).css('display', 'block');\n      $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);\n      $(customPaymentBtn).on('click', saveCollectFields);\n    }\n  };\n\n  const runCustomization = () => {\n    const shippingLoaded = $('div#postalCode-finished-loading').length > 0;\n\n    if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_1__.STEPS.SHIPPING && shippingLoaded) {\n      state.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active');\n      state.pickupSelected = $('div.ask-for-geolocation').length === 0;\n\n      if (state.inCollect) {\n        if (state.pickupSelected) {\n          $('button.shp-pickup-receiver__btn').trigger('click');\n          $('div.shp-pickup-receiver').addClass('show');\n          addCustomPhoneInput();\n          addCustomBtnPayment();\n        } else {\n          $('div.shp-pickup-receiver').removeClass('show');\n        }\n\n        changeTranslations();\n      }\n      /* If it has been redirected because of missing values, the click is forced to show the errors */\n\n\n      if (localStorage.getItem('shipping-incomplete-values')) {\n        $('#custom-go-to-payment').trigger('click');\n        localStorage.removeItem('shipping-incomplete-values');\n      }\n    } else {\n      /* Remove box-pickup-complement so that the input does not appear in the other steps of the checkout process  */\n      $('#box-pickup-complement').remove();\n\n      if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_1__.STEPS.PAYMENT) {\n        setTimeout(() => {\n          const address = window.vtexjs.checkout.orderForm?.shippingData?.address;\n          const savingCollect = localStorage.getItem('saving-shipping-collect');\n\n          if (!savingCollect) {\n            /* Redirect to shipping if required fields are empty */\n            if (address && address.addressType === _utils_const__WEBPACK_IMPORTED_MODULE_1__.AD_TYPE.PICKUP && (!address.receiverName || !address.complement)) {\n              window.location.hash = _utils_const__WEBPACK_IMPORTED_MODULE_1__.STEPS.SHIPPING;\n              localStorage.setItem('shipping-incomplete-values', true);\n            }\n          }\n        }, 1000);\n      }\n    } // eslint-disable-next-line no-use-before-define\n\n\n    runCollectObserver();\n  };\n  /* We need this observer to detect the change in the deliver and collect buttons */\n\n\n  const runCollectObserver = () => {\n    if (state.runningObserver) return;\n    const elementToObserveChange = document.querySelector('.shipping-container .box-step');\n    const observerConfig = {\n      attributes: false,\n      childList: true,\n      characterData: false\n    };\n    const observer = new MutationObserver(() => {\n      state.runningObserver = true;\n      runCustomization();\n    });\n\n    if (elementToObserveChange) {\n      observer.observe(elementToObserveChange, observerConfig);\n    }\n  }; // EVENTS SUBSCRIPTION\n\n\n  $(document).ready(() => {\n    runCustomization();\n  });\n  $(window).on('hashchange orderFormUpdated.vtex', () => {\n    runCustomization();\n  });\n  return {\n    state,\n    init: () => {}\n  };\n})();\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CollectController);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/controller/CollectController.js?");
-
-/***/ }),
-
-/***/ "./src/controller/DeliverController.js":
-/*!*********************************************!*\
-  !*** ./src/controller/DeliverController.js ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _partials_Deliver_DeliverContainer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../partials/Deliver/DeliverContainer */ \"./src/partials/Deliver/DeliverContainer.js\");\n/* harmony import */ var _partials_Deliver_ExtraFieldsContainer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../partials/Deliver/ExtraFieldsContainer */ \"./src/partials/Deliver/ExtraFieldsContainer.js\");\n/* harmony import */ var _partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../partials/Deliver/utils */ \"./src/partials/Deliver/utils.js\");\n/* harmony import */ var _utils_const__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/const */ \"./src/utils/const.js\");\n/* harmony import */ var _utils_functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/functions */ \"./src/utils/functions.js\");\n/* harmony import */ var _utils_services__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/services */ \"./src/utils/services.js\");\n\n\n\n\n\n\n\nconst DeliverController = (() => {\n  const state = {\n    view: 'list',\n    hasFurn: false,\n    hasTVs: false,\n    hasSim: false\n  };\n\n  const setupDeliver = () => {\n    if ($('#bash--delivery-container').length) return;\n\n    if (window.vtexjs.checkout.orderForm) {\n      const items = window.vtexjs.checkout.orderForm?.items;\n      const {\n        hasFurniture,\n        hasTVs,\n        hasSimCards\n      } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_4__.getSpecialCategories)(items);\n      state.hasFurn = hasFurniture;\n      state.hasTVs = hasTVs;\n      state.hasSim = hasSimCards;\n    }\n\n    $('.shipping-data .box-step').append((0,_partials_Deliver_DeliverContainer__WEBPACK_IMPORTED_MODULE_0__[\"default\"])({\n      hasFurn: state.hasFurn\n    }));\n    const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;\n\n    if (showExtraFields) {\n      $('#bash-delivery-options').before((0,_partials_Deliver_ExtraFieldsContainer__WEBPACK_IMPORTED_MODULE_1__[\"default\"])({\n        hasFurn: state.hasFurn,\n        hasSim: state.hasSim,\n        hasTV: state.hasTVs\n      }));\n      if (state.hasFurn) (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.populateFurnitureFields)();\n      if (state.hasSim) (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.populateRicaFields)();\n      if (state.hasTVs) (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.populateTVFields)();\n    }\n\n    const fieldsToValidate = 'select, input';\n    $(fieldsToValidate).on('invalid', function () {\n      const field = this;\n      $(field)[0].setCustomValidity(' ');\n      $(field).parents('form').addClass('show-form-errors');\n      $(field).off('change keyUp');\n      $(field).on('change keyUp', () => {\n        $(field)[0].setCustomValidity('');\n      });\n    });\n  }; // EVENTS\n\n\n  $(window).unload(() => {\n    (0,_utils_services__WEBPACK_IMPORTED_MODULE_5__.clearAddresses)();\n  });\n  $(document).ready(() => {\n    (0,_utils_services__WEBPACK_IMPORTED_MODULE_5__.clearAddresses)();\n\n    if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.SHIPPING) {\n      setupDeliver();\n      $('.bash--delivery-container.hide').removeClass('hide');\n    } else if ($('.bash--delivery-container:not(.hide)').length) {\n      $('.bash--delivery-container:not(.hide)').addClass('hide');\n    }\n  });\n  $(window).on('hashchange', () => {\n    if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.SHIPPING) {\n      setupDeliver();\n      (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.setCartClasses)();\n      $('.bash--delivery-container').css('display', 'flex');\n      $('.bash--delivery-container.hide').removeClass('hide');\n    } else if ($('.bash--delivery-container:not(.hide)').length) {\n      $('.bash--delivery-container:not(.hide)').addClass('hide');\n    }\n  }); // Define which tab is active ;/\n\n  $(window).on('orderFormUpdated.vtex', () => {\n    const items = window.vtexjs.checkout.orderForm?.items;\n    const addressType = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;\n    const {\n      hasTVs,\n      hasSimCards\n    } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_4__.getSpecialCategories)(items);\n    const {\n      messages\n    } = window.vtexjs.checkout.orderForm;\n\n    if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.SHIPPING) {\n      const errors = messages.filter(msg => msg.status === 'error');\n      if (errors) (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.populateDeliveryError)(errors);\n    }\n\n    if (addressType === 'search') {\n      // User has Collect enabled, but has Rica or TV products.\n      if (hasTVs || hasSimCards) {\n        if (window.location.hash !== _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.SHIPPING) window.location.hash = _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.SHIPPING;\n        setTimeout(() => document.getElementById('shipping-option-delivery')?.click(), 2000);\n        return;\n      }\n\n      $('#shipping-data:not(collection-active)').addClass('collection-active');\n      $('.delivery-active').removeClass('delivery-active');\n    } else {\n      setupDeliver();\n      $('#shipping-data:not(delivery-active)').addClass('delivery-active');\n      $('.collection-active').removeClass('collection-active');\n    }\n\n    (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.setCartClasses)();\n    (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.updateDeliveryFeeDisplay)();\n\n    if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.PAYMENT && !(0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.customShippingDataIsValid)()) {\n      window.location.hash = _utils_const__WEBPACK_IMPORTED_MODULE_3__.STEPS.SHIPPING;\n    }\n  }); // Change view\n\n  $(document).on('click', 'a[data-view]', function (e) {\n    e.preventDefault();\n    const viewTarget = $(this).data('view');\n    const content = decodeURIComponent($(this).data('content'));\n    window.postMessage({\n      action: 'setDeliveryView',\n      view: viewTarget,\n      content\n    });\n  }); // Select address\n\n  $(document).on('change', 'input[type=\"radio\"][name=\"selected-address\"]', function () {\n    const address = (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.parseAttribute)($(this).parents('.bash--address-listing').data('address'));\n\n    if (document.forms['bash--delivery-form']) {\n      document.forms['bash--delivery-form'].reset();\n      document.forms['bash--delivery-form'].classList.remove('show-form-errors');\n    }\n\n    (0,_utils_services__WEBPACK_IMPORTED_MODULE_5__.getAddressByName)(address.addressName).then(addressByName => {\n      (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.setAddress)(addressByName || address, {\n        validateExtraFields: false\n      });\n      $('input[type=\"radio\"][name=\"selected-address\"]:checked').attr('checked', false);\n      $(this).attr('checked', true);\n    });\n  }); // Rica - show/hide address fields\n\n  $(document).on('change', '#bash--input-rica_sameAddress', function () {\n    if (this.checked) {\n      $('.rica-conditional-fields').slideUp(() => (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.populateRicaFields)());\n    } else {\n      (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.clearRicaFields)();\n      $('.rica-conditional-fields').slideDown(() => $('#bash--input-rica_fullName').focus());\n    }\n  }); // address type - change building/complex label to either business\n\n  $(document).on('change', 'input[name=\"addressType\"]', function () {\n    if ($(this).is(':checked')) {\n      if ($(this).val() === 'business') {\n        $('#bash--label-companyBuilding').text('Business name');\n      } else {\n        $('#bash--label-companyBuilding').text('Building/Complex and number');\n      }\n    }\n  }); // switching to between shipping options\n  // hide delivery container when switching to collect\n\n  $(document).on('click', '#shipping-option-pickup-in-point, #shipping-option-delivery', function () {\n    const clickedButton = $(this).attr('id');\n\n    if (clickedButton === 'shipping-option-pickup-in-point') {\n      $('#bash--delivery-container').hide();\n    } else {\n      $('#bash--delivery-container').show();\n    }\n  }); // Furniture - enable/disable liftOrStairs\n\n  $(document).on('change', '#bash--input-deliveryFloor', function () {\n    (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.showHideLiftOrStairs)(this.value);\n  });\n  $(document).on('submit', '#bash--address-form', _partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.submitAddressForm);\n  $(document).on('submit', '#bash--delivery-form', _partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.submitDeliveryForm);\n  $(document).on('click', '.remove-cart-item', function (e) {\n    e.preventDefault();\n    (0,_utils_services__WEBPACK_IMPORTED_MODULE_5__.removeFromCart)($(this).data('index'));\n  }); // Form validation\n\n  window.addEventListener('message', event => {\n    const {\n      data\n    } = event;\n    if (!data || !data.action) return;\n\n    switch (data.action) {\n      case 'setDeliveryView':\n        document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);\n\n        if (data.view === 'address-form' || data.view === 'address-edit') {\n          (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.preparePhoneField)('#bash--input-complement');\n\n          if (data.content) {\n            const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));\n            (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_2__.populateAddressForm)(address);\n          }\n        }\n\n        break;\n\n      default:\n        console.error('Unknown action', data.action);\n    }\n  }); // Clear local checkout DB on ext.\n  // window.addEventListener('beforeunload', clearAddresses);\n\n  return {\n    state,\n    init: () => {}\n  };\n})();\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DeliverController);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/controller/DeliverController.js?");
-
-/***/ }),
-
-/***/ "./src/controller/FormController.js":
-/*!******************************************!*\
-  !*** ./src/controller/FormController.js ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _partials__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../partials */ \"./src/partials/index.js\");\n/* harmony import */ var _utils_const__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/const */ \"./src/utils/const.js\");\n/* harmony import */ var _utils_functions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/functions */ \"./src/utils/functions.js\");\n/* harmony import */ var _ViewController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ViewController */ \"./src/controller/ViewController.js\");\n/* eslint-disable func-names */\n\n\n\n\n\nconst FormController = (() => {\n  const state = {\n    validForm: true,\n    runningObserver: false\n  };\n\n  const checkField = field => {\n    if ($(`#${field}`).length > 0 && !$(`#${field}`).attr('disabled') && !$(`#${field}`).val()) {\n      $(`.${field}`).addClass('error');\n      $(`.${field}`).append(_partials__WEBPACK_IMPORTED_MODULE_0__.InputError);\n      $(`.${field} span.error`).show();\n      state.validForm = false;\n    } else {\n      $(`.${field}`).removeClass('error');\n    }\n  };\n\n  const checkFields = fields => {\n    fields.forEach(field => {\n      checkField(field);\n    });\n  };\n\n  const checkFurnitureForm = () => {\n    const furnitureFields = ['tfg-building-type', 'tfg-parking-distance', 'tfg-delivery-floor', 'tfg-lift-stairs'];\n    checkFields(furnitureFields);\n  };\n\n  const checkRICAForm = () => {\n    const ricaFields = ['tfg-rica-id-passport', 'tfg-rica-fullname', 'tfg-rica-street', 'tfg-rica-suburb', 'tfg-rica-city', 'tfg-rica-postal-code', 'tfg-rica-province'];\n    checkFields(ricaFields);\n  };\n\n  const checkForm = () => {\n    // Reset state & clear errors\n    $('span.help.error').remove();\n    state.validForm = true;\n    /* Checking Receiver & Receiver Phone */\n\n    if ($('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0) {\n      checkField('ship-receiverName');\n\n      if (!(0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.isValidNumberBash)(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)) {\n        $('.vtex-omnishipping-1-x-address .ship-complement').addClass('error');\n        $('.vtex-omnishipping-1-x-address .ship-complement').append((0,_partials__WEBPACK_IMPORTED_MODULE_0__.InputError)());\n        $('.vtex-omnishipping-1-x-address .ship-complement span.error').show();\n        state.validForm = false;\n      } else {\n        $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error');\n      }\n    }\n    /* Checking Custom Fields */\n\n\n    if (_ViewController__WEBPACK_IMPORTED_MODULE_3__[\"default\"].state.showFurnitureForm) {\n      checkFurnitureForm();\n    }\n\n    if (_ViewController__WEBPACK_IMPORTED_MODULE_3__[\"default\"].state.showRICAForm) {\n      checkRICAForm();\n    }\n\n    if (_ViewController__WEBPACK_IMPORTED_MODULE_3__[\"default\"].state.showTVIDForm) {\n      checkField('tfg-tv-licence');\n    }\n  };\n\n  const getFurnitureFormFields = () => {\n    const furnitureFields = {};\n    furnitureFields.furnitureReady = true;\n    furnitureFields.buildingType = $('#tfg-building-type').val();\n    furnitureFields.parkingDistance = $('#tfg-parking-distance').val();\n    furnitureFields.deliveryFloor = $('#tfg-delivery-floor').val();\n\n    if (!$('#tfg-lift-stairs').attr('disabled')) {\n      furnitureFields.liftOrStairs = $('#tfg-lift-stairs').val();\n    }\n\n    furnitureFields.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked');\n    furnitureFields.assembleFurniture = $('#tfg-assemble-furniture').is(':checked');\n    return furnitureFields;\n  };\n\n  const getRICAFields = () => {\n    const ricaFields = {};\n    ricaFields.idOrPassport = $('#tfg-rica-id-passport').val();\n    ricaFields.sameAddress = $('#tfg-rica-same-address').is(':checked');\n    ricaFields.fullName = $('#tfg-rica-fullname').val();\n    ricaFields.streetAddress = $('#tfg-rica-street').val();\n    ricaFields.suburb = $('#tfg-rica-suburb').val();\n    ricaFields.city = $('#tfg-rica-city').val();\n    ricaFields.postalCode = $('#tfg-rica-postal-code').val();\n    ricaFields.province = $('#tfg-rica-province').val();\n    ricaFields.country = $('#tfg-rica-country').val();\n    return ricaFields;\n  };\n\n  const saveAddressType = () => {\n    const addressType = localStorage.getItem('addressType');\n    window.vtexjs.checkout.getOrderForm().then(orderForm => {\n      const {\n        shippingData\n      } = orderForm;\n      shippingData.selectedAddresses[0].addressType = addressType;\n      return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);\n    });\n  };\n\n  const getTVFormFields = () => ({\n    tvID: $('#tfg-tv-licence').val()\n  });\n\n  const saveShippingForm = () => {\n    const {\n      showFurnitureForm,\n      showRICAForm,\n      showTVIDForm\n    } = _ViewController__WEBPACK_IMPORTED_MODULE_3__[\"default\"].state;\n    checkForm();\n    console.log('!! saveShippingForm - state', state);\n\n    if (!state.validForm) {// Click edit\n    }\n\n    if (state.validForm) {\n      // Fields saved in orderForm\n      if (showRICAForm) {\n        const ricaFields = getRICAFields();\n        (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.checkoutSendCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_1__.RICA_APP, ricaFields);\n      } // Fields saved in Masterdata\n\n\n      const masterdataFields = {};\n\n      if (showFurnitureForm) {\n        const furnitureFields = getFurnitureFormFields();\n        (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.checkoutSendCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_1__.FURNITURE_APP, furnitureFields);\n        Object.assign(masterdataFields, furnitureFields);\n      }\n\n      if (showTVIDForm) {\n        const tvFields = getTVFormFields();\n        (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.checkoutSendCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_1__.TV_APP, tvFields);\n        Object.assign(masterdataFields, tvFields);\n      }\n\n      (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.saveAddress)(masterdataFields);\n      setTimeout(() => {\n        $('#btn-go-to-payment').trigger('click');\n        saveAddressType();\n      }, _utils_const__WEBPACK_IMPORTED_MODULE_1__.TIMEOUT_750);\n    }\n  };\n\n  const addCustomBtnPayment = () => {\n    if ($('#custom-go-to-payment').length <= 0) {\n      const nativePaymentBtn = $('#btn-go-to-payment');\n      const customPaymentBtn = nativePaymentBtn.clone(false);\n      $(nativePaymentBtn).hide();\n      $(customPaymentBtn).data('bind', '');\n      $(customPaymentBtn).removeAttr('id').attr('id', 'custom-go-to-payment');\n      $(customPaymentBtn).removeAttr('data-bind');\n      $(customPaymentBtn).css('display', 'block');\n      $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);\n      $(customPaymentBtn).on('click', saveShippingForm);\n    }\n  };\n\n  const runCustomization = () => {\n    // If user has no addresses, and has Deliver selected.\n    if ($('div.address-list').length < 1 && $('#shipping-option-delivery').hasClass('shp-method-option-active') && $('body').data('delivery-view') !== 'address-list') {\n      $('body:not(.has-no-addresses)').addClass('has-no-addresses');\n    } else {\n      $('body.has-no-addresses').removeClass('has-no-addresses');\n    }\n\n    if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_1__.STEPS.SHIPPING) {\n      setTimeout(() => {\n        const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');\n\n        if (selectedDelivery) {\n          addCustomBtnPayment();\n        } // eslint-disable-next-line no-use-before-define\n\n\n        runFormObserver();\n      }, _utils_const__WEBPACK_IMPORTED_MODULE_1__.TIMEOUT_750);\n    }\n  }; // INPUT EVENT SUBSCRIPTION\n\n\n  const runFormObserver = () => {\n    if (state.runningObserver) return;\n    const elementToObserveChange = document.querySelector('.shipping-container .box-step');\n    const observerConfig = {\n      attributes: false,\n      childList: true,\n      characterData: false\n    };\n    const observer = new MutationObserver(() => {\n      state.runningObserver = true;\n\n      if (window.location.hash === _utils_const__WEBPACK_IMPORTED_MODULE_1__.STEPS.SHIPPING && !$('btn-link vtex-omnishipping-1-x-btnDelivery').length) {\n        runCustomization();\n      }\n    });\n\n    if (elementToObserveChange) {\n      observer.observe(elementToObserveChange, observerConfig);\n    }\n  };\n\n  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {\n    if ($(this).val() === 'Ground') {\n      $('#tfg-lift-stairs').val('');\n      $('#tfg-lift-stairs').attr('disabled', 'disabled');\n      $('#tfg-lift-stairs').next('span.help.error').remove();\n      $('.tfg-lift-stairs').removeClass('error');\n    } else {\n      $('#tfg-lift-stairs').removeAttr('disabled');\n    }\n  });\n  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector, .vtex-omnishipping-1-x-deliveryGroup .tfg-input', function () {\n    if ($(this).val()) {\n      $(this).parent().removeClass('error');\n      $(this).next('span.help.error').remove();\n      $(this).addClass('tfg-input-completed');\n    } else {\n      $(this).removeClass('tfg-input-completed');\n    }\n  });\n  $(document).on('change keyup', '.vtex-omnishipping-1-x-addressForm input, #tfg-tv-licence', function () {\n    if ($(this).val()) {\n      $(this).parent().removeClass('error');\n      $(this).next('span.help.error').remove();\n    }\n  });\n  $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-rica-same-address', function () {\n    if ($(this).is(':checked')) {\n      (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.setRicaFields)('shippingAddress');\n    } else {\n      $('.rica-field').val('');\n    }\n  });\n  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {\n    runCustomization();\n  }); // EVENTS SUBSCRIPTION\n\n  $(document).ready(() => {\n    runCustomization();\n  });\n  $(window).on('hashchange orderFormUpdated.vtex', () => {\n    runCustomization();\n  });\n  return {\n    state,\n    init: () => {}\n  };\n})();\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FormController);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/controller/FormController.js?");
-
-/***/ }),
-
-/***/ "./src/controller/ViewController.js":
-/*!******************************************!*\
-  !*** ./src/controller/ViewController.js ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _partials__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../partials */ \"./src/partials/index.js\");\n/* harmony import */ var _utils_const__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/const */ \"./src/utils/const.js\");\n/* harmony import */ var _utils_functions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/functions */ \"./src/utils/functions.js\");\n\n\n\n\nconst ViewController = (() => {\n  const state = {\n    showFurnitureForm: false,\n    showTVIDForm: false,\n    showRICAForm: false,\n    showTVorRICAMsg: false,\n    showMixedProductsMsg: false,\n    runningObserver: false\n  };\n\n  const checkCartCategories = () => {\n    if (window.vtexjs.checkout.orderForm) {\n      const {\n        items\n      } = window.vtexjs.checkout.orderForm;\n      const {\n        hasFurniture,\n        hasTVs,\n        hasSimCards,\n        categories\n      } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.getSpecialCategories)(items);\n      state.showFurnitureForm = hasFurniture;\n      state.showTVIDForm = hasTVs;\n      state.showRICAForm = hasSimCards;\n      state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;\n      /**\r\n        Conditions to show mixed products alert:\r\n        - more than one item\r\n        - after filter categories, this array includes at least one furniture id\r\n        - there are only one category OR not all the categories in the array are furniture\r\n      */\n\n      state.showMixedProductsMsg = items.length > 1 && hasFurniture && !categories.every(c => c === _utils_const__WEBPACK_IMPORTED_MODULE_1__.FURNITURE_CAT);\n    }\n  };\n\n  const showCustomSections = () => {\n    const tvOrRICAMsgStepExists = $('#tfg-custom-tvrica-msg').length > 0;\n    const mixedProductsMsgExits = $('#tfg-custom-mixed-msg').length > 0;\n    let addBorder = false;\n\n    if (state.showTVorRICAMsg || state.showMixedProductsMsg) {\n      if ($('.vtex-omnishipping-1-x-deliveryChannelsWrapper.custom-disabled').length < 1) {\n        $('#shipping-option-delivery').trigger('click');\n        $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled');\n      }\n\n      if (state.showTVorRICAMsg && !tvOrRICAMsgStepExists) {\n        $('.vtex-omnishipping-1-x-addressFormPart1').prepend((0,_partials__WEBPACK_IMPORTED_MODULE_0__.TVorRICAMsg)());\n        addBorder = true;\n      }\n\n      if (state.showMixedProductsMsg && !mixedProductsMsgExits) {\n        $('.vtex-omnishipping-1-x-addressFormPart1').prepend((0,_partials__WEBPACK_IMPORTED_MODULE_0__.MixedProducts)());\n        addBorder = true;\n      }\n    }\n\n    if (addBorder) (0,_utils_functions__WEBPACK_IMPORTED_MODULE_2__.addBorderTop)('.tfg-custom-step');\n  };\n\n  const runCustomization = () => {\n    /* Hiding subheader when there is furniture in cart */\n    setTimeout(() => {\n      checkCartCategories();\n\n      if (state.showFurnitureForm) {\n        $('div.subheader').css('display', 'none');\n      } else {\n        $('div.subheader').css('display', 'block');\n      }\n    }, _utils_const__WEBPACK_IMPORTED_MODULE_1__.TIMEOUT_500);\n  };\n\n  const setView = view => {\n    document.body.setAttribute('data-delivery-view', view);\n  }; // EVENTS SUBSCRIPTION\n\n\n  $(document).ready(() => {\n    runCustomization();\n  });\n  $(window).on('hashchange orderFormUpdated.vtex', () => {\n    runCustomization();\n  });\n  $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {\n    runCustomization();\n  });\n  return {\n    state,\n    setView,\n    showCustomSections,\n    init: () => {}\n  };\n})();\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ViewController);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/controller/ViewController.js?");
-
-/***/ }),
-
-/***/ "./src/partials/AddressForm.js":
-/*!*************************************!*\
-  !*** ./src/partials/AddressForm.js ***!
-  \*************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"PickupComplementField\": () => (/* binding */ PickupComplementField),\n/* harmony export */   \"SuburbField\": () => (/* binding */ SuburbField),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst AddressForm = () => `<p class=\"input custom-field-receiverName tfg-custom-addressForm\">\n      <label>Recipient</label>\n      <input id=\"custom-field-receiverName\" class=\"input-xlarge success\" type=\"text\" field=\"receiverName\" />\n    </p>\n    <p class=\"input custom-field-complement tfg-custom-addressForm\">\n      <label>Mobile number</label>\n      <input id=\"custom-field-complement\" class=\"input-xlarge success\" type=\"text\" field=\"complement\"/>\n    </p>\n    <p class=\"input custom-field-companyBuilding tfg-custom-addressForm\">\n      <label>Company/Building</label>\n      <input id=\"custom-field-companyBuilding\" class=\"input-xlarge success\" type=\"text\" field=\"companyBuilding\"/>\n    </p>\n  `;\n\nconst SuburbField = () => `<p class=\"input custom-field-neighborhood tfg-custom-addressForm\">\n<label>Suburb</label>\n<input id=\"custom-field-neighborhood\" class=\"input-xlarge success\" type=\"text\" field=\"neighborhood\"/>\n</p>`;\nconst PickupComplementField = () => `\n  <p id=\"box-pickup-complement\" class=\"input custom-field-complement tfg-custom-addressForm\">\n    <label>Mobile number</label>\n    <input id=\"custom-pickup-complement\" class=\"input-xlarge success\" type=\"text\" field=\"complement\" placeholder=\"\" />\n  </p>`;\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AddressForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/AddressForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/AlertBox.js":
-/*!**********************************!*\
-  !*** ./src/partials/AlertBox.js ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst AlertBox = (message, type) => `\n  <div id=\"tfg-custom-${type}-msg\" class=\"tfg-custom-msg\">\n    <p class=\"tfg-custom-icon\"></p>\n    <p class=\"tfg-custom-text\">${message}</p>\n  </div>\n`;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AlertBox);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/AlertBox.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/AddressForm.js":
-/*!*********************************************!*\
-  !*** ./src/partials/Deliver/AddressForm.js ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _utils_phoneFields__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/phoneFields */ \"./src/utils/phoneFields.js\");\n/* harmony import */ var _Elements_FormField__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Elements/FormField */ \"./src/partials/Deliver/Elements/FormField.js\");\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ \"./src/partials/Deliver/utils.js\");\n\n\n\n\nconst AddressForm = () => {\n  const fields = [{\n    name: 'addressId',\n    type: 'hidden',\n    value: '',\n    required: false\n  }, {\n    name: 'addressName',\n    type: 'hidden',\n    value: '',\n    required: false\n  }, {\n    name: 'street',\n    label: 'Street address',\n    required: true,\n    value: ''\n  }, {\n    name: 'addressType',\n    label: 'Address type',\n    required: true,\n    type: 'radio',\n    options: [{\n      value: 'residential',\n      label: 'Residential',\n      checked: true\n    }, {\n      value: 'business',\n      label: 'Business'\n    }]\n  }, {\n    name: 'number',\n    required: false,\n    value: '  ',\n    type: 'hidden'\n  }, {\n    name: 'companyBuilding',\n    label: 'Building/Complex and number',\n    required: false,\n    value: ''\n  }, {\n    name: 'neighborhood',\n    label: 'Suburb',\n    value: ''\n  }, {\n    name: 'city',\n    label: 'City',\n    required: true,\n    value: ''\n  }, {\n    name: 'postalCode',\n    label: 'Postal code',\n    value: '',\n    type: 'tel',\n    minlength: 4,\n    maxLength: 4\n  }, {\n    type: 'note',\n    required: false,\n    name: 'suburb-postal-reminder',\n    value: 'Make sure to specify the correct Suburb and Postal code so we can easily find your address.'\n  }, {\n    name: 'state',\n    label: 'Province',\n    type: 'dropdown',\n    options: [{\n      value: '',\n      label: 'Select'\n    }, {\n      value: 'EC',\n      label: 'Eastern Cape'\n    }, {\n      value: 'FS',\n      label: 'Free State'\n    }, {\n      value: 'GP',\n      label: 'Gauteng'\n    }, {\n      value: 'KZN',\n      label: 'KwaZulu-Natal'\n    }, {\n      value: 'LP',\n      label: 'Limpopo'\n    }, {\n      value: 'MP',\n      label: 'Mpumalanga'\n    }, {\n      value: 'NC',\n      label: 'Northern Cape'\n    }, {\n      value: 'NW',\n      label: 'North West'\n    }, {\n      value: 'WC',\n      label: 'Western Cape'\n    }]\n  }, {\n    type: 'note',\n    required: false,\n    name: 'country-display',\n    label: 'Country',\n    value: 'South Africa'\n  }, {\n    type: 'hidden',\n    required: true,\n    name: 'country',\n    value: 'ZAF'\n  }, {\n    name: 'receiverName',\n    label: 'Recipient’s name',\n    required: true,\n    value: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.getBestRecipient)()\n  }, {\n    name: 'complement',\n    label: 'Recipient’s mobile number',\n    required: true,\n    value: (0,_utils_phoneFields__WEBPACK_IMPORTED_MODULE_0__.getBestPhoneNumber)(),\n    type: 'tel',\n    helperText: 'We send shipping updates to this number.'\n  }];\n  const formFields = fields.map(field => (0,_Elements_FormField__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(field)).join('');\n  return `\n  <form id=\"bash--address-form\" method=\"post\">\n    ${formFields}\n\n    <button \n      class=\"submit btn-go-to-payment btn btn-large btn-success\"\n      id=\"btn-save-address\" \n      type=\"submit\"\n    >\n      Save address\n    </button>\n  </form>\n  \n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AddressForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/AddressForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/AddressListing.js":
-/*!************************************************!*\
-  !*** ./src/partials/Deliver/AddressListing.js ***!
-  \************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Elements_Radio__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Elements/Radio */ \"./src/partials/Deliver/Elements/Radio.js\");\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ \"./src/partials/Deliver/utils.js\");\n\n\n\nconst isSelectedAddress = (address, selectedAddress) => {\n  const addressObject = JSON.stringify({\n    street: address.street,\n    neighborhood: address.neighborhood,\n    city: address.city,\n    postalCode: address.postalCode\n  });\n  const selectedAddressObject = JSON.stringify({\n    street: selectedAddress.street,\n    neighborhood: selectedAddress.neighborhood,\n    city: selectedAddress.city,\n    postalCode: selectedAddress.postalCode\n  });\n  return addressObject === selectedAddressObject;\n};\n\nconst AddressListing = address => {\n  if (!address) return '';\n  const {\n    street,\n    neighborhood,\n    postalCode,\n    city,\n    receiverName,\n    complement,\n    addressName\n  } = address;\n  const addressLine = [street, neighborhood ?? city, postalCode].join(', ');\n  const contactLine = [receiverName, (0,_utils__WEBPACK_IMPORTED_MODULE_1__.formatPhoneNumber)((0,_utils__WEBPACK_IMPORTED_MODULE_1__.prependZero)(complement))].join(' - '); // orderform\n\n  const selectedAddress = window?.vtexjs?.checkout?.orderForm?.shippingData?.address;\n  if (!selectedAddress) return '';\n  const addressString = encodeURIComponent(JSON.stringify(address));\n  return `\n<label id=\"address-${addressName}\" class=\"bash--address-listing\" data-address=\"${addressString}\">\n  <div class=\"address-radio\">\n  ${(0,_Elements_Radio__WEBPACK_IMPORTED_MODULE_0__[\"default\"])({\n    name: 'selected-address',\n    options: [{\n      checked: isSelectedAddress(address, selectedAddress),\n      value: addressName\n    }]\n  })}\n  </div>\n  <div class=\"address-text\">\n    <div>${addressLine}</div>    \n    <div>${contactLine}</div>  \n  </div>\n  <div class=\"address-edit\">\n    <a href=\"#\" data-view=\"address-edit\" data-content=\"address-${addressName}\">\n      Edit\n    </a>\n  </div>\n</label>\n`;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AddressListing);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/AddressListing.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/AddressSearch.js":
-/*!***********************************************!*\
-  !*** ./src/partials/Deliver/AddressSearch.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Elements_FormField__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Elements/FormField */ \"./src/partials/Deliver/Elements/FormField.js\");\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ \"./src/partials/Deliver/utils.js\");\n\n\n\nconst AddressSearch = () => {\n  setTimeout(() => {\n    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.initGoogleAutocomplete)();\n  }, 500);\n  return (0,_Elements_FormField__WEBPACK_IMPORTED_MODULE_0__[\"default\"])({\n    name: 'address-search',\n    placeholder: 'Start typing an address...',\n    autoComplete: 'off'\n  });\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AddressSearch);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/AddressSearch.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Addresses.js":
-/*!*******************************************!*\
-  !*** ./src/partials/Deliver/Addresses.js ***!
-  \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _utils_functions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/functions */ \"./src/utils/functions.js\");\n/* harmony import */ var _utils_services__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/services */ \"./src/utils/services.js\");\n/* harmony import */ var _AddressListing__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AddressListing */ \"./src/partials/Deliver/AddressListing.js\");\n\n\n\n\nconst Addresses = () => {\n  (0,_utils_services__WEBPACK_IMPORTED_MODULE_1__.getAddresses)().then(({\n    data: addresses\n  }) => {\n    const addressesHtml = addresses.map(address => (0,_AddressListing__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(address));\n\n    if (document.getElementById('bash-address-list')) {\n      document.getElementById('bash-address-list').innerHTML = addressesHtml.join('');\n    }\n\n    if ($('#back-button-select-address').hasClass('inactive')) {\n      $('#back-button-select-address').show();\n    }\n\n    (0,_utils_functions__WEBPACK_IMPORTED_MODULE_0__.clearLoaders)();\n\n    if (addresses.length < 1) {\n      window.postMessage({\n        action: 'setDeliveryView',\n        view: 'address-search'\n      });\n      $('#bash--input-address-search').focus();\n      $('#back-button-select-address').hide();\n      $('#back-button-select-address').addClass('inactive');\n    }\n  }).catch(e => {\n    console.error('ERROR getAddresses', e);\n    throw new Error('Error getAddresses', e.message);\n  });\n  return `\n <div class=\"bash--addresses shimmer\" id=\"bash-address-list\">\n    Loading addresses...\n  </div>  \n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Addresses);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Addresses.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/DeliverContainer.js":
-/*!**************************************************!*\
-  !*** ./src/partials/Deliver/DeliverContainer.js ***!
-  \**************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _utils_const__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/const */ \"./src/utils/const.js\");\n/* harmony import */ var _Addresses__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Addresses */ \"./src/partials/Deliver/Addresses.js\");\n/* harmony import */ var _AddressForm__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AddressForm */ \"./src/partials/Deliver/AddressForm.js\");\n/* harmony import */ var _AddressSearch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AddressSearch */ \"./src/partials/Deliver/AddressSearch.js\");\n/* harmony import */ var _DeliveryError__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./DeliveryError */ \"./src/partials/Deliver/DeliveryError.js\");\n/* harmony import */ var _DeliveryOptions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./DeliveryOptions */ \"./src/partials/Deliver/DeliveryOptions.js\");\n/* harmony import */ var _MixedProducts__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MixedProducts */ \"./src/partials/Deliver/MixedProducts.js\");\n/* harmony import */ var _TVorRICAMsg__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./TVorRICAMsg */ \"./src/partials/Deliver/TVorRICAMsg.js\");\n/* harmony import */ var _Elements_Alert__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Elements/Alert */ \"./src/partials/Deliver/Elements/Alert.js\");\n\n\n\n\n\n\n\n\n\n\nconst DeliverContainer = ({\n  hasFurn\n}) => `\n  <div class=\"bash--delivery-container\" id=\"bash--delivery-container\" data-view=\"select-address\">\n    <div id=\"bash--shipping-messages\">\n      ${(0,_Elements_Alert__WEBPACK_IMPORTED_MODULE_8__[\"default\"])()}\n      ${(0,_TVorRICAMsg__WEBPACK_IMPORTED_MODULE_7__[\"default\"])()}\n      ${(0,_MixedProducts__WEBPACK_IMPORTED_MODULE_6__[\"default\"])()}\n      ${(0,_DeliveryError__WEBPACK_IMPORTED_MODULE_4__[\"default\"])()}\n    </div>\n   <form id=\"bash--delivery-form\" name=\"bash--delivery-form\" method=\"post\">\n\n    <section class=\"bash--delivery-view\" data-section=\"select-address\">\n    <div class=\"bash--heading\">\n        <h2>Delivery address</h2>\n        <a href=\"#\" data-view=\"address-search\">Add address</a>\n      </div>\n      ${(0,_Addresses__WEBPACK_IMPORTED_MODULE_1__[\"default\"])()}\n    </section>\n\n    <section id=\"bash-delivery-options\" class=\"shipping-method bash--delivery-view\" data-section=\"select-address\">\n      <hr>\n      <div class=\"bash--heading sub-heading\">\n        <h3>Delivery options</h3>\n        ${hasFurn ? _utils_const__WEBPACK_IMPORTED_MODULE_0__.FURNITURE_FEE_LINK : ''}\n      </div>\n      ${(0,_DeliveryOptions__WEBPACK_IMPORTED_MODULE_5__[\"default\"])()}\n      <button \n        class=\"submit btn-go-to-payment btn btn-large btn-success\"\n        id=\"btn-save-delivery\" \n        type=\"submit\">\n          Go to payment\n      </button>\n    </section>\n   </form>\n\n    <section class=\"bash--delivery-view\" data-section=\"address-search\">\n      <div class=\"bash--heading\">\n        <h3>Add a new delivery address</h3>\n        <a href='#' data-view='select-address' id='back-button-select-address'>&lt; Back</a>\n      </div>\n      ${(0,_AddressSearch__WEBPACK_IMPORTED_MODULE_3__[\"default\"])()} \n    </section>\n    \n    <section class=\"bash--delivery-view\" data-section=\"address-form\">\n       <div class=\"bash--heading\">\n        <h3>Delivery address</h3>\n        <a href=\"#\" class=\"back-button--search\" data-view=\"address-search\">&lt; Back</a>\n        <a href=\"#\" class=\"back-button--select\" data-view=\"select-address\">&lt; Back</a>\n      </div>\n      ${(0,_AddressForm__WEBPACK_IMPORTED_MODULE_2__[\"default\"])()}\n    </section>\n    \n  </div>`;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DeliverContainer);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/DeliverContainer.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/DeliveryError.js":
-/*!***********************************************!*\
-  !*** ./src/partials/Deliver/DeliveryError.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"DeliveryError\": () => (/* binding */ DeliveryError),\n/* harmony export */   \"DeliveryErrorContainer\": () => (/* binding */ DeliveryErrorContainer),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst DeliveryErrorContainer = () => ` \n \n<div id=\"bash-delivery-error-container\"   >\n</div>`;\nconst DeliveryError = ({\n  text,\n  fields\n}) => {\n  if (!fields.itemIndex) return '';\n  const cartItem = window.vtexjs.checkout?.orderForm.items?.[fields.itemIndex];\n  if (!cartItem) return '';\n  const imageUrl = cartItem?.imageUrl;\n  return ` \n<div id=\"bash-delivery-error\" class=\"notification error\" alt=\"${fields?.skuName ?? ''}\" >\n   <!---<div class=\"icon\"></div>--->\n   ${imageUrl ? `<img src=\"${imageUrl}\" style=\" float: right; \" />` : ''}\n   <div class=\"notification-content\">\n      <h3>Address error ${fields?.skuName ? `- ${fields?.skuName}` : ''}</h3>\n      <p>${text}</p>\n      <p>Check the postal code of your address, or \n      <a href=\"#\" \n        class=\"remove-cart-item\"\n        style=\"color: white; text-decoration: underline\"\n        data-index=\"${fields.itemIndex}\">remove this item from your cart</a>.\n      </p>\n   </div>  \n</div>  \n`;\n};\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DeliveryErrorContainer);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/DeliveryError.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/DeliveryOptions.js":
-/*!*************************************************!*\
-  !*** ./src/partials/Deliver/DeliveryOptions.js ***!
-  \*************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Elements_Radio__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Elements/Radio */ \"./src/partials/Deliver/Elements/Radio.js\");\n\n\nconst DeliveryOptions = () => `\n  <label class=\"bash--delivery-option-display\" >\n  ${(0,_Elements_Radio__WEBPACK_IMPORTED_MODULE_0__[\"default\"])({\n  name: 'delivery-option',\n  options: [{\n    checked: true,\n    value: true\n  }]\n})}\n   \n   <div id=\"bash--delivery-option-text\" class=\"bash--delivery-option-text\">\n      <span class=\"normal-delivery\">Deliver within 3 - 5 days</span>\n   </div>\n\n  <div id=\"bash--delivery-fee\" class=\"bash--delivery-fee\">\n    R50\n  </div>\n</label>\n  `;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DeliveryOptions);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/DeliveryOptions.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/Alert.js":
-/*!************************************************!*\
-  !*** ./src/partials/Deliver/Elements/Alert.js ***!
-  \************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"Alert\": () => (/* binding */ Alert),\n/* harmony export */   \"AlertContainer\": () => (/* binding */ AlertContainer),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n// message: string\nconst AlertContainer = () => '<div id=\"bash-alert-container\"></div>';\nconst Alert = ({\n  text\n}) => `<div class='alert-container'>\n      <p>${text}</p>\n    </div>\n  `;\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AlertContainer);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/Alert.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/Checkbox.js":
-/*!***************************************************!*\
-  !*** ./src/partials/Deliver/Elements/Checkbox.js ***!
-  \***************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst Checkbox = ({\n  name,\n  label,\n  checked,\n  value\n}) => `\n    <label class=\"tfg-checkbox-label\">\n       <input \n        type='checkbox' \n        name=\"${name}\" \n        id=\"bash--input-${name}\"\n        ${checked ? \"checked='checked'\" : ''}\n        value=${value ?? ''}\n      />\n      <span>${label}</span>\n    </label>\n  `;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Checkbox);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/Checkbox.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/DropDown.js":
-/*!***************************************************!*\
-  !*** ./src/partials/Deliver/Elements/DropDown.js ***!
-  \***************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst DropDown = ({\n  name,\n  disabled = false,\n  options,\n  required\n}) => {\n  const hasASelectedOption = options.find(option => option.selected === true);\n  return `\n  <select \n    name=\"${name}\" \n    ${required ? ' required ' : ''} \n    ${disabled ? ' disabled ' : ''} \n    id=\"bash--input-${name}\" \n    class=\"input-large\" \n  >\n  ${options.map(({\n    value,\n    label,\n    selected\n  }, index) => `\n    <option \n    ${index === 0 ? ' disabled ' : ''}\n    ${index === 0 && !hasASelectedOption ? ' selected ' : ''}\n    ${selected ? ' selected ' : ''}\n      value=\"${value}\" \n    >${label}</option>\n    `).join('')}\n  </select>\n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DropDown);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/DropDown.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/FormField.js":
-/*!****************************************************!*\
-  !*** ./src/partials/Deliver/Elements/FormField.js ***!
-  \****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Checkbox__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Checkbox */ \"./src/partials/Deliver/Elements/Checkbox.js\");\n/* harmony import */ var _DropDown__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DropDown */ \"./src/partials/Deliver/Elements/DropDown.js\");\n/* harmony import */ var _Note__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Note */ \"./src/partials/Deliver/Elements/Note.js\");\n/* harmony import */ var _Radio__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Radio */ \"./src/partials/Deliver/Elements/Radio.js\");\n/* harmony import */ var _TextField__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./TextField */ \"./src/partials/Deliver/Elements/TextField.js\");\n\n\n\n\n\n\nconst FormField = ({\n  label,\n  name,\n  value = '',\n  required = true,\n  type = 'text',\n  placeholder,\n  autoComplete = 'on',\n  maxLength,\n  minlength,\n  disabled = false,\n  options,\n  checked,\n  error = 'This field is required.'\n}) => {\n  const fieldId = name.replace(/\\s/g, '-');\n\n  const formField = () => {\n    switch (type) {\n      case 'radio':\n        return (0,_Radio__WEBPACK_IMPORTED_MODULE_3__[\"default\"])({\n          name,\n          options\n        });\n\n      case 'dropdown':\n        return (0,_DropDown__WEBPACK_IMPORTED_MODULE_1__[\"default\"])({\n          name,\n          disabled,\n          options,\n          required\n        });\n\n      case 'note':\n        return (0,_Note__WEBPACK_IMPORTED_MODULE_2__[\"default\"])({\n          name,\n          value\n        });\n\n      case 'checkbox':\n        return (0,_Checkbox__WEBPACK_IMPORTED_MODULE_0__[\"default\"])({\n          name,\n          label,\n          checked\n        });\n\n      default:\n        return (0,_TextField__WEBPACK_IMPORTED_MODULE_4__[\"default\"])({\n          name,\n          value,\n          required,\n          type,\n          placeholder,\n          autoComplete,\n          maxLength,\n          minlength\n        });\n    }\n  };\n\n  const separateLabel = `<label id=\"bash--label-${fieldId}\" for=\"bash--input-${fieldId}\">${label}</label>`;\n  return `\n<p class=\"input bash--${type}field-${name.replace(/\\s/g, '-')} bash--${type} ${required ? 'required' : 'optional'}\">\n  ${label && type !== 'checkbox' ? separateLabel : ''}\n  ${formField()}\n  <span class=\"bash--field-error\">${error}</span>\n</p>  \n`;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FormField);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/FormField.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/Note.js":
-/*!***********************************************!*\
-  !*** ./src/partials/Deliver/Elements/Note.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst Note = ({\n  value,\n  name\n}) => `\n  <div class=\"bash--note-field ${name}\">\n  ${value}\n  </div>\n  `;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Note);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/Note.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/Radio.js":
-/*!************************************************!*\
-  !*** ./src/partials/Deliver/Elements/Radio.js ***!
-  \************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst Radio = ({\n  name,\n  options = []\n}) => `\n  \n  <div class=\"bash--radio-options\">\n  ${options.map(({\n  value,\n  label,\n  checked = false,\n  disabled = false\n}) => `\n      <label class=\"bash--radio-option\" id=\"radio-label-${name}-${value}\">\n        <input type=\"radio\" \n          ${checked ? \"checked='checked'\" : ''} \n          ${disabled ? \"disabled='disabled'\" : ''} \n          value=\"${value ?? ''}\" \n          name=\"${name}\" \n          id=\"radio-${name}-${value}\"\n        />\n          <span class=\"radio-icon\"></span> \n          ${label ? `<span class=\"radio-label\">${label}</span>` : ''}\n      </label>\n    `).join('')}\n   \n  </div>\n  `;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Radio);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/Radio.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/Elements/TextField.js":
-/*!****************************************************!*\
-  !*** ./src/partials/Deliver/Elements/TextField.js ***!
-  \****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst TextField = ({\n  name,\n  value = '',\n  required = true,\n  type = 'text',\n  placeholder,\n  autoComplete = 'on',\n  minLength = 0,\n  maxLength = 0\n}) => {\n  const fieldId = name.replace(/\\s/g, '-');\n  return `\n  <input \n    ${required ? ' required ' : ''}\n    autocomplete=\"${autoComplete}\" \n    id=\"bash--input-${fieldId}\" \n    type=\"${type}\" \n    name=\"${name}\" \n    ${minLength > 0 ? `minlength=\"${minLength}\"` : ''}\n    ${maxLength > 0 ? `maxlength=\"${maxLength}\"` : ''}\n    placeholder=\"${placeholder ?? ''}\" \n    class=\"input-xlarge\" \n    value=\"${value}\" \n  />\n`;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TextField);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/Elements/TextField.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/ExtraFieldsContainer.js":
-/*!******************************************************!*\
-  !*** ./src/partials/Deliver/ExtraFieldsContainer.js ***!
-  \******************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _FurnitureForm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FurnitureForm */ \"./src/partials/Deliver/FurnitureForm.js\");\n/* harmony import */ var _RICAForm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./RICAForm */ \"./src/partials/Deliver/RICAForm.js\");\n/* harmony import */ var _TVLicenseForm__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TVLicenseForm */ \"./src/partials/Deliver/TVLicenseForm.js\");\n\n\n\n\nconst ExtraFieldsContainer = ({\n  hasFurn,\n  hasTV,\n  hasSim\n}) => {\n  const showFurnitureForm = `\n    <div id=\"furniture-form\">\n      <hr>\n      <div class=\"bash--heading sub-heading heading-with-description\">\n        <h3>Furniture information needed</h3>\n\n        <p class=\"tfg-custom-subtitle\">\n        We need some more information to prepare delivery of your furniture items to your address.\n        <br>\n        <br>\n        Please ensure sufficient space to receive the goods and keep in mind \n        that our couriers aren't able to hoist goods onto balconies.\n      </p>\n\n      </div>\n   \n      ${(0,_FurnitureForm__WEBPACK_IMPORTED_MODULE_0__[\"default\"])()}\n    </div>\n  `;\n  const showTVLicenseForm = `\n    <div id=\"tv-license-form\">\n      <hr>\n      <div class=\"bash--heading sub-heading heading-with-description\">\n        <h3>TV license information needed</h3>\n        <p class=\"tfg-custom-subtitle\">Please provide your ID number to validate your TV Licence.</p>\n      </div>\n      ${(0,_TVLicenseForm__WEBPACK_IMPORTED_MODULE_2__[\"default\"])()}\n    </div>\n  `;\n  const showRICAForm = `\n    <div id=\"rica-form\">\n      <hr>\n      <div class=\"bash--heading sub-heading heading-with-description\">\n        <h3>Rica information required</h3>\n        <p class=\"tfg-custom-subtitle\">\n          To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as\n          it appears on a valid proof of residence.\n        </p> \n      </div>\n        ${(0,_RICAForm__WEBPACK_IMPORTED_MODULE_1__[\"default\"])()}\n    </div>\n    `;\n  return `\n  <section class=\"bash--extra-fields bash--delivery-view\" data-section=\"select-address\">\n    ${hasFurn ? showFurnitureForm : ''}\n    ${hasTV ? showTVLicenseForm : ''}\n    ${hasSim ? showRICAForm : ''}\n  </section>`;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ExtraFieldsContainer);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/ExtraFieldsContainer.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/FurnitureForm.js":
-/*!***********************************************!*\
-  !*** ./src/partials/Deliver/FurnitureForm.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Elements_FormField__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Elements/FormField */ \"./src/partials/Deliver/Elements/FormField.js\");\n // import furnitureForm from './constants';\n\nconst furnitureForm = {\n  buildingType: [{\n    value: '',\n    label: 'Please select',\n    disabled: true\n  }, {\n    value: 'freeStanding',\n    label: 'Free standing'\n  }, {\n    value: 'houseInComplex',\n    label: 'House in complex'\n  }, {\n    value: 'townhouse',\n    label: 'Townhouse'\n  }, {\n    value: 'apartment',\n    label: 'Apartment'\n  }],\n  parkingDistance: [{\n    value: '',\n    label: 'Please select',\n    disabled: true\n  }, {\n    value: 15,\n    label: '15 meters or less'\n  }, {\n    value: 25,\n    label: '25 meters'\n  }, {\n    value: 50,\n    label: '50 meters'\n  }, {\n    value: 100,\n    label: '100 meters or more'\n  }],\n  deliveryFloor: [{\n    value: '',\n    label: 'Please select',\n    disabled: true\n  }, {\n    value: 'ground',\n    label: 'Ground'\n  }, {\n    value: '1',\n    label: '1'\n  }, {\n    value: '2',\n    label: '2'\n  }, {\n    value: '3+',\n    label: '3+'\n  }],\n  liftOrStairs: [{\n    value: '',\n    label: 'Please select',\n    disabled: true\n  }, {\n    value: 'lift',\n    label: 'Lift'\n  }, {\n    value: 'stairs',\n    label: 'Stairs'\n  }]\n};\n\nconst FurnitureForm = () => {\n  const {\n    buildingType,\n    parkingDistance,\n    deliveryFloor,\n    liftOrStairs\n  } = furnitureForm;\n  const fields = [{\n    name: 'buildingType',\n    label: 'Building Type',\n    required: true,\n    type: 'dropdown',\n    options: buildingType\n  }, {\n    name: 'parkingDistance',\n    label: 'Parking Distance',\n    required: true,\n    type: 'dropdown',\n    options: parkingDistance\n  }, {\n    name: 'deliveryFloor',\n    label: 'Delivery Floor',\n    required: true,\n    type: 'dropdown',\n    options: deliveryFloor\n  }, {\n    name: 'liftOrStairs',\n    label: 'Lift or Stairs',\n    required: false,\n    type: 'dropdown',\n    options: liftOrStairs\n  }, {\n    name: 'hasSufficientSpace',\n    label: 'Is there sufficent corner/passage door space?',\n    value: false,\n    type: 'checkbox',\n    checked: false\n  }, {\n    name: 'assembleFurniture',\n    label: 'Would you like us to assemble your furniture items?',\n    type: 'checkbox',\n    value: false,\n    checked: false\n  }];\n  const formFields = fields.map(field => (0,_Elements_FormField__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(field)).join('');\n  return `\n    ${formFields}\n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FurnitureForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/FurnitureForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/MixedProducts.js":
-/*!***********************************************!*\
-  !*** ./src/partials/Deliver/MixedProducts.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst MixedProducts = () => `\n  <div id=\"tfg-custom-mixed-msg\" class=\"tfg-custom-msg\">\n    <p class=\"tfg-custom-icon\"></p>\n    <p class=\"tfg-custom-text\">\n      We'll ship your furniture and other items in your cart to the selected address. \n      Only the furniture delivery fee will apply.\n      </p>\n  </div>\n`;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MixedProducts);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/MixedProducts.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/RICAForm.js":
-/*!******************************************!*\
-  !*** ./src/partials/Deliver/RICAForm.js ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Elements_FormField__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Elements/FormField */ \"./src/partials/Deliver/Elements/FormField.js\");\n/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ \"./src/partials/Deliver/utils.js\");\n\n\n\nconst RICAForm = () => {\n  const {\n    shippingData: {\n      selectedAddress\n    }\n  } = window.vtexjs.checkout.orderForm; // use rica_ prefix to ensure fields are unique\n\n  const fields = [{\n    name: 'rica_idOrPassport',\n    label: 'ID or Passport number',\n    required: true,\n    value: ''\n  }, {\n    name: 'rica_sameAddress',\n    label: 'Residential address the same as delivery address',\n    type: 'checkbox',\n    checked: true,\n    required: false\n  } // for rest of the fields check if\n  // same as residential address is checked?\n  // if checked prefill the fields otherwise don't\n  ];\n  const conditionalFields = [{\n    name: 'rica_fullName',\n    label: 'Full name and surname',\n    required: true,\n    value: (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getBestRecipient)() || ''\n  }, {\n    name: 'rica_streetAddress',\n    label: 'Street address',\n    required: true,\n    value: selectedAddress?.street || ''\n  }, {\n    name: 'rica_suburb',\n    label: 'Suburb',\n    value: selectedAddress?.neighborhood || ''\n  }, {\n    name: 'rica_city',\n    label: 'City',\n    required: true,\n    value: selectedAddress?.city || ''\n  }, {\n    name: 'rica_postalCode',\n    label: 'Postal code',\n    value: selectedAddress?.postalCode || '',\n    type: 'tel',\n    minlength: 4,\n    maxLength: 4\n  }, {\n    name: 'rica_province',\n    label: 'Province',\n    type: 'dropdown',\n    options: [{\n      value: '',\n      label: 'Select',\n      disabled: true\n    }, {\n      value: 'EC',\n      label: 'Eastern Cape'\n    }, {\n      value: 'FS',\n      label: 'Free State'\n    }, {\n      value: 'GP',\n      label: 'Gauteng'\n    }, {\n      value: 'KZN',\n      label: 'KwaZulu-Natal'\n    }, {\n      value: 'LP',\n      label: 'Limpopo'\n    }, {\n      value: 'MP',\n      label: 'Mpumalanga'\n    }, {\n      value: 'NC',\n      label: 'Northern Cape'\n    }, {\n      value: 'NW',\n      label: 'North West'\n    }, {\n      value: 'WC',\n      label: 'Western Cape'\n    }]\n  }, {\n    type: 'note',\n    required: false,\n    name: 'rica-country-display',\n    label: 'Country',\n    value: 'South Africa'\n  }, {\n    type: 'hidden',\n    required: true,\n    name: 'country',\n    value: 'ZAF'\n  }];\n  const formFields = fields.map(field => (0,_Elements_FormField__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(field)).join('');\n  const conditionalFormFields = conditionalFields.map(field => (0,_Elements_FormField__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(field)).join('');\n  return `\n    ${formFields}\n    <div class=\"rica-conditional-fields hide\">\n    ${conditionalFormFields}\n    </div>\n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (RICAForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/RICAForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/TVLicenseForm.js":
-/*!***********************************************!*\
-  !*** ./src/partials/Deliver/TVLicenseForm.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Elements_FormField__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Elements/FormField */ \"./src/partials/Deliver/Elements/FormField.js\");\n\n\nconst TVLicenseForm = () => {\n  // use tv_ prefix to ensure fields are unique\n  const field = {\n    name: 'tv_tvID',\n    label: 'SA ID number',\n    required: true,\n    value: ''\n  };\n  return `\n    ${(0,_Elements_FormField__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(field)}\n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TVLicenseForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/TVLicenseForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/TVorRICAMsg.js":
-/*!*********************************************!*\
-  !*** ./src/partials/Deliver/TVorRICAMsg.js ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst TVorRICAMsg = () => `\n  <div id=\"tfg-custom-tvrica-msg\" class=\"tfg-custom-msg\">\n    <p class=\"tfg-custom-icon\"></p>\n    <p class=\"tfg-custom-text\">\n      You can't collect this order in store because your cart contains items \n      which require either RICA or TV License validation.\n    </p>\n  </div>\n`;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TVorRICAMsg);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/TVorRICAMsg.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/constants.js":
-/*!*******************************************!*\
-  !*** ./src/partials/Deliver/constants.js ***!
-  \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"furnitureForm\": () => (/* binding */ furnitureForm),\n/* harmony export */   \"requiredAddressFields\": () => (/* binding */ requiredAddressFields),\n/* harmony export */   \"requiredFurnitureFields\": () => (/* binding */ requiredFurnitureFields),\n/* harmony export */   \"requiredRicaFields\": () => (/* binding */ requiredRicaFields),\n/* harmony export */   \"requiredTVFields\": () => (/* binding */ requiredTVFields),\n/* harmony export */   \"validAddressTypes\": () => (/* binding */ validAddressTypes)\n/* harmony export */ });\n/* eslint-disable import/prefer-default-export */\nconst furnitureForm = {\n  buildingType: [{\n    value: '',\n    label: 'Select'\n  }, {\n    value: 'freeStanding',\n    label: 'Free standing'\n  }, {\n    value: 'houseInComplex',\n    label: 'House in complex'\n  }, {\n    value: 'townhouse',\n    label: 'Townhouse'\n  }, {\n    value: 'apartment',\n    label: 'Apartment'\n  }],\n  parkingDistance: [{\n    value: 15,\n    label: 15\n  }, {\n    value: 25,\n    label: 25\n  }, {\n    value: 50,\n    label: 50\n  }, {\n    value: 100,\n    label: 100\n  }],\n  deliveryFloor: [{\n    value: 'ground',\n    label: 'Ground'\n  }, {\n    value: '1',\n    label: '1'\n  }, {\n    value: '2',\n    label: '2'\n  }, {\n    value: '3+',\n    label: '3+'\n  }],\n  liftOrStairs: [{\n    value: 'lift',\n    label: 'Lift'\n  }, {\n    value: 'stairs',\n    label: 'Stairs'\n  }]\n};\nconst requiredAddressFields = ['receiverName', 'complement', 'street', 'neighborhood', 'state', 'city', 'country', 'postalCode'];\nconst requiredFurnitureFields = ['buildingType', 'assembleFurniture', 'deliveryFloor', 'hasSufficientSpace', 'liftOrStairs', 'parkingDistance'];\nconst requiredRicaFields = ['idOrPassport', 'sameAddress', 'fullName', 'streetAddress', 'suburb', 'city', 'postalCode', 'province'];\nconst requiredTVFields = ['tvID'];\nconst validAddressTypes = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/constants.js?");
-
-/***/ }),
-
-/***/ "./src/partials/Deliver/utils.js":
-/*!***************************************!*\
-  !*** ./src/partials/Deliver/utils.js ***!
-  \***************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"addressIsValid\": () => (/* binding */ addressIsValid),\n/* harmony export */   \"clearRicaFields\": () => (/* binding */ clearRicaFields),\n/* harmony export */   \"customShippingDataIsValid\": () => (/* binding */ customShippingDataIsValid),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__),\n/* harmony export */   \"formatPhoneNumber\": () => (/* binding */ formatPhoneNumber),\n/* harmony export */   \"getBestRecipient\": () => (/* binding */ getBestRecipient),\n/* harmony export */   \"initGoogleAutocomplete\": () => (/* binding */ initGoogleAutocomplete),\n/* harmony export */   \"mapGoogleAddress\": () => (/* binding */ mapGoogleAddress),\n/* harmony export */   \"parseAttribute\": () => (/* binding */ parseAttribute),\n/* harmony export */   \"populateAddressForm\": () => (/* binding */ populateAddressForm),\n/* harmony export */   \"populateDeliveryError\": () => (/* binding */ populateDeliveryError),\n/* harmony export */   \"populateExtraFields\": () => (/* binding */ populateExtraFields),\n/* harmony export */   \"populateFurnitureFields\": () => (/* binding */ populateFurnitureFields),\n/* harmony export */   \"populateRicaFields\": () => (/* binding */ populateRicaFields),\n/* harmony export */   \"populateTVFields\": () => (/* binding */ populateTVFields),\n/* harmony export */   \"preparePhoneField\": () => (/* binding */ preparePhoneField),\n/* harmony export */   \"prependZero\": () => (/* binding */ prependZero),\n/* harmony export */   \"setAddress\": () => (/* binding */ setAddress),\n/* harmony export */   \"setCartClasses\": () => (/* binding */ setCartClasses),\n/* harmony export */   \"setDeliveryLoading\": () => (/* binding */ setDeliveryLoading),\n/* harmony export */   \"showAlertBox\": () => (/* binding */ showAlertBox),\n/* harmony export */   \"showHideLiftOrStairs\": () => (/* binding */ showHideLiftOrStairs),\n/* harmony export */   \"submitAddressForm\": () => (/* binding */ submitAddressForm),\n/* harmony export */   \"submitDeliveryForm\": () => (/* binding */ submitDeliveryForm),\n/* harmony export */   \"updateDeliveryFeeDisplay\": () => (/* binding */ updateDeliveryFeeDisplay)\n/* harmony export */ });\n/* harmony import */ var _utils_const__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/const */ \"./src/utils/const.js\");\n/* harmony import */ var _utils_functions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/functions */ \"./src/utils/functions.js\");\n/* harmony import */ var _utils_services__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/services */ \"./src/utils/services.js\");\n/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./constants */ \"./src/partials/Deliver/constants.js\");\n/* harmony import */ var _DeliveryError__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./DeliveryError */ \"./src/partials/Deliver/DeliveryError.js\");\n/* harmony import */ var _Elements_Alert__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Elements/Alert */ \"./src/partials/Deliver/Elements/Alert.js\");\n\n\n\n\n\n\nconst setDeliveryLoading = () => {\n  document.querySelector('.bash--delivery-container').classList.add('shimmer');\n};\nconst mapGoogleAddress = (addressComponents, geometry) => {\n  const streetNumber = addressComponents.find(item => item.types.includes('street_number'))?.long_name;\n  const street = addressComponents.find(item => item.types.includes('route'))?.long_name;\n  const neighborhood = addressComponents.find(item => item.types.includes('sublocality'))?.long_name;\n  const city = addressComponents.find(item => item.types.includes('locality'))?.long_name;\n  const postalCode = addressComponents.find(item => item.types.includes('postal_code'))?.long_name;\n  const state = addressComponents.find(item => item.types.includes('administrative_area_level_1'))?.long_name;\n  const coords = {\n    lat: '',\n    lng: ''\n  };\n\n  if (geometry) {\n    coords.lat = geometry.location.lat();\n    coords.lng = geometry.location.lng();\n  }\n\n  return {\n    street: `${streetNumber ?? ''} ${street ?? ''}`.trim(),\n    neighborhood,\n    city,\n    postalCode,\n    state,\n    ...coords\n  };\n};\n\nconst provinceShortCode = province => {\n  switch (province) {\n    case 'Select':\n      return '';\n\n    case 'Western Cape':\n      return 'WC';\n\n    case 'Easter Cape':\n      return 'EC';\n\n    case 'Gauteng':\n      return 'GP';\n\n    case 'KwaZulu-Natal':\n    case 'KwaZulu Natal':\n      return 'KZN';\n\n    case 'Northern Cape':\n      return 'NC';\n\n    case 'Limpopo':\n      return 'LP';\n\n    case 'Mpumalanga':\n      return 'MP';\n\n    case 'North West':\n      return 'NW';\n\n    case 'Freestate':\n    case 'Free State':\n      return 'FS';\n\n    default:\n      return province;\n  }\n};\n\nconst getBestRecipient = () => {\n  const receiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;\n  const firstName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;\n  const lastName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;\n  const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();\n  return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;\n};\n\nconst populateAddressFromSearch = address => {\n  const {\n    street,\n    neighborhood,\n    postalCode,\n    state,\n    city\n  } = address; // Clear any populated fields\n\n  document.getElementById('bash--address-form').reset(); // Clear hidden ID fields to prevent overwriting existing.\n\n  document.getElementById('bash--input-addressId').value = '';\n  document.getElementById('bash--input-addressName').value = '';\n  document.getElementById('bash--input-number').value = '  ';\n  document.getElementById('bash--input-street').value = street ?? '';\n  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';\n  document.getElementById('bash--input-city').value = city ?? '';\n  document.getElementById('bash--input-postalCode').value = postalCode ?? '';\n  document.getElementById('bash--input-state').value = provinceShortCode(state);\n};\n\nconst populateAddressForm = address => {\n  const {\n    street,\n    companyBuilding,\n    neighborhood,\n    postalCode,\n    state,\n    city,\n    receiverName,\n    complement,\n    id,\n    addressId,\n    addressName\n  } = address; // Clear any populated fields\n\n  document.getElementById('bash--address-form').reset(); // Only overwrite defaults if values exist.\n\n  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';\n  if (complement) document.getElementById('bash--input-complement').value = complement ?? ''; // addressId indicates that address is being edited / completed.\n\n  if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?\n\n  if (addressName) document.getElementById('bash--input-addressName').value = addressName;\n  document.getElementById('bash--input-number').value = '';\n  document.getElementById('bash--input-companyBuilding').value = companyBuilding ?? '';\n  document.getElementById('bash--input-street').value = street ?? '';\n  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';\n  document.getElementById('bash--input-city').value = city ?? '';\n  document.getElementById('bash--input-postalCode').value = postalCode ?? '';\n  document.getElementById('bash--input-state').value = provinceShortCode(state);\n  $(':invalid').trigger('change');\n};\nconst initGoogleAutocomplete = () => {\n  if (!window.google) return;\n  const input = document.getElementById('bash--input-address-search');\n  const autocomplete = new window.google.maps.places.Autocomplete(input, {\n    componentRestrictions: {\n      country: 'ZA'\n    }\n  });\n  window.google.maps.event.addListener(autocomplete, 'place_changed', () => {\n    const place = autocomplete.getPlace();\n    const {\n      address_components: addressComponents,\n      geometry\n    } = place;\n    const address = mapGoogleAddress(addressComponents, geometry); // Populate the form\n    // Set view to add-address\n\n    populateAddressFromSearch(address);\n    window.postMessage({\n      action: 'setDeliveryView',\n      view: 'address-form'\n    });\n    input.value = '';\n  });\n};\nconst parseAttribute = data => JSON.parse(decodeURIComponent(data));\nconst populateExtraFields = (address, fields, prefix = '', override = false) => {\n  if (!address) return;\n\n  for (let i = 0; i < fields.length; i++) {\n    const fieldId = `bash--input-${prefix}${fields[i]}`;\n\n    if (document.getElementById(fieldId) && (address[fields[i]] || override) && (!document.getElementById(fieldId).value || override)) {\n      document.getElementById(fieldId).value = address[fields[i]];\n    }\n  }\n\n  $(':invalid').trigger('change');\n};\nconst populateRicaFields = () => {\n  const {\n    address\n  } = window.vtexjs.checkout.orderForm.shippingData;\n  if (document.getElementById('bash--input-rica_streetAddress')?.value || !address) return;\n  address.fullName = getBestRecipient();\n  address.streetAddress = address.street;\n  address.suburb = address.neighborhood;\n  address.province = address.state;\n  populateExtraFields(address, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredRicaFields, 'rica_');\n  const data = (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.RICA_APP);\n  if (data.streetAddress) populateExtraFields(data, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredRicaFields, 'rica_', true);\n};\nconst clearRicaFields = () => {\n  const idOrPassport = $('#bash--input-rica_idOrPassport').val();\n  const clearedRica = {\n    idOrPassport: idOrPassport ?? '',\n    // TODO populate with users ID\n    fullName: '',\n    streetAddress: '',\n    suburb: '',\n    city: '',\n    postalCode: '',\n    province: ''\n  };\n  populateExtraFields(clearedRica, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredRicaFields, 'rica_', true);\n};\nconst showHideLiftOrStairs = floor => {\n  if (floor && floor !== 'ground') {\n    $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');\n    $('#bash--input-liftOrStairs').attr('required', 'required');\n  } else {\n    $('.bash--dropdownfield-liftOrStairs').slideUp();\n    $('#bash--input-liftOrStairs').removeAttr('required');\n  }\n};\nconst populateFurnitureFields = async () => {\n  const data = (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.FURNITURE_APP);\n  populateExtraFields(data, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredFurnitureFields);\n  showHideLiftOrStairs(data?.deliveryFloor);\n};\nconst populateTVFields = async () => {\n  const data = (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.TV_APP);\n  populateExtraFields(data, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredTVFields, 'tv');\n}; // Runs when you setAddress\n\nconst addressIsValid = (address, validateExtraFields = true) => {\n  const {\n    items\n  } = window.vtexjs.checkout.orderForm;\n  const {\n    hasFurniture,\n    hasTVs,\n    hasSimCards\n  } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.getSpecialCategories)(items);\n  let requiredFields = [];\n  const invalidFields = [];\n  requiredFields = [..._constants__WEBPACK_IMPORTED_MODULE_3__.requiredAddressFields];\n\n  if (hasFurniture && validateExtraFields) {\n    requiredFields = [...requiredFields, ..._constants__WEBPACK_IMPORTED_MODULE_3__.requiredFurnitureFields];\n  }\n\n  if (hasTVs && validateExtraFields) {\n    requiredFields = [...requiredFields, ..._constants__WEBPACK_IMPORTED_MODULE_3__.requiredTVFields];\n  }\n\n  if (hasSimCards && validateExtraFields) {\n    requiredFields = [...requiredFields, ..._constants__WEBPACK_IMPORTED_MODULE_3__.requiredRicaFields];\n  }\n\n  for (let i = 0; i < requiredFields.length; i++) {\n    if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);\n  }\n\n  return {\n    isValid: !invalidFields.length,\n    invalidFields\n  };\n};\nconst setCartClasses = () => {\n  const {\n    items\n  } = window.vtexjs.checkout.orderForm;\n  const {\n    hasFurniture,\n    hasTVs,\n    hasSimCards,\n    hasFurnitureMixed\n  } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.getSpecialCategories)(items);\n  const $container = '#shipping-data';\n\n  if (hasFurniture) {\n    $(`${$container}:not(.has-furniture)`).addClass('has-furniture');\n  } else {\n    $(`${$container}.has-furniture`).removeClass('has-furniture');\n  }\n\n  if (hasTVs) {\n    $(`${$container}:not(.has-tv)`).addClass('has-tv');\n  } else {\n    $(`${$container}.has-tv`).removeClass('has-tv');\n  }\n\n  if (hasSimCards) {\n    $(`${$container}:not(.has-rica)`).addClass('has-rica');\n  } else {\n    $(`${$container}.has-rica`).removeClass('has-rica');\n  }\n\n  if (hasFurnitureMixed) {\n    $(`${$container}:not(.has-furniture-mixed)`).addClass('has-furniture-mixed');\n  } else {\n    $(`${$container}.has-furniture-mixed`).removeClass('has-furniture-mixed');\n  }\n};\nconst updateDeliveryFeeDisplay = () => {\n  if (!window.vtexjs.checkout.orderForm.totalizers) return;\n  const {\n    value: shippingFee\n  } = window.vtexjs.checkout.orderForm.totalizers.find(item => item.id === 'Shipping') || {\n    value: 5000\n  };\n  let feeText = 'Free';\n  if (shippingFee > 0) feeText = `R${(shippingFee / 100).toFixed(2).replace('.00', '')}`;\n\n  if ($('#bash--delivery-fee').length > 0) {\n    document.getElementById('bash--delivery-fee').innerHTML = feeText;\n  }\n};\nconst customShippingDataIsValid = () => {\n  const items = window.vtexjs.checkout.orderForm?.items;\n  const {\n    hasTVs,\n    hasSimCards,\n    hasFurniture\n  } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.getSpecialCategories)(items);\n  let valid = true;\n\n  if (hasTVs) {\n    const data = (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.TV_APP);\n    if (!data.tvID) valid = false;\n  }\n\n  if (hasSimCards) {\n    const data = (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.RICA_APP);\n    if (!data.idOrPassport || !data.streetAddress || !data.postalCode) valid = false;\n  }\n\n  if (hasFurniture) {\n    const data = (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.FURNITURE_APP);\n    if (!data.buildingType || !data.parkingDistance || !data.deliveryFloor) valid = false;\n  }\n\n  return valid;\n};\nconst populateDeliveryError = (errors = []) => {\n  if ($('#bash-delivery-error-container').length < 1) return;\n  const errorsHtml = errors.length > 0 ? errors.map(error => (0,_DeliveryError__WEBPACK_IMPORTED_MODULE_4__.DeliveryError)(error)) : '';\n  $('#bash-delivery-error-container').html(errorsHtml);\n  if (errors.length > 0) $('html, body').animate({\n    scrollTop: $('#bash-delivery-error-container').offset().top\n  }, 400);\n}; // TODO move somewhere else?\n\nconst setAddress = (address, options = {\n  validateExtraFields: true\n}) => {\n  const {\n    validateExtraFields\n  } = options;\n  const {\n    items\n  } = window.vtexjs.checkout.orderForm;\n  const {\n    hasFurniture,\n    hasTVs,\n    hasSimCards\n  } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.getSpecialCategories)(items);\n\n  if (hasFurniture) {\n    populateExtraFields(address, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredFurnitureFields);\n    showHideLiftOrStairs(address.deliveryFloor);\n  }\n\n  if (hasTVs) populateExtraFields(address, _constants__WEBPACK_IMPORTED_MODULE_3__.requiredTVFields, 'tv_');\n  if (hasSimCards) populateRicaFields();\n  const {\n    isValid,\n    invalidFields\n  } = addressIsValid(address, validateExtraFields);\n\n  if (!isValid) {\n    populateAddressForm(address);\n    $('#bash--address-form').addClass('show-form-errors');\n    if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');\n    $(`#bash--input-${invalidFields[0]}`).focus();\n\n    if (_constants__WEBPACK_IMPORTED_MODULE_3__.requiredAddressFields.includes(invalidFields[0])) {\n      window.postMessage({\n        action: 'setDeliveryView',\n        view: 'address-edit'\n      });\n    }\n\n    return {\n      success: false,\n      error: 'Invalid address details.'\n    };\n  } // Fix bad addressType.\n\n\n  if (address.addressType === 'business') address.addressType = 'commercial';\n  if (!_constants__WEBPACK_IMPORTED_MODULE_3__.validAddressTypes.includes(address.addressType)) address.addressType = 'residential';\n  const {\n    shippingData\n  } = window?.vtexjs?.checkout?.orderForm;\n  shippingData.address = address;\n  shippingData.address.number = shippingData.address.number ?? ' ';\n  shippingData.selectedAddresses = [address]; // Start Shimmering\n\n  setDeliveryLoading();\n  return window.vtexjs.checkout.sendAttachment('shippingData', shippingData).then(orderForm => {\n    const {\n      messages\n    } = orderForm;\n    const errors = messages.filter(msg => msg.status === 'error');\n\n    if (errors.length > 0) {\n      populateDeliveryError(errors);\n      window.postMessage({\n        action: 'setDeliveryView',\n        view: 'address-form'\n      });\n      return {\n        success: false,\n        errors\n      };\n    }\n\n    if (address.addressName) (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.updateAddressListing)(shippingData.address);\n    return {\n      success: true\n    };\n  }).done(() => (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.clearLoaders)());\n};\nconst showAlertBox = () => {\n  $('.alert-container').addClass('show');\n  $('.alert-container').slideDown();\n  const alertText = $('[data-view=\"address-form\"]').length > 0 ? 'Address added' : 'Address updated';\n  $('#bash-alert-container').html((0,_Elements_Alert__WEBPACK_IMPORTED_MODULE_5__.Alert)({\n    text: alertText\n  })); // After 5 seconds, remove the element\n\n  setTimeout(() => {\n    $('.alert-container').slideUp();\n  }, 5000);\n};\nconst submitAddressForm = async event => {\n  event.preventDefault(); // Prevent false positive for invalid selects.\n\n  $('select').change();\n  const form = document.forms['bash--address-form'];\n  const addressName = $('#bash--input-addressName').val();\n  const storedAddress = await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getAddressByName)(addressName);\n  const fields = ['addressId', 'addressName', 'addressType', 'receiverName', 'postalCode', 'city', 'state', 'country', 'street', 'neighborhood', 'complement', 'companyBuilding'];\n  const address = {\n    isDisposable: false,\n    reference: null,\n    geoCoordinates: [],\n    number: '',\n    country: 'ZAF',\n    ...storedAddress\n  };\n\n  for (let f = 0; f < fields.length; f++) {\n    address[fields[f]] = form[fields[f]]?.value || null;\n  }\n\n  address.addressName = address.addressName || address.addressId;\n  address.addressId = address.addressId || address.addressName;\n  const {\n    isValid,\n    invalidFields\n  } = addressIsValid(address, false);\n\n  if (!isValid) {\n    console.error({\n      invalidFields\n    });\n    $('#bash--address-form').addClass('show-form-errors');\n    $(`#bash--input-${invalidFields[0]}`).focus();\n\n    if (_constants__WEBPACK_IMPORTED_MODULE_3__.requiredAddressFields.includes(invalidFields[0])) {\n      window.postMessage({\n        action: 'setDeliveryView',\n        view: 'address-form'\n      });\n    }\n\n    return;\n  } // Apply the selected address to customers orderForm.\n\n\n  const setAddressResponse = await setAddress(address, {\n    validateExtraFields: false\n  });\n  const {\n    success\n  } = setAddressResponse;\n\n  if (!success) {\n    console.error('Set address error', {\n      setAddressResponse\n    });\n    return;\n  } // Update the localstore, and the API\n\n\n  await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.addOrUpdateAddress)(address);\n  window.postMessage({\n    action: 'setDeliveryView',\n    view: 'select-address'\n  });\n  showAlertBox();\n};\nconst submitDeliveryForm = async event => {\n  event.preventDefault();\n  const {\n    items\n  } = window.vtexjs.checkout.orderForm;\n  const {\n    address\n  } = window.vtexjs.checkout.orderForm.shippingData;\n  const {\n    hasFurniture,\n    hasTVs,\n    hasSimCards\n  } = (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.getSpecialCategories)(items); // Prevent false positive validation errors for invalid selects.\n\n  $('select').change();\n  let fullAddress = {};\n  const selectedAddressRadio = \"[name='selected-address']:checked\"; // Prevent sending without having selected an address.\n\n  if ($(selectedAddressRadio).length < 1) {\n    $('html, body').animate({\n      scrollTop: $('#bash--delivery-form').offset().top\n    }, 400);\n    return;\n  }\n\n  setDeliveryLoading();\n  const dbAddress = await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.getAddressByName)($(selectedAddressRadio).val());\n  fullAddress = { ...address,\n    ...dbAddress\n  }; // Final check to validate that the selected address has no validation errors.\n\n  const {\n    success: didSetAddress\n  } = await setAddress(fullAddress, {\n    validateExtraFields: false\n  });\n\n  if (!didSetAddress) {\n    console.error('Delivery Form - Address Validation error');\n    (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.clearLoaders)();\n    return;\n  }\n\n  const furnitureData = {};\n  const ricaData = {};\n  const tvData = {};\n\n  if (hasFurniture) {\n    const fields = _constants__WEBPACK_IMPORTED_MODULE_3__.requiredFurnitureFields;\n\n    for (let i = 0; i < fields.length; i++) {\n      if (fields[i] === 'hasSufficientSpace' || fields[i] === 'assembleFurniture') {\n        const fieldValue = $(`#bash--input-${fields[i]}`).is(':checked');\n        $(`#bash--input-${fields[i]}`).val(fieldValue);\n        furnitureData[fields[i]] = fieldValue;\n      } // check business/residential for the normal address\n\n\n      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();\n      furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val();\n    }\n\n    const furnitureDataSent = await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.sendOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.FURNITURE_APP, furnitureData, true, false);\n    console.info({\n      furnitureDataSent\n    });\n  } // Not saved to address profile.\n\n\n  if (hasSimCards) {\n    const fields = _constants__WEBPACK_IMPORTED_MODULE_3__.requiredRicaFields;\n\n    for (let i = 0; i < fields.length; i++) {\n      if (fields[i] === 'sameAddress') {\n        const isFieldChecked = $(`#bash--input-${fields[i]}`).is(':checked');\n        console.log('isFieldChecked', isFieldChecked);\n        ricaData[fields[i]] = isFieldChecked;\n      }\n\n      ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val();\n    }\n\n    const ricaDataSent = await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.sendOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.RICA_APP, ricaData, false, true);\n    console.info({\n      ricaDataSent\n    });\n  }\n\n  if (hasTVs) {\n    const fields = _constants__WEBPACK_IMPORTED_MODULE_3__.requiredTVFields;\n\n    for (let i = 0; i < fields.length; i++) {\n      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();\n      tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();\n    }\n\n    const tvDataSent = await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.sendOrderFormCustomData)(_utils_const__WEBPACK_IMPORTED_MODULE_0__.TV_APP, tvData);\n    console.info({\n      tvDataSent\n    });\n  }\n\n  await (0,_utils_services__WEBPACK_IMPORTED_MODULE_2__.addOrUpdateAddress)(fullAddress); // after submitting hide the delivery container\n\n  $('.bash--delivery-container').css('display', 'none');\n  window.location.hash = _utils_const__WEBPACK_IMPORTED_MODULE_0__.STEPS.PAYMENT;\n  (0,_utils_functions__WEBPACK_IMPORTED_MODULE_1__.clearLoaders)();\n}; // some presaved addresses still have a missing zero,\n// this adds a zero to the phone number, if it's not there.\n\nconst prependZero = tel => {\n  let phoneNumber = tel.replace(/\\s/g, '');\n\n  if (phoneNumber.length === 9 && phoneNumber[0] !== '0') {\n    phoneNumber = `0${phoneNumber}`;\n  }\n\n  return phoneNumber;\n}; // add spaces between 3rd and 6th digit\n\nconst formatPhoneNumber = value => [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');\n/**\n * formattedPhoneNumber\n * Add spaces to help guide the user how the number should look.\n * Adds space after 3rd and 6th digits only.\n * xxx xxx xxxxxxxxx\n * @param value - string value\n * @returns string\n */\n\nconst formattedPhoneNumber = (value, isBackSpace) => {\n  value = value.replace(/[^0-9+*#]+/g, '').trim(); // Eg. 072 123 4567\n\n  if (value[0] === '0') {\n    if (value.length >= 6) {\n      // 'xxx xxx *'\n      const newValue = [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');\n      return isBackSpace ? newValue.trim() : newValue;\n    } // 'xxx *'\n\n\n    if (value.length >= 3) {\n      const newValue = [value.slice(0, 3), value.slice(3)].join(' ');\n      return isBackSpace ? newValue.trim() : newValue;\n    } // Eg. 72 123 4567\n\n  } else {\n    if (value.length >= 5) {\n      // 'xx xxx *'\n      const newValue = [value.slice(0, 2), value.slice(2, 5), value.slice(5)].join(' ');\n      return isBackSpace ? newValue.trim() : newValue;\n    } // 'xx *'\n\n\n    if (value.length >= 2) {\n      const newValue = [value.slice(0, 2), value.slice(2)].join(' ');\n      return isBackSpace ? newValue.trim() : newValue;\n    }\n  }\n\n  if (isBackSpace) return value.trim();\n  return value;\n};\n/**\n * preparePhoneField\n * When phone fields are loaded onto the DOM\n * Prepare them for proper display and validation.\n *\n * @param  input - string css selector to the element.\n */\n\n\nconst preparePhoneField = input => {\n  const phoneInput = document.querySelector(input);\n  if (!phoneInput) return;\n  phoneInput.setAttribute('maxlength', 12);\n  phoneInput.value = formattedPhoneNumber(phoneInput.value);\n  $(document).off('keyup', input); // preventbubble\n\n  $(document).on('keyup', input, function (e) {\n    const $phoneInput = $(this);\n    const value = $phoneInput.val().replace(/[^0-9+*#]+/g, '');\n    const isBackSpace = e.keyCode === 8;\n    const displayValue = formattedPhoneNumber(value, isBackSpace);\n    $phoneInput.parent('.text').removeClass('error');\n    $phoneInput.parent('.text').find('span.error').hide();\n    $phoneInput.val(displayValue);\n  });\n};\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (mapGoogleAddress);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/Deliver/utils.js?");
-
-/***/ }),
-
-/***/ "./src/partials/FurnitureForm.js":
-/*!***************************************!*\
-  !*** ./src/partials/FurnitureForm.js ***!
-  \***************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst furnitureForm = {\n  buildingType: ['Free standing', 'House in complex', 'Townhouse', 'Apartment'],\n  parkingDistance: [15, 25, 50, 100],\n  deliveryFloor: ['Ground', '1', '2', '3+'],\n  liftOrStairs: ['Lift', 'Stairs']\n};\n\nconst FurnitureForm = () => {\n  const {\n    buildingType,\n    parkingDistance,\n    deliveryFloor,\n    liftOrStairs\n  } = furnitureForm; // Building type selector\n\n  let buildingTypeInput = `\n    <p class=\"input tfg-custom-input tfg-building-type\">\n      <label>Building type</label>\n      <select class=\"input-xlarge tfg-custom-selector\" id=\"tfg-building-type\">\n        <option disabled selected value=\"\">Please select</option>\n    `;\n  buildingType.forEach(value => {\n    buildingTypeInput += `<option value=\"${value}\">${value}</option>`;\n  });\n  buildingTypeInput += `\n      </select>\n    </p>\n    `; // Parking selector\n\n  let parkingDistanceInput = `\n  <p class=\"input tfg-custom-input tfg-parking-distance\">\n    <label>Distance to parking</label>\n    <select class=\"input-xlarge tfg-custom-selector\" id=\"tfg-parking-distance\">\n      <option disabled selected value=\"\">Please select</option>\n  `;\n  parkingDistance.forEach(value => {\n    parkingDistanceInput += `<option value=\"${value}\">${value}</option>`;\n  });\n  parkingDistanceInput += `\n    </select>\n  </p>\n  `; // Delivery floor selector\n\n  let deliveryFloorInput = `\n  <p class=\"input tfg-custom-input tfg-delivery-floor\">\n    <label>Delivery floor</label>\n    <select class=\"input-xlarge tfg-custom-selector\" id=\"tfg-delivery-floor\">\n      <option disabled selected value=\"\">Please select</option>\n  `;\n  deliveryFloor.forEach(value => {\n    deliveryFloorInput += `<option value=\"${value}\">${value}</option>`;\n  });\n  deliveryFloorInput += `\n    </select>\n  </p>\n  `; // Lift/Stairs selector\n\n  let liftOrStairsInput = `\n  <p class=\"input tfg-custom-input tfg-lift-stairs\">\n    <label>Lift or stairs</label>\n    <select class=\"input-xlarge tfg-custom-selector\" id=\"tfg-lift-stairs\">\n      <option disabled selected value=\"\">Please select</option>\n  `;\n  liftOrStairs.forEach(value => {\n    liftOrStairsInput += `<option value=\"${value}\">${value}</option>`;\n  });\n  liftOrStairsInput += `\n    </select>\n  </p>\n  `; // Complete Form\n\n  return `\n    <div id=\"tfg-custom-furniture-step\" class=\"tfg-custom-step\">\n      <p class=\"tfg-custom-title\">Furniture information needed</p>\n      <p class=\"tfg-custom-subtitle\">\n        We need some more information to prepare delivery of your furniture items to your address.\n      </p>\n      ${buildingTypeInput}\n      ${parkingDistanceInput}\n      ${deliveryFloorInput}\n      ${liftOrStairsInput}\n      <p class=\"tfg-custom-checkbox\">\n        <label class=\"tfg-checkbox-label\">\n          <input type='checkbox' id=\"tfg-sufficient-space\"/>\n          <span class=\"tfg-checkbox-text\">Is there sufficent corner/passage door space?</span>\n        </label>\n      </p>\n      <p class=\"tfg-custom-checkbox\">\n        <label class=\"tfg-checkbox-label\">\n          <input type='checkbox' id=\"tfg-assemble-furniture\"/>\n          <span class=\"tfg-checkbox-text\">Would you like us to assemble your furniture items?</span>\n        </label>\n      </p>\n    </div>\n  `;\n};\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FurnitureForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/FurnitureForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/InputError.js":
-/*!************************************!*\
-  !*** ./src/partials/InputError.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst InputError = () => '<span class=\"help error\">This field is required.</span>';\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (InputError);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/InputError.js?");
-
-/***/ }),
-
-/***/ "./src/partials/RICAForm.js":
-/*!**********************************!*\
-  !*** ./src/partials/RICAForm.js ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst RICAForm = () => `\n  <div id=\"tfg-custom-rica-msg\" class=\"tfg-custom-step\">\n    <p class=\"tfg-custom-title\">RICA information required</p>\n    <p class=\"tfg-custom-subtitle\">\n      To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as\n      it appears on a valid proof of residence.\n    </p>\n    <p class=\"input tfg-custom-input tfg-rica-id-passport\">\n      <label>ID or passport number</label>\n      <input id=\"tfg-rica-id-passport\" type=\"text\" class=\"input-xlarge tfg-input\">\n    </p>\n    <label class=\"tfg-mtop10\">Proof of residential address</label>\n    <p class=\"tfg-custom-checkbox\">\n      <label class=\"tfg-checkbox-label\">\n        <input type='checkbox' id=\"tfg-rica-same-address\" checked/>\n        <span class=\"tfg-checkbox-text\">Residential address the same as Delivery address</span>\n      </label>\n    </p>\n    <p class=\"input tfg-custom-input tfg-rica-fullname\">\n      <label>Full name and surname</label>\n      <input id=\"tfg-rica-fullname\" type=\"text\" class=\"input-xlarge tfg-input rica-field\">\n    </p>\n    <p class=\"input tfg-custom-input tfg-rica-street\">\n      <label>Street address</label>\n      <input id=\"tfg-rica-street\" type=\"text\" class=\"input-xlarge tfg-input rica-field\">\n    </p>\n    <p class=\"input tfg-custom-input tfg-rica-suburb\">\n      <label>Suburb</label>\n      <input id=\"tfg-rica-suburb\" type=\"text\" class=\"input-xlarge tfg-input rica-field\">\n    </p>\n    <p class=\"input tfg-custom-input tfg-rica-city\">\n      <label>City</label>\n      <input id=\"tfg-rica-city\" type=\"text\" class=\"input-xlarge tfg-input rica-field\">\n    </p>\n    <p class=\"input tfg-custom-input tfg-rica-postal-code\">\n      <label>Postal code</label>\n      <input id=\"tfg-rica-postal-code\" type=\"text\" class=\"input-xlarge tfg-input rica-field\">\n    </p>\n    <p class=\"input tfg-rica-province tfg-custom-input\">\n      <label>Province</label>\n      <select class=\"input-xlarge tfg-custom-selector rica-field\" id=\"tfg-rica-province\">\n        <option value=\"\" disabled selected>State</option>\n        <option value=\"EC\">Eastern Cape</option>\n        <option value=\"FS\">Free State</option>\n        <option value=\"GP\">Gauteng</option>\n        <option value=\"KZN\">KwaZulu-Natal</option>\n        <option value=\"LP\">Limpopo</option>\n        <option value=\"MP\">Mpumalanga</option>\n        <option value=\"NC\">Northern Cape</option>\n        <option value=\"NW\">North West</option>\n        <option value=\"WC\">Western Cape</option>\n      </select>\n    </p>\n    <p class=\"input tfg-rica-country tfg-custom-input\">\n      <label>Country</label>\n      <select class=\"input-xlarge tfg-custom-selector\" id=\"tfg-rica-country\" disabled>\n        <option value=\"ZAF\" selected>South Africa</option>\n      </select>\n    </p>\n  </div>\n`;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (RICAForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/RICAForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/TVIDForm.js":
-/*!**********************************!*\
-  !*** ./src/partials/TVIDForm.js ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nconst TVIDForm = () => `\n    <div id=\"tfg-custom-tvid-step\" class=\"tfg-custom-step\">\n        <p class=\"tfg-custom-title\">TV licence required</p>\n        <p class=\"tfg-custom-subtitle\">Please provide your ID number to validate your TV Licence.</p>\n        <p class=\"input tfg-custom-input tfg-tv-licence\">\n            <label>SA ID number</label>\n            <input id=\"tfg-tv-licence\" type=\"tel\" class=\"input-xlarge tfg-input\">\n        </p>\n    </div>\n`;\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TVIDForm);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/TVIDForm.js?");
-
-/***/ }),
-
-/***/ "./src/partials/index.js":
-/*!*******************************!*\
-  !*** ./src/partials/index.js ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"AddressForm\": () => (/* reexport safe */ _AddressForm__WEBPACK_IMPORTED_MODULE_0__[\"default\"]),\n/* harmony export */   \"AlertBox\": () => (/* reexport safe */ _AlertBox__WEBPACK_IMPORTED_MODULE_1__[\"default\"]),\n/* harmony export */   \"FurnitureForm\": () => (/* reexport safe */ _FurnitureForm__WEBPACK_IMPORTED_MODULE_4__[\"default\"]),\n/* harmony export */   \"InputError\": () => (/* reexport safe */ _InputError__WEBPACK_IMPORTED_MODULE_5__[\"default\"]),\n/* harmony export */   \"MixedProducts\": () => (/* reexport safe */ _Deliver_MixedProducts__WEBPACK_IMPORTED_MODULE_2__[\"default\"]),\n/* harmony export */   \"PickupComplementField\": () => (/* reexport safe */ _AddressForm__WEBPACK_IMPORTED_MODULE_0__.PickupComplementField),\n/* harmony export */   \"RICAForm\": () => (/* reexport safe */ _RICAForm__WEBPACK_IMPORTED_MODULE_6__[\"default\"]),\n/* harmony export */   \"SuburbField\": () => (/* reexport safe */ _AddressForm__WEBPACK_IMPORTED_MODULE_0__.SuburbField),\n/* harmony export */   \"TVIDForm\": () => (/* reexport safe */ _TVIDForm__WEBPACK_IMPORTED_MODULE_7__[\"default\"]),\n/* harmony export */   \"TVorRICAMsg\": () => (/* reexport safe */ _Deliver_TVorRICAMsg__WEBPACK_IMPORTED_MODULE_3__[\"default\"])\n/* harmony export */ });\n/* harmony import */ var _AddressForm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AddressForm */ \"./src/partials/AddressForm.js\");\n/* harmony import */ var _AlertBox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AlertBox */ \"./src/partials/AlertBox.js\");\n/* harmony import */ var _Deliver_MixedProducts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Deliver/MixedProducts */ \"./src/partials/Deliver/MixedProducts.js\");\n/* harmony import */ var _Deliver_TVorRICAMsg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Deliver/TVorRICAMsg */ \"./src/partials/Deliver/TVorRICAMsg.js\");\n/* harmony import */ var _FurnitureForm__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FurnitureForm */ \"./src/partials/FurnitureForm.js\");\n/* harmony import */ var _InputError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./InputError */ \"./src/partials/InputError.js\");\n/* harmony import */ var _RICAForm__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./RICAForm */ \"./src/partials/RICAForm.js\");\n/* harmony import */ var _TVIDForm__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./TVIDForm */ \"./src/partials/TVIDForm.js\");\n\n\n\n\n\n\n\n\n\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/partials/index.js?");
-
-/***/ }),
-
-/***/ "./src/utils/checkoutDB.js":
-/*!*********************************!*\
-  !*** ./src/utils/checkoutDB.js ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nclass CheckoutDB {\n  constructor() {\n    this.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB || window.shimIndexedDB;\n    this.checkoutDB = indexedDB.open('checkoutDB', 1.2);\n\n    this.checkoutDB.onerror = event => {\n      console.error('CheckoutDB Error', {\n        event\n      });\n      throw new Error('Could not load checkoutDB');\n    };\n\n    this.checkoutDB.onupgradeneeded = () => {\n      const db = this.checkoutDB.result;\n      const store = db.createObjectStore('addresses', {\n        keyPath: 'addressName'\n      });\n      store.createIndex('address_street', ['street'], {\n        unique: false\n      });\n      store.createIndex('address_addressName', ['addressName'], {\n        unique: true\n      });\n      store.createIndex('address_street_suburb_city_postal', ['street', 'neighborhood', 'city', 'postalCode'], {\n        unique: true\n      });\n    };\n\n    this.checkoutDB.onsuccess = () => {\n      const db = this.checkoutDB.result;\n      const transaction = db.transaction('addresses', 'readwrite');\n      this.addresses = transaction.objectStore('addresses'); // Close DB connection\n\n      transaction.oncomplete = () => {// db.close();\n      };\n    };\n  }\n\n  store() {\n    const db = this.checkoutDB.result;\n    const transaction = db.transaction('addresses', 'readwrite');\n    return transaction.objectStore('addresses');\n  }\n\n  loadAddresses(addresses) {\n    const queries = addresses.map(address => this.addOrUpdateAddress(address));\n    return Promise.all(queries).then(values => values);\n  }\n\n  addOrUpdateAddress(address) {\n    const thisDb = this;\n    return new Promise((resolve, reject) => {\n      const query = thisDb.store().put(address);\n\n      query.onsuccess = () => {\n        resolve({\n          success: true,\n          addressId: query.result\n        });\n      };\n\n      query.onerror = error => {\n        reject(new Error({\n          sucess: false,\n          error: error?.target?.error\n        }));\n      };\n    });\n  }\n\n  getAddresses() {\n    const thisDb = this;\n    return new Promise(resolve => {\n      const query = thisDb.store().getAll();\n\n      query.onsuccess = () => resolve(query.result);\n\n      query.onerror = () => {\n        console.error('Something wrong with getAddresses ? ...');\n        resolve([]);\n      };\n    });\n  }\n\n  getAddress(id) {\n    const thisDb = this;\n    return new Promise(resolve => {\n      const query = thisDb.store().get(id);\n\n      query.onsuccess = () => resolve(query.result);\n\n      query.onerror = () => {\n        console.error('Something wrong with getAddress ? ...');\n        resolve([]);\n      };\n    });\n  }\n\n  deleteAddress(id) {\n    const query = this.addresses.delete(id);\n\n    query.onsuccess = () => query.result;\n  }\n\n  clearData() {\n    const thisDb = this;\n    return new Promise(resolve => {\n      const query = thisDb.store().clear();\n\n      query.onsuccess = () => resolve(query.result);\n\n      query.onerror = () => {\n        console.error('Something wrong with clearData ? ...');\n        resolve([]);\n      };\n    });\n  }\n\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CheckoutDB);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/utils/checkoutDB.js?");
-
-/***/ }),
-
-/***/ "./src/utils/const.js":
-/*!****************************!*\
-  !*** ./src/utils/const.js ***!
-  \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"AD_TYPE\": () => (/* binding */ AD_TYPE),\n/* harmony export */   \"BASE_URL_API\": () => (/* binding */ BASE_URL_API),\n/* harmony export */   \"COUNTRIES\": () => (/* binding */ COUNTRIES),\n/* harmony export */   \"COUNTRIES_AVAILABLES\": () => (/* binding */ COUNTRIES_AVAILABLES),\n/* harmony export */   \"FURNITURE_APP\": () => (/* binding */ FURNITURE_APP),\n/* harmony export */   \"FURNITURE_CAT\": () => (/* binding */ FURNITURE_CAT),\n/* harmony export */   \"FURNITURE_FEES\": () => (/* binding */ FURNITURE_FEES),\n/* harmony export */   \"FURNITURE_FEE_LINK\": () => (/* binding */ FURNITURE_FEE_LINK),\n/* harmony export */   \"RICA_APP\": () => (/* binding */ RICA_APP),\n/* harmony export */   \"SIM_CAT\": () => (/* binding */ SIM_CAT),\n/* harmony export */   \"STEPS\": () => (/* binding */ STEPS),\n/* harmony export */   \"TIMEOUT_500\": () => (/* binding */ TIMEOUT_500),\n/* harmony export */   \"TIMEOUT_750\": () => (/* binding */ TIMEOUT_750),\n/* harmony export */   \"TV_APP\": () => (/* binding */ TV_APP),\n/* harmony export */   \"TV_CAT\": () => (/* binding */ TV_CAT)\n/* harmony export */ });\n// Checkout steps\nconst STEPS = {\n  CART: '#/cart',\n  PROFILE: '#/profile',\n  SHIPPING: '#/shipping',\n  PAYMENT: '#/payment'\n}; // Address types\n\nconst AD_TYPE = {\n  PICKUP: 'search',\n  DELIVERY: 'residential'\n}; // TIMEOUT\n\nconst TIMEOUT_500 = 500;\nconst TIMEOUT_750 = 750; // APP CONFIGURATION IDs\n\nconst RICA_APP = 'ricafields';\nconst TV_APP = 'tvfields';\nconst FURNITURE_APP = 'furniturefields'; // Furniture fees Url\n\nconst FURNITURE_FEES = 'http://image.tfgmedia.co.za/image/1/process/500x790?source=http://cdn.tfgmedia.co.za' + '/15/Marketing/HTMLPages/Furniture_Delivery_Fees_tab_image.jpg';\nconst COUNTRIES = {\n  za: {\n    code: 'za',\n    phonePlaceholder: '(+27)'\n  } // South Africa\n\n};\nconst COUNTRIES_AVAILABLES = [COUNTRIES.za.code];\nconst BASE_URL_API = window.location.host.includes('bash.com') ? 'https://store-api.www.bash.com/custom-api/' : `${window.location.protocol}//${window.location.host}/custom-api/`;\nconst FURNITURE_FEE_LINK = `\n<a \n  href=\"${FURNITURE_FEES}\"\n  class=\"furniture-fees-link\" \n  target=\"_blank\"\n>\n  Furniture delivery costs\n</a>\n`;\nconst FURNITURE_CAT = '1169288799';\nconst TV_CAT = '938942995';\nconst SIM_CAT = '24833302';\n\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/utils/const.js?");
-
-/***/ }),
-
-/***/ "./src/utils/functions.js":
-/*!********************************!*\
-  !*** ./src/utils/functions.js ***!
-  \********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"addBorderTop\": () => (/* binding */ addBorderTop),\n/* harmony export */   \"checkoutGetCustomData\": () => (/* binding */ checkoutGetCustomData),\n/* harmony export */   \"checkoutSendCustomData\": () => (/* binding */ checkoutSendCustomData),\n/* harmony export */   \"clearLoaders\": () => (/* binding */ clearLoaders),\n/* harmony export */   \"getShippingData\": () => (/* binding */ getShippingData),\n/* harmony export */   \"getSpecialCategories\": () => (/* binding */ getSpecialCategories),\n/* harmony export */   \"isOnPromotion\": () => (/* binding */ isOnPromotion),\n/* harmony export */   \"isValidNumberBash\": () => (/* binding */ isValidNumberBash),\n/* harmony export */   \"saveAddress\": () => (/* binding */ saveAddress),\n/* harmony export */   \"setMasterdataFields\": () => (/* binding */ setMasterdataFields),\n/* harmony export */   \"setRicaFields\": () => (/* binding */ setRicaFields),\n/* harmony export */   \"waitAndResetLocalStorage\": () => (/* binding */ waitAndResetLocalStorage)\n/* harmony export */ });\n/* harmony import */ var _const__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./const */ \"./src/utils/const.js\");\n/* harmony import */ var _phoneFields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./phoneFields */ \"./src/utils/phoneFields.js\");\n\n // API Functions\n\nconst catchError = message => {\n  console.error('ERROR', message);\n  throw new Error(message);\n};\n\nconst getHeadersByConfig = ({\n  cookie,\n  cache,\n  json\n}) => {\n  const headers = new Headers();\n  if (cookie) headers.append('Cookie', document?.cookie);\n  if (cache) headers.append('Cache-Control', 'no-cache');\n  if (json) headers.append('Content-type', 'application/json');\n  return headers;\n}; // TODO remove when no longer used in favour of services.\n\n\nconst getShippingData = async (addressName, fields) => {\n  let data = {};\n  const headers = getHeadersByConfig({\n    cookie: true,\n    cache: true,\n    json: false\n  });\n  const options = {\n    headers,\n    credentials: 'include'\n  };\n  const response = await fetch(`${_const__WEBPACK_IMPORTED_MODULE_0__.BASE_URL_API}masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`, options).then(res => res.json()).catch(error => catchError(`GET_ADDRESS_ERROR: ${error?.message}`));\n\n  if (response && !response.error && response.data && response.data.length > 0) {\n    [data] = response.data;\n  }\n\n  return data;\n}; // TODO remove when no longer used in favour of services.\n\n\nconst saveAddress = async (fields = {}) => {\n  let path;\n  const {\n    email\n  } = window.vtexjs.checkout.orderForm.clientProfileData;\n  const {\n    address\n  } = window.vtexjs.checkout.orderForm.shippingData;\n  if (!address) return; // Address already exists (?)\n\n  const savedAddress = address?.addressId ? await getShippingData(address.addressId, '?_fields=id') : {}; // Guardado del nuevo addressType\n\n  address.addressType = localStorage.getItem('addressType');\n\n  if (savedAddress?.id) {\n    path = `${_const__WEBPACK_IMPORTED_MODULE_0__.BASE_URL_API}masterdata/address/${savedAddress.id}`;\n  } else {\n    path = `${_const__WEBPACK_IMPORTED_MODULE_0__.BASE_URL_API}masterdata/addresses`;\n  }\n\n  address.complement = address.complement || (0,_phoneFields__WEBPACK_IMPORTED_MODULE_1__.getBestPhoneNumber)(); // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood\n\n  const newAddress = {\n    userId: email,\n    ...address,\n    ...fields\n  };\n\n  if (!savedAddress.id) {\n    newAddress.addressName = address.addressId;\n  }\n\n  const headers = getHeadersByConfig({\n    cookie: true,\n    cache: true,\n    json: true\n  });\n  const options = {\n    method: 'PATCH',\n    headers,\n    body: JSON.stringify(newAddress),\n    credentials: 'include'\n  };\n  await fetch(path, options).then(res => {\n    localStorage.setItem('shippingDataCompleted', true);\n\n    if (res.status !== 204) {\n      res.json();\n    }\n  }).catch(error => catchError(`SAVE_ADDRESS_ERROR: ${error?.message}`));\n};\n\nconst setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {\n  /* Data will only be searched and set if any of the custom fields for TFG are displayed. */\n  if (completeFurnitureForm || completeTVIDForm) {\n    const {\n      address\n    } = window.vtexjs.checkout.orderForm.shippingData;\n    /* Setting Masterdata custom fields */\n\n    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';\n    const shippingData = await getShippingData(address.addressId, fields);\n\n    if (shippingData && !jQuery.isEmptyObject(shippingData)) {\n      /* Setting furniture form values */\n      if (completeFurnitureForm) {\n        $('#tfg-building-type').val(shippingData.buildingType);\n        $('#tfg-parking-distance').val(shippingData.parkingDistance);\n        $('#tfg-delivery-floor').val(shippingData.deliveryFloor);\n\n        if ($('#tfg-delivery-floor').val() === 'Ground') {\n          $('#tfg-lift-stairs').attr('disabled', 'disabled');\n        } else {\n          $('#tfg-lift-stairs').val(shippingData.liftOrStairs);\n        }\n\n        $('#tfg-sufficient-space').prop('checked', shippingData.hasSufficientSpace);\n        $('#tfg-assemble-furniture').prop('checked', shippingData.assembleFurniture);\n      }\n      /* Setting TV form values */\n\n\n      if (completeTVIDForm) {\n        $('#tfg-tv-licence').val(shippingData.tvID);\n      }\n    } else if (tries <= 5) {\n      setTimeout(() => {\n        setMasterdataFields(completeFurnitureForm, completeTVIDForm, tries += 1);\n      }, 3000);\n    }\n  }\n}; // Functions to manage CustomData\n\n\nconst checkoutGetCustomData = appId => {\n  const {\n    customData\n  } = window.vtexjs.checkout.orderForm;\n  let fields = {};\n\n  if (customData && customData.customApps && customData.customApps.length > 0) {\n    customData.customApps.forEach(app => {\n      if (app.id === appId) {\n        fields = app.fields;\n      }\n    });\n  }\n\n  return fields;\n};\n\nconst checkoutSendCustomData = (appId, customData) => {\n  const {\n    orderFormId\n  } = window.vtexjs.checkout.orderForm;\n  return $.ajax({\n    type: 'PUT',\n    url: `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,\n    dataType: 'json',\n    contentType: 'application/json; charset=utf-8',\n    data: JSON.stringify(customData)\n  });\n};\n\nconst setRicaFields = (getDataFrom = 'customApps') => {\n  let ricaFields;\n\n  if (getDataFrom === 'shippingAddress') {\n    const {\n      address\n    } = window.vtexjs.checkout.orderForm.shippingData;\n    ricaFields = {\n      idOrPassport: '',\n      sameAddress: 'true',\n      fullName: address.receiverName || $('#ship-receiverName').val(),\n      streetAddress: `${address.street}, ${address.number}`,\n      suburb: address.neighborhood,\n      city: address.city,\n      postalCode: address.postalCode,\n      province: address.state\n    };\n  } else if (getDataFrom === 'customApps') {\n    ricaFields = checkoutGetCustomData(_const__WEBPACK_IMPORTED_MODULE_0__.RICA_APP);\n  }\n\n  if (ricaFields && !jQuery.isEmptyObject(ricaFields)) {\n    if (getDataFrom === 'customApps') {\n      $('#tfg-rica-id-passport').val(ricaFields.idOrPassport);\n      $('#tfg-rica-same-address').prop('checked', ricaFields.sameAddress === 'true');\n    }\n\n    $('#tfg-rica-fullname').val(ricaFields.fullName);\n    $('#tfg-rica-street').val(ricaFields.streetAddress);\n    $('#tfg-rica-suburb').val(ricaFields.suburb);\n    $('#tfg-rica-city').val(ricaFields.city);\n    $('#tfg-rica-postal-code').val(ricaFields.postalCode);\n    $('#tfg-rica-province').val(ricaFields.province);\n  }\n}; // Random Functions\n\n\nconst addBorderTop = elementClass => {\n  $(elementClass).addClass('custom-step-border');\n  $(elementClass).last().addClass('last-custom-step-border');\n};\n\nconst waitAndResetLocalStorage = () => {\n  setTimeout(() => {\n    localStorage.removeItem('shippingDataCompleted');\n  }, 5000);\n};\n\nconst isValidNumberBash = tel => (0,_phoneFields__WEBPACK_IMPORTED_MODULE_1__.validatePhoneNumber)(tel);\n\nconst getSpecialCategories = items => {\n  const furnitureCategories = [_const__WEBPACK_IMPORTED_MODULE_0__.FURNITURE_CAT];\n  const tvCategories = [_const__WEBPACK_IMPORTED_MODULE_0__.TV_CAT];\n  const simCardCategories = [_const__WEBPACK_IMPORTED_MODULE_0__.SIM_CAT];\n  const categories = [];\n  let hasTVs = false;\n  let hasSimCards = false;\n  let hasFurniture = false;\n  let hasFurnitureMixed = false;\n  items.forEach(item => {\n    const itemCategories = item.productCategoryIds.split('/');\n    categories.push(itemCategories);\n    itemCategories.forEach(category => {\n      if (!category) return;\n      if (tvCategories.includes(category)) hasTVs = true;\n      if (simCardCategories.includes(category)) hasSimCards = true;\n      if (furnitureCategories.includes(category)) hasFurniture = true;\n    });\n  });\n  hasFurnitureMixed = items.length > 1 && hasFurniture && !categories.every(c => c === _const__WEBPACK_IMPORTED_MODULE_0__.FURNITURE_CAT);\n  return {\n    hasFurniture,\n    hasSimCards,\n    hasTVs,\n    hasFurnitureMixed,\n    categories\n  };\n};\n\nconst clearLoaders = () => {\n  $('.shimmer').removeClass('shimmer');\n};\nconst isOnPromotion = (listPrice, price, sellingPrice, manualPrice) => {\n  let discount;\n\n  if (listPrice > price) {\n    discount = listPrice - price;\n    return {\n      status: 'SALE',\n      discount\n    };\n  }\n\n  if (listPrice === price && sellingPrice < price) {\n    discount = listPrice - sellingPrice;\n    return {\n      status: 'PROMO',\n      discount\n    };\n  }\n\n  if (manualPrice) {\n    discount = price - manualPrice;\n    return {\n      status: 'STAFF DISCOUNT',\n      discount\n    };\n  } // default -> item not on promo\n\n\n  return {\n    status: '',\n    discount: ''\n  };\n};\n\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/utils/functions.js?");
-
-/***/ }),
-
-/***/ "./src/utils/phoneFields.js":
-/*!**********************************!*\
-  !*** ./src/utils/phoneFields.js ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__),\n/* harmony export */   \"getBestPhoneNumber\": () => (/* binding */ getBestPhoneNumber),\n/* harmony export */   \"preparePhoneField\": () => (/* binding */ preparePhoneField),\n/* harmony export */   \"validatePhoneNumber\": () => (/* binding */ validatePhoneNumber)\n/* harmony export */ });\n/**\n * validatePhoneNumber\n * Determine if number is valid.\n * Numbers and spaces only, 9 digits or longer.\n * @param tel - string\n * @returns boolean\n */\nconst validatePhoneNumber = tel => {\n  if (!tel) return false;\n  tel = tel.replace(/\\s/g, '');\n  if (tel[0] === '0') return tel.match(/[0-9\\s]{10}/);\n  return tel.match(/[0-9\\s]{9,}/);\n};\n/**\n * formattedPhoneNumber\n * Add spaces to help guide the user how the number should look.\n * Adds space after 3rd and 6th digits only.\n * xxx xxx xxxxxxxxx\n * @param value - string value\n * @returns string\n */\n\nconst formattedPhoneNumber = (value, doFormat = true) => {\n  value = value.replace(/[^0-9+*#]+/g, '').trim(); // 'xxx xxx *'\n\n  if (value.length >= 6 && doFormat) {\n    return [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');\n  } // 'xxx *'\n\n\n  if (value.length >= 3 && doFormat) {\n    return [value.slice(0, 3), value.slice(3)].join(' ');\n  }\n\n  return value;\n};\n/**\n * preparePhoneField\n * When phone fields are loaded onto the DOM\n * Prepare them for proper display and validation.\n *\n * @param  input - string css selector to the element.\n */\n\n\nconst preparePhoneField = input => {\n  const phoneInput = document.querySelector(input);\n  if (!phoneInput) return;\n  phoneInput.setAttribute('type', 'tel');\n  phoneInput.setAttribute('maxlength', 12);\n  phoneInput.value = formattedPhoneNumber(phoneInput.value);\n  const $phoneInput = $(input);\n  $phoneInput.keyup(e => {\n    const value = e.currentTarget.value.replace(/[^0-9+*#]+/g, '').trim();\n    let displayValue = value;\n    const isBackSpace = e.keyCode === 8;\n    displayValue = formattedPhoneNumber(value, !isBackSpace);\n    $phoneInput.parent('.text').removeClass('error');\n    $phoneInput.parent('.text').find('span.error').hide();\n    $phoneInput.val(displayValue);\n  });\n};\nconst getBestPhoneNumber = () => window.vtexjs.checkout.orderForm?.shippingData?.address?.complement || window.vtexjs.checkout.orderForm?.clientProfileData?.phone || document?.getElementById('client-phone')?.value;\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({\n  validatePhoneNumber\n});\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/utils/phoneFields.js?");
-
-/***/ }),
-
-/***/ "./src/utils/services.js":
-/*!*******************************!*\
-  !*** ./src/utils/services.js ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"addOrUpdateAddress\": () => (/* binding */ addOrUpdateAddress),\n/* harmony export */   \"clearAddresses\": () => (/* binding */ clearAddresses),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__),\n/* harmony export */   \"getAddressByName\": () => (/* binding */ getAddressByName),\n/* harmony export */   \"getAddresses\": () => (/* binding */ getAddresses),\n/* harmony export */   \"getOrderFormCustomData\": () => (/* binding */ getOrderFormCustomData),\n/* harmony export */   \"removeFromCart\": () => (/* binding */ removeFromCart),\n/* harmony export */   \"sendOrderFormCustomData\": () => (/* binding */ sendOrderFormCustomData),\n/* harmony export */   \"updateAddressListing\": () => (/* binding */ updateAddressListing),\n/* harmony export */   \"upsertAddress\": () => (/* binding */ upsertAddress)\n/* harmony export */ });\n/* harmony import */ var _partials_Deliver_AddressListing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../partials/Deliver/AddressListing */ \"./src/partials/Deliver/AddressListing.js\");\n/* harmony import */ var _partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../partials/Deliver/utils */ \"./src/partials/Deliver/utils.js\");\n/* harmony import */ var _checkoutDB__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./checkoutDB */ \"./src/utils/checkoutDB.js\");\n/* harmony import */ var _const__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./const */ \"./src/utils/const.js\");\n/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./functions */ \"./src/utils/functions.js\");\n/* harmony import */ var _phoneFields__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./phoneFields */ \"./src/utils/phoneFields.js\");\n/* eslint-disable no-new-wrappers */\n\n\n\n\n\n // API Functions\n\nconst catchError = message => {\n  console.error('ERROR', message);\n  throw new Error(message);\n};\n\nconst getHeadersByConfig = ({\n  cookie,\n  cache,\n  json\n}) => {\n  const headers = new Headers();\n  if (cookie) headers.append('Cookie', document?.cookie);\n  if (cache) headers.append('Cache-Control', 'no-cache');\n  if (json) headers.append('Content-type', 'application/json');\n  return headers;\n}; // GET addresses\n\n\nconst DB = new _checkoutDB__WEBPACK_IMPORTED_MODULE_2__[\"default\"]();\nconst getAddresses = async () => {\n  // Try to get addresses from users local store.\n  // TODO: When should addresses be reloaded/updated?\n  const addresses = await DB.getAddresses();\n  if (addresses.length > 0) return {\n    data: addresses\n  }; // Fallback to get addresses from API.\n\n  const {\n    email\n  } = window.vtexjs.checkout.orderForm?.clientProfileData;\n  const fields = ['id', 'addressType', 'addressQuery', 'addressName', 'reference', 'number', 'geolocation', 'receiverName', 'complement', 'companyBuilding', 'street', 'neighborhood', 'city', 'postalCode', 'state', 'country', 'buildingType', 'parkingDistance', 'deliveryFloor', 'liftOrStairs', 'hasSufficientSpace', 'assembleFurniture', 'tvID'].join(',');\n  const headers = getHeadersByConfig({\n    cookie: true,\n    cache: true,\n    json: false\n  });\n  const options = {\n    headers,\n    credentials: 'include'\n  };\n  const cacheBust = Date.now();\n  return fetch(`${_const__WEBPACK_IMPORTED_MODULE_3__.BASE_URL_API}masterdata/addresses?t=${cacheBust}&_fields=${fields}&_where=${encodeURIComponent(`userIdQuery=${email}`)}`, options).then(res => res.json()).then(async data => {\n    // Store addresses locally\n    if (data.data) DB.loadAddresses(data.data); // return DB.getAddresses();\n    // API can have dups.\n\n    return data;\n  }).catch(error => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));\n}; // GET Address by ID / Name?\n\nconst getAddress = async (addressName, fields) => {\n  let data = {};\n  const headers = getHeadersByConfig({\n    cookie: true,\n    cache: true,\n    json: false\n  });\n  const options = {\n    headers,\n    credentials: 'include'\n  };\n  const response = await fetch(`${_const__WEBPACK_IMPORTED_MODULE_3__.BASE_URL_API}masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`, options).then(res => res.json()).catch(error => catchError(`GET_ADDRESS_ERROR: ${error?.message}`));\n\n  if (response && !response.error && response.data && response.data.length > 0) {\n    [data] = response.data;\n  }\n\n  return data;\n}; // PATCH address\n\n\nconst upsertAddress = async address => {\n  let path;\n  const {\n    email\n  } = window.vtexjs.checkout.orderForm.clientProfileData;\n  if (!address) return Promise.reject(new Error('No address provided.')); // Address already exists (?) - ID keeps channging?\n\n  const existingAddress = address.addressName ? await getAddress(address.addressName, '?_fields=id') : {};\n\n  if (existingAddress?.id) {\n    path = `${_const__WEBPACK_IMPORTED_MODULE_3__.BASE_URL_API}masterdata/address/${existingAddress.id}`;\n  } else {\n    path = `${_const__WEBPACK_IMPORTED_MODULE_3__.BASE_URL_API}masterdata/addresses`;\n  }\n\n  address.complement = address.complement || (0,_phoneFields__WEBPACK_IMPORTED_MODULE_5__.getBestPhoneNumber)(); // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood\n\n  const newAddress = {\n    userId: email,\n    ...address\n  };\n\n  if (!existingAddress.id) {\n    newAddress.addressName = address.addressId || `address-${Date.now()}`;\n  }\n\n  const headers = getHeadersByConfig({\n    cookie: true,\n    cache: true,\n    json: true\n  });\n  const options = {\n    method: 'PATCH',\n    headers,\n    body: JSON.stringify(newAddress),\n    credentials: 'include'\n  };\n  await fetch(path, options).then(res => {\n    if (res.status !== 204) {\n      return res.json();\n    }\n\n    return res;\n  }).then(result => result).catch(error => catchError(`SAVE_ADDRESS_ERROR: ${error?.message}`));\n};\nconst updateAddressListing = address => {\n  let $currentListing = $(`#address-${address.addressName}`);\n\n  if (!$currentListing.length) {\n    $('#bash-address-list').append((0,_partials_Deliver_AddressListing__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(address));\n  } else {\n    $currentListing.after((0,_partials_Deliver_AddressListing__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(address));\n    $currentListing.remove();\n    $currentListing = null;\n  }\n\n  $('input[type=\"radio\"][name=\"selected-address\"]:checked').attr('checked', false);\n  $(`input[type=\"radio\"][name=\"selected-address\"][value=\"${address.addressName}\"]`).attr('checked', true);\n};\nconst addOrUpdateAddress = async address => {\n  if (!address.addressName) {\n    const streetStr = address.street.replace(/[^a-zA-Z0-9]/g, ' ').trim().replace(/\\s/g, '-').toLowerCase();\n    address.addressName = `${Date.now()}-${streetStr}`;\n  }\n\n  if (!address.addressId) address.addressId = address.addressName; // Add or update at local store. Update UI.\n\n  DB.addOrUpdateAddress(address).then(() => updateAddressListing(address)); // Add or update at the API.\n\n  upsertAddress(address);\n};\nconst getAddressByName = async addressName => DB.getAddress(addressName);\nconst clearAddresses = async () => DB.clearData();\n/**\n * OrderForm CustomData\n * @param {Object} data - custom data.\n * @param {string} appId - unique app id.\n * @param {boolean} furniture - boolean value for sending furniture.\n * @param {boolean} rica - boolean value for sending rica fields.\n */\n\nconst sendOrderFormCustomData = async (appId, data, furniture, rica) => {\n  const {\n    orderFormId\n  } = window.vtexjs.checkout.orderForm;\n  if (!furniture) furniture = false;\n  if (!rica) rica = false;\n  const path = `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`;\n  const body = JSON.stringify({ ...data,\n    ...(furniture && {\n      assembleFurniture: new Boolean(data.assembleFurniture)\n    }),\n    ...(furniture && {\n      hasSufficientSpace: new Boolean(data.hasSufficientSpace)\n    }),\n    ...(rica && {\n      sameAddress: new Boolean(data.sameAddress)\n    })\n  });\n  const options = {\n    method: 'PUT',\n    headers: {\n      'Content-Type': 'application/json'\n    },\n    body\n  };\n  return fetch(path, options);\n};\nconst getOrderFormCustomData = appId => {\n  const {\n    customData\n  } = window.vtexjs.checkout.orderForm;\n  let fields = {};\n\n  if (customData && customData.customApps && customData.customApps.length > 0) {\n    customData.customApps.forEach(app => {\n      if (app.id === appId) {\n        fields = app.fields;\n      }\n    });\n  }\n\n  return fields;\n};\nconst removeFromCart = index => {\n  (0,_partials_Deliver_utils__WEBPACK_IMPORTED_MODULE_1__.setDeliveryLoading)();\n  return window.vtexjs.checkout.updateItems([{\n    index: `${index}`,\n    quantity: 0\n  }]).then(orderForm => {\n    console.info('ITEM REMOVED', {\n      orderForm\n    });\n  }).done(() => {\n    (0,_functions__WEBPACK_IMPORTED_MODULE_4__.clearLoaders)();\n  });\n};\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (getAddresses);\n\n//# sourceURL=webpack://custom-shipping-step-by-items/./src/utils/services.js?");
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/checkout6-custom.js");
-/******/ 	
-/******/ })()
-;
+(() => {
+  const e = () =>
+    '\n  <p id="box-pickup-complement" class="input custom-field-complement tfg-custom-addressForm">\n    <label>Mobile number</label>\n    <input id="custom-pickup-complement" class="input-xlarge success" type="text" field="complement" placeholder="" />\n  </p>';
+  const t = () => '<span class="help error">This field is required.</span>';
+  const s = '#/shipping';
+  const a = '#/payment';
+  const n = 'ricafields';
+  const r = 'tvfields';
+  const i = 'furniturefields';
+  const o = window.location.host.includes('bash.com')
+    ? 'https://store-api.www.bash.com/custom-api/'
+    : `${window.location.protocol}//${window.location.host}/custom-api/`;
+  const d = '1169288799';
+  const l = () =>
+    window.vtexjs.checkout.orderForm?.shippingData?.address?.complement ||
+    window.vtexjs.checkout.orderForm?.clientProfileData?.phone ||
+    document?.getElementById('client-phone')?.value;
+  const c = (e) => {
+    throw (console.error('ERROR', e), new Error(e));
+  };
+  const u = ({ cookie: e, cache: t, json: s }) => {
+    const a = new Headers();
+    return (
+      e && a.append('Cookie', document?.cookie),
+      t && a.append('Cache-Control', 'no-cache'),
+      s && a.append('Content-type', 'application/json'),
+      a
+    );
+  };
+  const p = (e, t) => {
+    const { orderFormId: s } = window.vtexjs.checkout.orderForm;
+    return $.ajax({
+      type: 'PUT',
+      url: `/api/checkout/pub/orderForm/${s}/customData/${e}`,
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      data: JSON.stringify(t),
+    });
+  };
+  const h = (e) =>
+    ((e) => !!e && ((e = e.replace(/\s/g, ''))[0] === '0' ? e.match(/[0-9\s]{10}/) : e.match(/[0-9\s]{9,}/)))(e);
+  const m = (e) => {
+    const t = [d];
+    const s = ['938942995'];
+    const a = ['24833302'];
+    const n = [];
+    let r = !1;
+    let i = !1;
+    let o = !1;
+    let l = !1;
+    return (
+      e.forEach((e) => {
+        const d = e.productCategoryIds.split('/');
+        n.push(d),
+          d.forEach((e) => {
+            e && (s.includes(e) && (r = !0), a.includes(e) && (i = !0), t.includes(e) && (o = !0));
+          });
+      }),
+      (l = e.length > 1 && o && !n.every((e) => e === d)),
+      { hasFurniture: o, hasSimCards: i, hasTVs: r, hasFurnitureMixed: l, categories: n }
+    );
+  };
+  const v = () => {
+    $('.shimmer').removeClass('shimmer');
+  };
+  const g = (() => {
+    const t = { inCollect: !1, pickupSelected: !1, validForm: !1, runningObserver: !1 };
+    const n = () => {
+      if (
+        ($('span.help.error').remove(),
+        (t.validForm = !0),
+        ['pickup-receiver', 'custom-pickup-complement'].forEach((e) => {
+          let s;
+          let a = !0;
+          switch (e) {
+            case 'pickup-receiver':
+              (a = !($(`#${e}`).length > 0 && !$(`#${e}`).attr('disabled') && !$(`#${e}`).val())),
+                (s = '.shp-pickup-receiver');
+              break;
+            case 'custom-pickup-complement':
+              (a = h($(`#${e}`).val())), (s = '#box-pickup-complement');
+          }
+          a
+            ? $(s).removeClass('error')
+            : ($(s).addClass('error'),
+              $(s).append('<span class="help error">This field is required.</span>'),
+              $(`${s} span.error`).show(),
+              (t.validForm = !1));
+        }),
+        t.validForm)
+      ) {
+        let e = $('#custom-pickup-complement').val().replace(/\s/g, '');
+        e.length === 9 && e[0] !== '0' && (e = `0${e}`),
+          localStorage.setItem('saving-shipping-collect', !0),
+          $('#btn-go-to-payment').trigger('click'),
+          setTimeout(() => {
+            window.vtexjs.checkout
+              .getOrderForm()
+              .then((t) => {
+                const { address: s } = t.shippingData;
+                return (s.complement = e), window.vtexjs.checkout.calculateShipping(s);
+              })
+              .done(() => {
+                localStorage.removeItem('saving-shipping-collect');
+              });
+          }, 750);
+      }
+    };
+    const r = () => {
+      const r = $('div#postalCode-finished-loading').length > 0;
+      window.location.hash === s && r
+        ? ((t.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active')),
+          (t.pickupSelected = $('div.ask-for-geolocation').length === 0),
+          t.inCollect &&
+            (t.pickupSelected
+              ? ($('button.shp-pickup-receiver__btn').trigger('click'),
+                $('div.shp-pickup-receiver').addClass('show'),
+                (() => {
+                  const t =
+                    window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
+                  $('input#custom-pickup-complement').length === 0
+                    ? ($('.btn-go-to-payment-wrapper').before(e),
+                      (() => {
+                        const e = document.querySelector('input#custom-pickup-complement');
+                        e && e.setAttribute('placeholder', '');
+                      })(),
+                      t && $('input#custom-pickup-complement').val(t))
+                    : $('input#custom-pickup-complement').val() === '' &&
+                      ($('input#custom-pickup-complement').val(t),
+                      window.vtexjs.checkout.getOrderForm().then((e) => {
+                        const { shippingData: s } = e;
+                        return (s.address.complement = t), window.vtexjs.checkout.sendAttachment('shippingData', s);
+                      })),
+                    (() => {
+                      const { firstName: e, lastName: t } = window.vtexjs.checkout.orderForm?.clientProfileData;
+                      const s = $('#client-first-name').val();
+                      const a = $('#client-last-name').val();
+                      const n = e ? [e, t].join(' ') : [s, a].join(' ');
+                      $('input#pickup-receiver').val() === '' &&
+                        ($('input#pickup-receiver').val(n.trim()),
+                        window.vtexjs.checkout.getOrderForm().then((e) => {
+                          const { shippingData: t } = e;
+                          return (
+                            (t.address.receiverName = n.trim()),
+                            window.vtexjs.checkout.sendAttachment('shippingData', t)
+                          );
+                        }));
+                    })();
+                })(),
+                (() => {
+                  if ($('#custom-go-to-payment').length <= 0) {
+                    const e = $('#btn-go-to-payment');
+                    const t = e.clone(!1);
+                    $(e).hide(),
+                      $(t).data('bind', ''),
+                      $(t).removeAttr('id').attr('id', 'custom-go-to-payment'),
+                      $(t).removeAttr('data-bind'),
+                      $(t).css('display', 'block'),
+                      $('p.btn-go-to-payment-wrapper').append(t),
+                      $(t).on('click', n);
+                  }
+                })())
+              : $('div.shp-pickup-receiver').removeClass('show'),
+            $('p.vtex-omnishipping-1-x-shippingSectionTitle').text('Collect options'),
+            $('#change-pickup-button').text('Available pickup points'),
+            $('h2.vtex-omnishipping-1-x-geolocationTitle.ask-for-geolocation-title').text(
+              'Find nearby Click & Collect points'
+            ),
+            $('h3.vtex-omnishipping-1-x-subtitle.ask-for-geolocation-subtitle').text(
+              "Search for addresses that you frequently use and we'll locate stores nearby."
+            ),
+            t.pickupSelected && $('label.shp-pickup-receiver__label').text("Recipient's name")),
+          localStorage.getItem('shipping-incomplete-values') &&
+            ($('#custom-go-to-payment').trigger('click'), localStorage.removeItem('shipping-incomplete-values')))
+        : ($('#box-pickup-complement').remove(),
+          window.location.hash === a &&
+            setTimeout(() => {
+              const e = window.vtexjs.checkout.orderForm?.shippingData?.address;
+              localStorage.getItem('saving-shipping-collect') ||
+                !e ||
+                e.addressType !== 'search' ||
+                (e.receiverName && e.complement) ||
+                ((window.location.hash = s), localStorage.setItem('shipping-incomplete-values', !0));
+            }, 1e3)),
+        i();
+    };
+    const i = () => {
+      if (t.runningObserver) return;
+      const e = document.querySelector('.shipping-container .box-step');
+      const s = new MutationObserver(() => {
+        (t.runningObserver = !0), r();
+      });
+      e && s.observe(e, { attributes: !1, childList: !0, characterData: !1 });
+    };
+    return (
+      $(document).ready(() => {
+        r();
+      }),
+      $(window).on('hashchange orderFormUpdated.vtex', () => {
+        r();
+      }),
+      { state: t, init: () => {} }
+    );
+  })();
+  const b = ({ name: e, options: t = [] }) =>
+    `\n  \n  <div class="bash--radio-options">\n  ${t
+      .map(
+        ({ value: t, label: s, checked: a = !1, disabled: n = !1 }) =>
+          `\n      <label class="bash--radio-option" id="radio-label-${e}-${t}">\n        <input type="radio" \n          ${
+            a ? "checked='checked'" : ''
+          } \n          ${n ? "disabled='disabled'" : ''} \n          value="${
+            t ?? ''
+          }" \n          name="${e}" \n          id="radio-${e}-${t}"\n        />\n          <span class="radio-icon"></span> \n          ${
+            s ? `<span class="radio-label">${s}</span>` : ''
+          }\n      </label>\n    `
+      )
+      .join('')}\n   \n  </div>\n  `;
+  const f = ['receiverName', 'complement', 'street', 'neighborhood', 'state', 'city', 'country', 'postalCode'];
+  const y = [
+    'buildingType',
+    'assembleFurniture',
+    'deliveryFloor',
+    'hasSufficientSpace',
+    'liftOrStairs',
+    'parkingDistance',
+  ];
+  const w = ['idOrPassport', 'sameAddress', 'fullName', 'streetAddress', 'suburb', 'city', 'postalCode', 'province'];
+  const k = ['tvID'];
+  const x = ['residential', 'inStore', 'commercial', 'giftRegistry', 'pickup', 'search'];
+  const C = () => {
+    document.querySelector('.bash--delivery-container').classList.add('shimmer');
+  };
+  const F = (e) => {
+    switch (e) {
+      case 'Select':
+        return '';
+      case 'Western Cape':
+        return 'WC';
+      case 'Easter Cape':
+        return 'EC';
+      case 'Gauteng':
+        return 'GP';
+      case 'KwaZulu-Natal':
+      case 'KwaZulu Natal':
+        return 'KZN';
+      case 'Northern Cape':
+        return 'NC';
+      case 'Limpopo':
+        return 'LP';
+      case 'Mpumalanga':
+        return 'MP';
+      case 'North West':
+        return 'NW';
+      case 'Freestate':
+      case 'Free State':
+        return 'FS';
+      default:
+        return e;
+    }
+  };
+  const D = () => {
+    const e = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
+    const t = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;
+    const s = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;
+    const a = `${t ?? ''} ${s ?? ''}`.trim();
+    return e || document.getElementById('client-first-name')?.value || a;
+  };
+  const S = (e) => {
+    const {
+      street: t,
+      companyBuilding: s,
+      neighborhood: a,
+      postalCode: n,
+      state: r,
+      city: i,
+      receiverName: o,
+      complement: d,
+      id: l,
+      addressId: c,
+      addressName: u,
+    } = e;
+    document.getElementById('bash--address-form').reset(),
+      o && (document.getElementById('bash--input-receiverName').value = o ?? ''),
+      d && (document.getElementById('bash--input-complement').value = d ?? ''),
+      (l || c) && (document.getElementById('bash--input-addressId').value = l || c),
+      u && (document.getElementById('bash--input-addressName').value = u),
+      (document.getElementById('bash--input-number').value = ''),
+      (document.getElementById('bash--input-companyBuilding').value = s ?? ''),
+      (document.getElementById('bash--input-street').value = t ?? ''),
+      (document.getElementById('bash--input-neighborhood').value = a ?? ''),
+      (document.getElementById('bash--input-city').value = i ?? ''),
+      (document.getElementById('bash--input-postalCode').value = n ?? ''),
+      (document.getElementById('bash--input-state').value = F(r)),
+      $(':invalid').trigger('change');
+  };
+  const I = (e, t, s = '', a = !1) => {
+    if (e) {
+      for (let n = 0; n < t.length; n++) {
+        const r = `bash--input-${s}${t[n]}`;
+        !document.getElementById(r) ||
+          (!e[t[n]] && !a) ||
+          (document.getElementById(r).value && !a) ||
+          (document.getElementById(r).value = e[t[n]]);
+      }
+      $(':invalid').trigger('change');
+    }
+  };
+  const A = () => {
+    const { address: e } = window.vtexjs.checkout.orderForm.shippingData;
+    if (document.getElementById('bash--input-rica_streetAddress')?.value || !e) return;
+    (e.fullName = D()),
+      (e.streetAddress = e.street),
+      (e.suburb = e.neighborhood),
+      (e.province = e.state),
+      I(e, w, 'rica_');
+    const t = z(n);
+    t.streetAddress && I(t, w, 'rica_', !0);
+  };
+  const j = (e) => {
+    e && e !== 'ground'
+      ? ($('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required'),
+        $('#bash--input-liftOrStairs').attr('required', 'required'))
+      : ($('.bash--dropdownfield-liftOrStairs').slideUp(), $('#bash--input-liftOrStairs').removeAttr('required'));
+  };
+  const T = (e, t = !0) => {
+    const { items: s } = window.vtexjs.checkout.orderForm;
+    const { hasFurniture: a, hasTVs: n, hasSimCards: r } = m(s);
+    let i = [];
+    const o = [];
+    (i = [...f]), a && t && (i = [...i, ...y]), n && t && (i = [...i, ...k]), r && t && (i = [...i, ...w]);
+    for (let t = 0; t < i.length; t++) e[i[t]] || o.push(i[t]);
+    return { isValid: !o.length, invalidFields: o };
+  };
+  const N = () => {
+    const { items: e } = window.vtexjs.checkout.orderForm;
+    const { hasFurniture: t, hasTVs: s, hasSimCards: a, hasFurnitureMixed: n } = m(e);
+    const r = '#shipping-data';
+    t ? $(`${r}:not(.has-furniture)`).addClass('has-furniture') : $(`${r}.has-furniture`).removeClass('has-furniture'),
+      s ? $(`${r}:not(.has-tv)`).addClass('has-tv') : $(`${r}.has-tv`).removeClass('has-tv'),
+      a ? $(`${r}:not(.has-rica)`).addClass('has-rica') : $(`${r}.has-rica`).removeClass('has-rica'),
+      n
+        ? $(`${r}:not(.has-furniture-mixed)`).addClass('has-furniture-mixed')
+        : $(`${r}.has-furniture-mixed`).removeClass('has-furniture-mixed');
+  };
+  const E = (e = []) => {
+    if ($('#bash-delivery-error-container').length < 1) return;
+    const t =
+      e.length > 0
+        ? e.map((e) =>
+            (({ text: e, fields: t }) => {
+              if (!t.itemIndex) return '';
+              const s = window.vtexjs.checkout?.orderForm.items?.[t.itemIndex];
+              if (!s) return '';
+              const a = s?.imageUrl;
+              return ` \n<div id="bash-delivery-error" class="notification error" alt="${
+                t?.skuName ?? ''
+              }" >\n   \x3c!---<div class="icon"></div>---\x3e\n   ${
+                a ? `<img src="${a}" style=" float: right; " />` : ''
+              }\n   <div class="notification-content">\n      <h3>Address error ${
+                t?.skuName ? `- ${t?.skuName}` : ''
+              }</h3>\n      <p>${e}</p>\n      <p>Check the postal code of your address, or \n      <a href="#" \n        class="remove-cart-item"\n        style="color: white; text-decoration: underline"\n        data-index="${
+                t.itemIndex
+              }">remove this item from your cart</a>.\n      </p>\n   </div>  \n</div>  \n`;
+            })(e)
+          )
+        : '';
+    $('#bash-delivery-error-container').html(t),
+      e.length > 0 && $('html, body').animate({ scrollTop: $('#bash-delivery-error-container').offset().top }, 400);
+  };
+  const B = (e, t = { validateExtraFields: !0 }) => {
+    const { validateExtraFields: s } = t;
+    const { items: a } = window.vtexjs.checkout.orderForm;
+    const { hasFurniture: n, hasTVs: r, hasSimCards: i } = m(a);
+    n && (I(e, y), j(e.deliveryFloor)), r && I(e, k, 'tv_'), i && A();
+    const { isValid: o, invalidFields: d } = T(e, s);
+    if (!o)
+      return (
+        S(e),
+        $('#bash--address-form').addClass('show-form-errors'),
+        s && $('#bash--delivery-form')?.addClass('show-form-errors'),
+        $(`#bash--input-${d[0]}`).focus(),
+        f.includes(d[0]) && window.postMessage({ action: 'setDeliveryView', view: 'address-edit' }),
+        { success: !1, error: 'Invalid address details.' }
+      );
+    e.addressType === 'business' && (e.addressType = 'commercial'),
+      x.includes(e.addressType) || (e.addressType = 'residential');
+    const { shippingData: l } = window?.vtexjs?.checkout?.orderForm;
+    return (
+      (l.address = e),
+      (l.address.number = l.address.number ?? ' '),
+      (l.selectedAddresses = [e]),
+      C(),
+      window.vtexjs.checkout
+        .sendAttachment('shippingData', l)
+        .then((t) => {
+          const { messages: s } = t;
+          const a = s.filter((e) => e.status === 'error');
+          return a.length > 0
+            ? (E(a),
+              window.postMessage({ action: 'setDeliveryView', view: 'address-form' }),
+              { success: !1, errors: a })
+            : (e.addressName && G(l.address), { success: !0 });
+        })
+        .done(() => v())
+    );
+  };
+  const _ = async (e) => {
+    e.preventDefault(), $('select').change();
+    const t = document.forms['bash--address-form'];
+    const s = $('#bash--input-addressName').val();
+    const a = [
+      'addressId',
+      'addressName',
+      'addressType',
+      'receiverName',
+      'postalCode',
+      'city',
+      'state',
+      'country',
+      'street',
+      'neighborhood',
+      'complement',
+      'companyBuilding',
+    ];
+    const n = { isDisposable: !1, reference: null, geoCoordinates: [], number: '', country: 'ZAF', ...(await J(s)) };
+    for (let e = 0; e < a.length; e++) n[a[e]] = t[a[e]]?.value || null;
+    (n.addressName = n.addressName || n.addressId), (n.addressId = n.addressId || n.addressName);
+    const { isValid: r, invalidFields: i } = T(n, !1);
+    if (!r)
+      return (
+        console.error({ invalidFields: i }),
+        $('#bash--address-form').addClass('show-form-errors'),
+        $(`#bash--input-${i[0]}`).focus(),
+        void (f.includes(i[0]) && window.postMessage({ action: 'setDeliveryView', view: 'address-form' }))
+      );
+    const o = await B(n, { validateExtraFields: !1 });
+    const { success: d } = o;
+    d
+      ? (await Z(n),
+        window.postMessage({ action: 'setDeliveryView', view: 'select-address' }),
+        (() => {
+          $('.alert-container').addClass('show'), $('.alert-container').slideDown();
+          const e = $('[data-view="address-form"]').length > 0 ? 'Address added' : 'Address updated';
+          $('#bash-alert-container').html(
+            (({ text: e }) => `<div class='alert-container'>\n      <p>${e}</p>\n    </div>\n  `)({ text: e })
+          ),
+            setTimeout(() => {
+              $('.alert-container').slideUp();
+            }, 5e3);
+        })())
+      : console.error('Set address error', { setAddressResponse: o });
+  };
+  const R = async (e) => {
+    e.preventDefault();
+    const { items: t } = window.vtexjs.checkout.orderForm;
+    const { address: s } = window.vtexjs.checkout.orderForm.shippingData;
+    const { hasFurniture: o, hasTVs: d, hasSimCards: l } = m(t);
+    $('select').change();
+    let c = {};
+    const u = "[name='selected-address']:checked";
+    if ($(u).length < 1)
+      return void $('html, body').animate({ scrollTop: $('#bash--delivery-form').offset().top }, 400);
+    C();
+    const p = await J($(u).val());
+    c = { ...s, ...p };
+    const { success: h } = await B(c, { validateExtraFields: !1 });
+    if (!h) return console.error('Delivery Form - Address Validation error'), void v();
+    const g = {};
+    const b = {};
+    const f = {};
+    if (o) {
+      const e = y;
+      for (let t = 0; t < e.length; t++) {
+        if (e[t] === 'hasSufficientSpace' || e[t] === 'assembleFurniture') {
+          const s = $(`#bash--input-${e[t]}`).is(':checked');
+          $(`#bash--input-${e[t]}`).val(s), (g[e[t]] = s);
+        }
+        s[e[t]] || (c[e[t]] = $(`#bash--input-${e[t]}`).val()), (g[e[t]] = $(`#bash--input-${e[t]}`).val());
+      }
+      const t = await K(i, g, !0, !1);
+      console.info({ furnitureDataSent: t });
+    }
+    if (l) {
+      const e = w;
+      for (let t = 0; t < e.length; t++) {
+        if (e[t] === 'sameAddress') {
+          const s = $(`#bash--input-${e[t]}`).is(':checked');
+          b[e[t]] = s;
+        }
+        b[e[t]] = $(`#bash--input-rica_${e[t]}`).val();
+      }
+      const t = await K(n, b, !1, !0);
+      console.info({ ricaDataSent: t });
+    }
+    if (d) {
+      const e = k;
+      for (let t = 0; t < e.length; t++)
+        s[e[t]] || (c[e[t]] = $(`#bash--input-tv_${e[t]}`).val()), (f[e[t]] = $(`#bash--input-tv_${e[t]}`).val());
+      const t = await K(r, f);
+      console.info({ tvDataSent: t });
+    }
+    await Z(c), (window.location.hash = a), v();
+  };
+  const O = (e) => {
+    let t = e.replace(/\s/g, '');
+    return t.length === 9 && t[0] !== '0' && (t = `0${t}`), t;
+  };
+  const P = (e, t) => {
+    if ((e = e.replace(/[^0-9+*#]+/g, '').trim())[0] === '0') {
+      if (e.length >= 6) {
+        const s = [e.slice(0, 3), e.slice(3, 6), e.slice(6)].join(' ');
+        return t ? s.trim() : s;
+      }
+      if (e.length >= 3) {
+        const s = [e.slice(0, 3), e.slice(3)].join(' ');
+        return t ? s.trim() : s;
+      }
+    } else {
+      if (e.length >= 5) {
+        const s = [e.slice(0, 2), e.slice(2, 5), e.slice(5)].join(' ');
+        return t ? s.trim() : s;
+      }
+      if (e.length >= 2) {
+        const s = [e.slice(0, 2), e.slice(2)].join(' ');
+        return t ? s.trim() : s;
+      }
+    }
+    return t ? e.trim() : e;
+  };
+  const q = (e) => {
+    const t = document.querySelector(e);
+    t &&
+      (t.setAttribute('maxlength', 12),
+      (t.value = P(t.value)),
+      $(document).off('keyup', e),
+      $(document).on('keyup', e, function (e) {
+        const t = $(this);
+        const s = t.val().replace(/[^0-9+*#]+/g, '');
+        const a = e.keyCode === 8;
+        const n = P(s, a);
+        t.parent('.text').removeClass('error'), t.parent('.text').find('span.error').hide(), t.val(n);
+      }));
+  };
+  const V = (e, t) =>
+    JSON.stringify({ street: e.street, neighborhood: e.neighborhood, city: e.city, postalCode: e.postalCode }) ===
+    JSON.stringify({ street: t.street, neighborhood: t.neighborhood, city: t.city, postalCode: t.postalCode });
+  const M = (e) => {
+    if (!e) return '';
+    const { street: t, neighborhood: s, postalCode: a, city: n, receiverName: r, complement: i, addressName: o } = e;
+    const d = [t, s ?? n, a].join(', ');
+    const l = [r, ((c = O(i)), [c.slice(0, 3), c.slice(3, 6), c.slice(6)].join(' '))].join(' - ');
+    let c;
+    const u = window?.vtexjs?.checkout?.orderForm?.shippingData?.address;
+    return u
+      ? `\n<label id="address-${o}" class="bash--address-listing" data-address="${encodeURIComponent(
+          JSON.stringify(e)
+        )}">\n  <div class="address-radio">\n  ${b({
+          name: 'selected-address',
+          options: [{ checked: V(e, u), value: o }],
+        })}\n  </div>\n  <div class="address-text">\n    <div>${d}</div>    \n    <div>${l}</div>  \n  </div>\n  <div class="address-edit">\n    <a href="#" data-view="address-edit" data-content="address-${o}">\n      Edit\n    </a>\n  </div>\n</label>\n`
+      : '';
+  };
+  const L = (e) => {
+    throw (console.error('ERROR', e), new Error(e));
+  };
+  const U = ({ cookie: e, cache: t, json: s }) => {
+    const a = new Headers();
+    return (
+      e && a.append('Cookie', document?.cookie),
+      t && a.append('Cache-Control', 'no-cache'),
+      s && a.append('Content-type', 'application/json'),
+      a
+    );
+  };
+  const W = new (class {
+    constructor() {
+      (this.indexedDB =
+        window.indexedDB ||
+        window.webkitIndexedDB ||
+        window.mozIndexedDB ||
+        window.msIndexedDB ||
+        window.shimIndexedDB),
+        (this.checkoutDB = indexedDB.open('checkoutDB', 1.2)),
+        (this.checkoutDB.onerror = (e) => {
+          throw (console.error('CheckoutDB Error', { event: e }), new Error('Could not load checkoutDB'));
+        }),
+        (this.checkoutDB.onupgradeneeded = () => {
+          const e = this.checkoutDB.result.createObjectStore('addresses', { keyPath: 'addressName' });
+          e.createIndex('address_street', ['street'], { unique: !1 }),
+            e.createIndex('address_addressName', ['addressName'], { unique: !0 }),
+            e.createIndex('address_street_suburb_city_postal', ['street', 'neighborhood', 'city', 'postalCode'], {
+              unique: !0,
+            });
+        }),
+        (this.checkoutDB.onsuccess = () => {
+          const e = this.checkoutDB.result.transaction('addresses', 'readwrite');
+          (this.addresses = e.objectStore('addresses')), (e.oncomplete = () => {});
+        });
+    }
+
+    store() {
+      return this.checkoutDB.result.transaction('addresses', 'readwrite').objectStore('addresses');
+    }
+
+    loadAddresses(e) {
+      const t = e.map((e) => this.addOrUpdateAddress(e));
+      return Promise.all(t).then((e) => e);
+    }
+
+    addOrUpdateAddress(e) {
+      const t = this;
+      return new Promise((s, a) => {
+        const n = t.store().put(e);
+        (n.onsuccess = () => {
+          s({ success: !0, addressId: n.result });
+        }),
+          (n.onerror = (e) => {
+            a(new Error({ sucess: !1, error: e?.target?.error }));
+          });
+      });
+    }
+
+    getAddresses() {
+      const e = this;
+      return new Promise((t) => {
+        const s = e.store().getAll();
+        (s.onsuccess = () => t(s.result)),
+          (s.onerror = () => {
+            console.error('Something wrong with getAddresses ? ...'), t([]);
+          });
+      });
+    }
+
+    getAddress(e) {
+      const t = this;
+      return new Promise((s) => {
+        const a = t.store().get(e);
+        (a.onsuccess = () => s(a.result)),
+          (a.onerror = () => {
+            console.error('Something wrong with getAddress ? ...'), s([]);
+          });
+      });
+    }
+
+    deleteAddress(e) {
+      const t = this.addresses.delete(e);
+      t.onsuccess = () => t.result;
+    }
+
+    clearData() {
+      const e = this;
+      return new Promise((t) => {
+        const s = e.store().clear();
+        (s.onsuccess = () => t(s.result)),
+          (s.onerror = () => {
+            console.error('Something wrong with clearData ? ...'), t([]);
+          });
+      });
+    }
+  })();
+  const G = (e) => {
+    let t = $(`#address-${e.addressName}`);
+    t.length ? (t.after(M(e)), t.remove(), (t = null)) : $('#bash-address-list').append(M(e)),
+      $('input[type="radio"][name="selected-address"]:checked').attr('checked', !1),
+      $(`input[type="radio"][name="selected-address"][value="${e.addressName}"]`).attr('checked', !0);
+  };
+  const Z = async (e) => {
+    if (!e.addressName) {
+      const t = e.street
+        .replace(/[^a-zA-Z0-9]/g, ' ')
+        .trim()
+        .replace(/\s/g, '-')
+        .toLowerCase();
+      e.addressName = `${Date.now()}-${t}`.substring(0, 50);
+    }
+    e.addressId || (e.addressId = e.addressName),
+      W.addOrUpdateAddress(e).then(() => G(e)),
+      (async (e) => {
+        let t;
+        const { email: s } = window.vtexjs.checkout.orderForm.clientProfileData;
+        if (!e) return Promise.reject(new Error('No address provided.'));
+        const a = e.addressName
+          ? await (async (e, t) => {
+              let s = {};
+              const a = { headers: U({ cookie: !0, cache: !0, json: !1 }), credentials: 'include' };
+              const n = await fetch(
+                `${o}masterdata/addresses/?_fields=id&_where=addressName=${e}&timestamp=${Date.now()}`,
+                a
+              )
+                .then((e) => e.json())
+                .catch((e) => L(`GET_ADDRESS_ERROR: ${e?.message}`));
+              return n && !n.error && n.data && n.data.length > 0 && ([s] = n.data), s;
+            })(e.addressName)
+          : {};
+        (t = a?.id ? `${o}masterdata/address/${a.id}` : `${o}masterdata/addresses`),
+          (e.complement = e.complement || l());
+        const n = { userId: s, ...e };
+        a.id || (n.addressName = e.addressId || `address-${Date.now()}`);
+        const r = {
+          method: 'PATCH',
+          headers: U({ cookie: !0, cache: !0, json: !0 }),
+          body: JSON.stringify(n),
+          credentials: 'include',
+        };
+        await fetch(t, r)
+          .then((e) => (e.status !== 204 ? e.json() : e))
+          .then((e) => e)
+          .catch((e) => L(`SAVE_ADDRESS_ERROR: ${e?.message}`));
+      })(e);
+  };
+  const J = async (e) => W.getAddress(e);
+  const H = async () => W.clearData();
+  const K = async (e, t, s, a) => {
+    const { orderFormId: n } = window.vtexjs.checkout.orderForm;
+    s || (s = !1), a || (a = !1);
+    const r = `/api/checkout/pub/orderForm/${n}/customData/${e}`;
+    const i = JSON.stringify({
+      ...t,
+      ...(s && { assembleFurniture: new Boolean(t.assembleFurniture) }),
+      ...(s && { hasSufficientSpace: new Boolean(t.hasSufficientSpace) }),
+      ...(a && { sameAddress: new Boolean(t.sameAddress) }),
+    });
+    return fetch(r, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: i });
+  };
+  const z = (e) => {
+    const { customData: t } = window.vtexjs.checkout.orderForm;
+    let s = {};
+    return (
+      t &&
+        t.customApps &&
+        t.customApps.length > 0 &&
+        t.customApps.forEach((t) => {
+          t.id === e && (s = t.fields);
+        }),
+      s
+    );
+  };
+  const Q = () => (
+    (async () => {
+      const e = await W.getAddresses();
+      if (e.length > 0) return { data: e };
+      const { email: t } = window.vtexjs.checkout.orderForm?.clientProfileData;
+      const s = [
+        'id',
+        'addressType',
+        'addressQuery',
+        'addressName',
+        'reference',
+        'number',
+        'geolocation',
+        'receiverName',
+        'complement',
+        'companyBuilding',
+        'street',
+        'neighborhood',
+        'city',
+        'postalCode',
+        'state',
+        'country',
+        'buildingType',
+        'parkingDistance',
+        'deliveryFloor',
+        'liftOrStairs',
+        'hasSufficientSpace',
+        'assembleFurniture',
+        'tvID',
+      ].join(',');
+      const a = { headers: U({ cookie: !0, cache: !0, json: !1 }), credentials: 'include' };
+      const n = Date.now();
+      return fetch(`${o}masterdata/addresses?t=${n}&_fields=${s}&_where=${encodeURIComponent(`userIdQuery=${t}`)}`, a)
+        .then((e) => e.json())
+        .then(async (e) => (e.data && W.loadAddresses(e.data), e))
+        .catch((e) => L(`GET_ADDRESSES_ERROR: ${e?.message}`));
+    })()
+      .then(({ data: e }) => {
+        const t = e.map((e) => M(e));
+        document.getElementById('bash-address-list') &&
+          (document.getElementById('bash-address-list').innerHTML = t.join('')),
+          $('#back-button-select-address').hasClass('inactive') && $('#back-button-select-address').show(),
+          v(),
+          e.length < 1 &&
+            (window.postMessage({ action: 'setDeliveryView', view: 'address-search' }),
+            $('#bash--input-address-search').focus(),
+            $('#back-button-select-address').hide(),
+            $('#back-button-select-address').addClass('inactive'));
+      })
+      .catch((e) => {
+        throw (console.error('ERROR getAddresses', e), new Error('Error getAddresses', e.message));
+      }),
+    '\n <div class="bash--addresses shimmer" id="bash-address-list">\n    Loading addresses...\n  </div>  \n  '
+  );
+  const Y = ({
+    label: e,
+    name: t,
+    value: s = '',
+    required: a = !0,
+    type: n = 'text',
+    placeholder: r,
+    autoComplete: i = 'on',
+    maxLength: o,
+    minlength: d,
+    disabled: l = !1,
+    options: c,
+    checked: u,
+    error: p = 'This field is required.',
+  }) => {
+    const h = t.replace(/\s/g, '-');
+    const m = `<label id="bash--label-${h}" for="bash--input-${h}">${e}</label>`;
+    return `\n<p class="input bash--${n}field-${t.replace(/\s/g, '-')} bash--${n} ${a ? 'required' : 'optional'}">\n  ${
+      e && n !== 'checkbox' ? m : ''
+    }\n  ${(() => {
+      switch (n) {
+        case 'radio':
+          return b({ name: t, options: c });
+        case 'dropdown':
+          return (({ name: e, disabled: t = !1, options: s, required: a }) => {
+            const n = s.find((e) => !0 === e.selected);
+            return `\n  <select \n    name="${e}" \n    ${a ? ' required ' : ''} \n    ${
+              t ? ' disabled ' : ''
+            } \n    id="bash--input-${e}" \n    class="input-large" \n  >\n  ${s
+              .map(
+                ({ value: e, label: t, selected: s }, a) =>
+                  `\n    <option \n    ${a === 0 ? ' disabled ' : ''}\n    ${a !== 0 || n ? '' : ' selected '}\n    ${
+                    s ? ' selected ' : ''
+                  }\n      value="${e}" \n    >${t}</option>\n    `
+              )
+              .join('')}\n  </select>\n  `;
+          })({ name: t, disabled: l, options: c, required: a });
+        case 'note':
+          return (({ value: e, name: t }) => `\n  <div class="bash--note-field ${t}">\n  ${e}\n  </div>\n  `)({
+            name: t,
+            value: s,
+          });
+        case 'checkbox':
+          return (({ name: e, label: t, checked: s, value: a }) =>
+            `\n    <label class="tfg-checkbox-label">\n       <input \n        type='checkbox' \n        name="${e}" \n        id="bash--input-${e}"\n        ${
+              s ? "checked='checked'" : ''
+            }\n        value=${a ?? ''}\n      />\n      <span>${t}</span>\n    </label>\n  `)({
+            name: t,
+            label: e,
+            checked: u,
+          });
+        default:
+          return (({
+            name: e,
+            value: t = '',
+            required: s = !0,
+            type: a = 'text',
+            placeholder: n,
+            autoComplete: r = 'on',
+            minLength: i = 0,
+            maxLength: o = 0,
+          }) =>
+            `\n  <input \n    ${s ? ' required ' : ''}\n    autocomplete="${r}" \n    id="bash--input-${e.replace(
+              /\s/g,
+              '-'
+            )}" \n    type="${a}" \n    name="${e}" \n    ${i > 0 ? `minlength="${i}"` : ''}\n    ${
+              o > 0 ? `maxlength="${o}"` : ''
+            }\n    placeholder="${n ?? ''}" \n    class="input-xlarge" \n    value="${t}" \n  />\n`)({
+            name: t,
+            value: s,
+            required: a,
+            type: n,
+            placeholder: r,
+            autoComplete: i,
+            maxLength: o,
+            minlength: d,
+          });
+      }
+    })()}\n  <span class="bash--field-error">${p}</span>\n</p>  \n`;
+  };
+  const X = () => (
+    setTimeout(() => {
+      (() => {
+        if (!window.google) return;
+        const e = document.getElementById('bash--input-address-search');
+        const t = new window.google.maps.places.Autocomplete(e, { componentRestrictions: { country: 'ZA' } });
+        window.google.maps.event.addListener(t, 'place_changed', () => {
+          const s = t.getPlace();
+          const { address_components: a, geometry: n } = s;
+          ((e) => {
+            const { street: t, neighborhood: s, postalCode: a, state: n, city: r } = e;
+            document.getElementById('bash--address-form').reset(),
+              (document.getElementById('bash--input-addressId').value = ''),
+              (document.getElementById('bash--input-addressName').value = ''),
+              (document.getElementById('bash--input-number').value = '  '),
+              (document.getElementById('bash--input-street').value = t ?? ''),
+              (document.getElementById('bash--input-neighborhood').value = s ?? ''),
+              (document.getElementById('bash--input-city').value = r ?? ''),
+              (document.getElementById('bash--input-postalCode').value = a ?? ''),
+              (document.getElementById('bash--input-state').value = F(n));
+          })(
+            ((e, t) => {
+              const s = e.find((e) => e.types.includes('street_number'))?.long_name;
+              const a = e.find((e) => e.types.includes('route'))?.long_name;
+              const n = e.find((e) => e.types.includes('sublocality'))?.long_name;
+              const r = e.find((e) => e.types.includes('locality'))?.long_name;
+              const i = e.find((e) => e.types.includes('postal_code'))?.long_name;
+              const o = e.find((e) => e.types.includes('administrative_area_level_1'))?.long_name;
+              const d = { lat: '', lng: '' };
+              return (
+                t && ((d.lat = t.location.lat()), (d.lng = t.location.lng())),
+                { street: `${s ?? ''} ${a ?? ''}`.trim(), neighborhood: n, city: r, postalCode: i, state: o, ...d }
+              );
+            })(a, n)
+          ),
+            window.postMessage({ action: 'setDeliveryView', view: 'address-form' }),
+            (e.value = '');
+        });
+      })();
+    }, 500),
+    Y({ name: 'address-search', placeholder: 'Start typing an address...', autoComplete: 'off' })
+  );
+  const ee = ({ hasFurn: e }) =>
+    `\n  <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">\n    <div id="bash--shipping-messages">\n      <div id="bash-alert-container"></div>\n      \n  <div id="tfg-custom-tvrica-msg" class="tfg-custom-msg">\n    <p class="tfg-custom-icon"></p>\n    <p class="tfg-custom-text">\n      You can't collect this order in store because your cart contains items \n      which require either RICA or TV License validation.\n    </p>\n  </div>\n\n      \n  <div id="tfg-custom-mixed-msg" class="tfg-custom-msg">\n    <p class="tfg-custom-icon"></p>\n    <p class="tfg-custom-text">\n      We'll ship your furniture and other items in your cart to the selected address. \n      Only the furniture delivery fee will apply.\n      </p>\n  </div>\n\n       \n \n<div id="bash-delivery-error-container"   >\n</div>\n    </div>\n   <form id="bash--delivery-form" name="bash--delivery-form" method="post">\n\n    <section class="bash--delivery-view" data-section="select-address">\n    <div class="bash--heading">\n        <h2>Delivery address</h2>\n        <a href="#" data-view="address-search">Add address</a>\n      </div>\n      ${Q()}\n    </section>\n\n    <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">\n      <hr>\n      <div class="bash--heading sub-heading">\n        <h3>Delivery options</h3>\n        ${
+      e
+        ? '\n<a \n  href="http://image.tfgmedia.co.za/image/1/process/500x790?source=http://cdn.tfgmedia.co.za/15/Marketing/HTMLPages/Furniture_Delivery_Fees_tab_image.jpg"\n  class="furniture-fees-link" \n  target="_blank"\n>\n  Furniture delivery costs\n</a>\n'
+        : ''
+    }\n      </div>\n      \n  <label class="bash--delivery-option-display" >\n  ${b({
+      name: 'delivery-option',
+      options: [{ checked: !0, value: !0 }],
+    })}\n   \n   <div id="bash--delivery-option-text" class="bash--delivery-option-text">\n      <span class="normal-delivery">Deliver within 3 - 5 days</span>\n   </div>\n\n  <div id="bash--delivery-fee" class="bash--delivery-fee">\n    R50\n  </div>\n</label>\n  \n      <button \n        class="submit btn-go-to-payment btn btn-large btn-success"\n        id="btn-save-delivery" \n        type="submit">\n          Go to payment\n      </button>\n    </section>\n   </form>\n\n    <section class="bash--delivery-view" data-section="address-search">\n      <div class="bash--heading">\n        <h3>Add a new delivery address</h3>\n        <a href='#' data-view='select-address' id='back-button-select-address'>&lt; Back</a>\n      </div>\n      ${X()} \n    </section>\n    \n    <section class="bash--delivery-view" data-section="address-form">\n       <div class="bash--heading">\n        <h3>Delivery address</h3>\n        <a href="#" class="back-button--search" data-view="address-search">&lt; Back</a>\n        <a href="#" class="back-button--select" data-view="select-address">&lt; Back</a>\n      </div>\n      \n  <form id="bash--address-form" method="post">\n    ${[
+      { name: 'addressId', type: 'hidden', value: '', required: !1 },
+      { name: 'addressName', type: 'hidden', value: '', required: !1, maxLength: 50 },
+      { name: 'street', label: 'Street address', required: !0, value: '' },
+      {
+        name: 'addressType',
+        label: 'Address type',
+        required: !0,
+        type: 'radio',
+        options: [
+          { value: 'residential', label: 'Residential', checked: !0 },
+          { value: 'business', label: 'Business' },
+        ],
+      },
+      { name: 'number', required: !1, value: '  ', type: 'hidden' },
+      { name: 'companyBuilding', label: 'Building/Complex and number', required: !1, value: '', maxLength: 100 },
+      { name: 'neighborhood', label: 'Suburb', value: '', maxLength: 750 },
+      { name: 'city', label: 'City', required: !0, value: '', maxLength: 750 },
+      { name: 'postalCode', label: 'Postal code', value: '', type: 'tel', minlength: 4, maxLength: 4 },
+      {
+        type: 'note',
+        required: !1,
+        name: 'suburb-postal-reminder',
+        value: 'Make sure to specify the correct Suburb and Postal code so we can easily find your address.',
+      },
+      {
+        name: 'state',
+        label: 'Province',
+        type: 'dropdown',
+        options: [
+          { value: '', label: 'Select' },
+          { value: 'EC', label: 'Eastern Cape' },
+          { value: 'FS', label: 'Free State' },
+          { value: 'GP', label: 'Gauteng' },
+          { value: 'KZN', label: 'KwaZulu-Natal' },
+          { value: 'LP', label: 'Limpopo' },
+          { value: 'MP', label: 'Mpumalanga' },
+          { value: 'NC', label: 'Northern Cape' },
+          { value: 'NW', label: 'North West' },
+          { value: 'WC', label: 'Western Cape' },
+        ],
+      },
+      { type: 'note', required: !1, name: 'country-display', label: 'Country', value: 'South Africa' },
+      { type: 'hidden', required: !0, name: 'country', value: 'ZAF' },
+      { name: 'receiverName', label: 'Recipient’s name', required: !0, value: D() },
+      {
+        name: 'complement',
+        label: 'Recipient’s mobile number',
+        required: !0,
+        value: l(),
+        type: 'tel',
+        helperText: 'We send shipping updates to this number.',
+      },
+    ]
+      .map((e) => Y(e))
+      .join(
+        ''
+      )}\n\n    <button \n      class="submit btn-go-to-payment btn btn-large btn-success"\n      id="btn-save-address" \n      type="submit"\n    >\n      Save address\n    </button>\n  </form>\n  \n  \n    </section>\n    \n  </div>`;
+  const te = {
+    buildingType: [
+      { value: '', label: 'Please select', disabled: !0 },
+      { value: 'freeStanding', label: 'Free standing' },
+      { value: 'houseInComplex', label: 'House in complex' },
+      { value: 'townhouse', label: 'Townhouse' },
+      { value: 'apartment', label: 'Apartment' },
+    ],
+    parkingDistance: [
+      { value: '', label: 'Please select', disabled: !0 },
+      { value: 15, label: '15 meters or less' },
+      { value: 25, label: '25 meters' },
+      { value: 50, label: '50 meters' },
+      { value: 100, label: '100 meters or more' },
+    ],
+    deliveryFloor: [
+      { value: '', label: 'Please select', disabled: !0 },
+      { value: 'ground', label: 'Ground' },
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+      { value: '3+', label: '3+' },
+    ],
+    liftOrStairs: [
+      { value: '', label: 'Please select', disabled: !0 },
+      { value: 'lift', label: 'Lift' },
+      { value: 'stairs', label: 'Stairs' },
+    ],
+  };
+  const se = ({ hasFurn: e, hasTV: t, hasSim: s }) => {
+    const a = `\n    <div id="furniture-form">\n      <hr>\n      <div class="bash--heading sub-heading heading-with-description">\n        <h3>Furniture information needed</h3>\n\n        <p class="tfg-custom-subtitle">\n        We need some more information to prepare delivery of your furniture items to your address.\n        <br>\n        <br>\n        Please ensure sufficient space to receive the goods and keep in mind \n        that our couriers aren't able to hoist goods onto balconies.\n      </p>\n\n      </div>\n   \n      ${(() => {
+      const { buildingType: e, parkingDistance: t, deliveryFloor: s, liftOrStairs: a } = te;
+      return `\n    ${[
+        { name: 'buildingType', label: 'Building Type', required: !0, type: 'dropdown', options: e },
+        { name: 'parkingDistance', label: 'Parking Distance', required: !0, type: 'dropdown', options: t },
+        { name: 'deliveryFloor', label: 'Delivery Floor', required: !0, type: 'dropdown', options: s },
+        { name: 'liftOrStairs', label: 'Lift or Stairs', required: !1, type: 'dropdown', options: a },
+        {
+          name: 'hasSufficientSpace',
+          label: 'Is there sufficent corner/passage door space?',
+          value: !1,
+          type: 'checkbox',
+          checked: !1,
+        },
+        {
+          name: 'assembleFurniture',
+          label: 'Would you like us to assemble your furniture items?',
+          type: 'checkbox',
+          value: !1,
+          checked: !1,
+        },
+      ]
+        .map((e) => Y(e))
+        .join('')}\n  `;
+    })()}\n    </div>\n  `;
+    const n = `\n    <div id="tv-license-form">\n      <hr>\n      <div class="bash--heading sub-heading heading-with-description">\n        <h3>TV license information needed</h3>\n        <p class="tfg-custom-subtitle">Please provide your ID number to validate your TV Licence.</p>\n      </div>\n      \n    ${Y(
+      { name: 'tv_tvID', label: 'SA ID number', required: !0, value: '' }
+    )}\n  \n    </div>\n  `;
+    const r = `\n    <div id="rica-form">\n      <hr>\n      <div class="bash--heading sub-heading heading-with-description">\n        <h3>Rica information required</h3>\n        <p class="tfg-custom-subtitle">\n          To RICA your SIM card, provide your SA ID (or foreign passport) number and your address as\n          it appears on a valid proof of residence.\n        </p> \n      </div>\n        ${(() => {
+      const {
+        shippingData: { selectedAddress: e },
+      } = window.vtexjs.checkout.orderForm;
+      const t = [
+        { name: 'rica_fullName', label: 'Full name and surname', required: !0, value: D() || '' },
+        { name: 'rica_streetAddress', label: 'Street address', required: !0, value: e?.street || '' },
+        { name: 'rica_suburb', label: 'Suburb', value: e?.neighborhood || '' },
+        { name: 'rica_city', label: 'City', required: !0, value: e?.city || '' },
+        {
+          name: 'rica_postalCode',
+          label: 'Postal code',
+          value: e?.postalCode || '',
+          type: 'tel',
+          minlength: 4,
+          maxLength: 4,
+        },
+        {
+          name: 'rica_province',
+          label: 'Province',
+          type: 'dropdown',
+          options: [
+            { value: '', label: 'Select', disabled: !0 },
+            { value: 'EC', label: 'Eastern Cape' },
+            { value: 'FS', label: 'Free State' },
+            { value: 'GP', label: 'Gauteng' },
+            { value: 'KZN', label: 'KwaZulu-Natal' },
+            { value: 'LP', label: 'Limpopo' },
+            { value: 'MP', label: 'Mpumalanga' },
+            { value: 'NC', label: 'Northern Cape' },
+            { value: 'NW', label: 'North West' },
+            { value: 'WC', label: 'Western Cape' },
+          ],
+        },
+        { type: 'note', required: !1, name: 'rica-country-display', label: 'Country', value: 'South Africa' },
+        { type: 'hidden', required: !0, name: 'country', value: 'ZAF' },
+      ];
+      return `\n    ${[
+        { name: 'rica_idOrPassport', label: 'ID or Passport number', required: !0, value: '' },
+        {
+          name: 'rica_sameAddress',
+          label: 'Residential address the same as delivery address',
+          type: 'checkbox',
+          checked: !0,
+          required: !1,
+        },
+      ]
+        .map((e) => Y(e))
+        .join('')}\n    <div class="rica-conditional-fields hide">\n    ${t.map((e) => Y(e)).join('')}\n    </div>\n  `;
+    })()}\n    </div>\n    `;
+    return `\n  <section class="bash--extra-fields bash--delivery-view" data-section="select-address">\n    ${
+      e ? a : ''
+    }\n    ${t ? n : ''}\n    ${s ? r : ''}\n  </section>`;
+  };
+  const ae = (() => {
+    const e = { view: 'list', hasFurn: !1, hasTVs: !1, hasSim: !1 };
+    const t = () => {
+      if (!$('#bash--delivery-container').length) {
+        if (window.vtexjs.checkout.orderForm) {
+          const t = window.vtexjs.checkout.orderForm?.items;
+          const { hasFurniture: s, hasTVs: a, hasSimCards: n } = m(t);
+          (e.hasFurn = s), (e.hasTVs = a), (e.hasSim = n);
+        }
+        $('.shipping-data .box-step').append(ee({ hasFurn: e.hasFurn })),
+          (e.hasFurn || e.hasSim || e.hasTVs) &&
+            ($('#bash-delivery-options').before(se({ hasFurn: e.hasFurn, hasSim: e.hasSim, hasTV: e.hasTVs })),
+            e.hasFurn &&
+              (async () => {
+                const e = z(i);
+                I(e, y), j(e?.deliveryFloor);
+              })(),
+            e.hasSim && A(),
+            e.hasTVs &&
+              (async () => {
+                const e = z(r);
+                I(e, k, 'tv');
+              })()),
+          $('select, input').on('invalid', function () {
+            const e = this;
+            $(e)[0].setCustomValidity(' '),
+              $(e).parents('form').addClass('show-form-errors'),
+              $(e).off('change keyUp'),
+              $(e).on('change keyUp', () => {
+                $(e)[0].setCustomValidity('');
+              });
+          });
+      }
+    };
+    return (
+      $(window).unload(() => {
+        H();
+      }),
+      $(document).ready(() => {
+        H(),
+          window.location.hash === s
+            ? (t(), $('.bash--delivery-container.hide').removeClass('hide'))
+            : $('.bash--delivery-container:not(.hide)').length &&
+              $('.bash--delivery-container:not(.hide)').addClass('hide');
+      }),
+      $(window).on('hashchange', () => {
+        window.location.hash === s
+          ? (t(), N(), $('.bash--delivery-container.hide').removeClass('hide'))
+          : $('.bash--delivery-container:not(.hide)').length &&
+            $('.bash--delivery-container:not(.hide)').addClass('hide');
+      }),
+      $(window).on('orderFormUpdated.vtex', () => {
+        const e = window.vtexjs.checkout.orderForm?.items;
+        const o = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
+        const { hasTVs: d, hasSimCards: l } = m(e);
+        const { messages: c } = window.vtexjs.checkout.orderForm;
+        if (window.location.hash === s) {
+          const e = c.filter((e) => e.status === 'error');
+          e && E(e);
+        }
+        if (o === 'search') {
+          if (d || l)
+            return (
+              window.location.hash !== s && (window.location.hash = s),
+              void setTimeout(() => document.getElementById('shipping-option-delivery')?.click(), 2e3)
+            );
+          $('#shipping-data:not(collection-active)').addClass('collection-active'),
+            $('.delivery-active').removeClass('delivery-active');
+        } else
+          t(),
+            $('#shipping-data:not(delivery-active)').addClass('delivery-active'),
+            $('.collection-active').removeClass('collection-active');
+        N(),
+          (() => {
+            if (!window.vtexjs.checkout.orderForm.totalizers) return;
+            const { value: e } = window.vtexjs.checkout.orderForm.totalizers.find((e) => e.id === 'Shipping') || {
+              value: 5e3,
+            };
+            let t = 'Free';
+            e > 0 && (t = `R${(e / 100).toFixed(2).replace('.00', '')}`),
+              $('#bash--delivery-fee').length > 0 && (document.getElementById('bash--delivery-fee').innerHTML = t);
+          })(),
+          window.location.hash !== a ||
+            (() => {
+              const e = window.vtexjs.checkout.orderForm?.items;
+              const { hasTVs: t, hasSimCards: s, hasFurniture: a } = m(e);
+              const o = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
+              let d = !0;
+              if ((t && (z(r).tvID || (d = !1)), s)) {
+                const e = z(n);
+                (e.idOrPassport && e.streetAddress && e.postalCode) || (d = !1);
+              }
+              if (a && o !== 'search') {
+                const e = z(i);
+                (e.buildingType && e.parkingDistance && e.deliveryFloor) || (d = !1);
+              }
+              return d;
+            })() ||
+            (window.location.hash = s);
+      }),
+      $(document).on('click', 'a[data-view]', function (e) {
+        e.preventDefault();
+        const t = $(this).data('view');
+        const s = decodeURIComponent($(this).data('content'));
+        window.postMessage({ action: 'setDeliveryView', view: t, content: s });
+      }),
+      $(document).on('change', 'input[type="radio"][name="selected-address"]', function () {
+        const e = ((t = $(this).parents('.bash--address-listing').data('address')), JSON.parse(decodeURIComponent(t)));
+        let t;
+        document.forms['bash--delivery-form'] &&
+          (document.forms['bash--delivery-form'].reset(),
+          document.forms['bash--delivery-form'].classList.remove('show-form-errors')),
+          J(e.addressName).then((t) => {
+            B(t || e, { validateExtraFields: !1 }),
+              $('input[type="radio"][name="selected-address"]:checked').attr('checked', !1),
+              $(this).attr('checked', !0);
+          });
+      }),
+      $(document).on('change', '#bash--input-rica_sameAddress', function () {
+        this.checked
+          ? $('.rica-conditional-fields').slideUp(() => A())
+          : ((() => {
+              const e = $('#bash--input-rica_idOrPassport').val();
+              I(
+                {
+                  idOrPassport: e ?? '',
+                  fullName: '',
+                  streetAddress: '',
+                  suburb: '',
+                  city: '',
+                  postalCode: '',
+                  province: '',
+                },
+                w,
+                'rica_',
+                !0
+              );
+            })(),
+            $('.rica-conditional-fields').slideDown(() => $('#bash--input-rica_fullName').focus()));
+      }),
+      $(document).on('change', 'input[name="addressType"]', function () {
+        $(this).is(':checked') &&
+          ($(this).val() === 'business'
+            ? $('#bash--label-companyBuilding').text('Business name')
+            : $('#bash--label-companyBuilding').text('Building/Complex and number'));
+      }),
+      $(document).on('click', '#shipping-option-pickup-in-point, #shipping-option-delivery', function () {
+        $(this).attr('id') === 'shipping-option-pickup-in-point'
+          ? $('#bash--delivery-container').hide()
+          : $('#bash--delivery-container').show();
+      }),
+      $(document).on('change', '#bash--input-deliveryFloor', function () {
+        j(this.value);
+      }),
+      $(document).on('submit', '#bash--address-form', _),
+      $(document).on('submit', '#bash--delivery-form', R),
+      $(document).on('click', '.remove-cart-item', function (e) {
+        let t;
+        e.preventDefault(),
+          (t = $(this).data('index')),
+          C(),
+          window.vtexjs.checkout
+            .updateItems([{ index: `${t}`, quantity: 0 }])
+            .then((e) => {
+              console.info('ITEM REMOVED', { orderForm: e });
+            })
+            .done(() => {
+              v();
+            });
+      }),
+      window.addEventListener('message', (e) => {
+        const { data: t } = e;
+        if (t && t.action)
+          if (t.action === 'setDeliveryView') {
+            if (
+              (document.querySelector('.bash--delivery-container').setAttribute('data-view', t.view),
+              (t.view === 'address-form' || t.view === 'address-edit') && (q('#bash--input-complement'), t.content))
+            ) {
+              const e = JSON.parse(decodeURIComponent($(`#${t.content}`).data('address')));
+              S(e);
+            }
+          } else console.error('Unknown action', t.action);
+      }),
+      { state: e, init: () => {} }
+    );
+  })();
+  const ne = (() => {
+    const e = {
+      showFurnitureForm: !1,
+      showTVIDForm: !1,
+      showRICAForm: !1,
+      showTVorRICAMsg: !1,
+      showMixedProductsMsg: !1,
+      runningObserver: !1,
+    };
+    const t = () => {
+      setTimeout(() => {
+        (() => {
+          if (window.vtexjs.checkout.orderForm) {
+            const { items: t } = window.vtexjs.checkout.orderForm;
+            const { hasFurniture: s, hasTVs: a, hasSimCards: n, categories: r } = m(t);
+            (e.showFurnitureForm = s),
+              (e.showTVIDForm = a),
+              (e.showRICAForm = n),
+              (e.showTVorRICAMsg = e.showTVIDForm || e.showRICAForm),
+              (e.showMixedProductsMsg = t.length > 1 && s && !r.every((e) => e === d));
+          }
+        })(),
+          e.showFurnitureForm ? $('div.subheader').css('display', 'none') : $('div.subheader').css('display', 'block');
+      }, 500);
+    };
+    return (
+      $(document).ready(() => {
+        t();
+      }),
+      $(window).on('hashchange orderFormUpdated.vtex', () => {
+        t();
+      }),
+      $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+        t();
+      }),
+      {
+        state: e,
+        setView: (e) => {
+          document.body.setAttribute('data-delivery-view', e);
+        },
+        showCustomSections: () => {
+          const t = $('#tfg-custom-tvrica-msg').length > 0;
+          const s = $('#tfg-custom-mixed-msg').length > 0;
+          let a = !1;
+          let n;
+          (e.showTVorRICAMsg || e.showMixedProductsMsg) &&
+            ($('.vtex-omnishipping-1-x-deliveryChannelsWrapper.custom-disabled').length < 1 &&
+              ($('#shipping-option-delivery').trigger('click'),
+              $('.vtex-omnishipping-1-x-deliveryChannelsWrapper').addClass('custom-disabled')),
+            e.showTVorRICAMsg &&
+              !t &&
+              ($('.vtex-omnishipping-1-x-addressFormPart1').prepend(
+                '\n  <div id="tfg-custom-tvrica-msg" class="tfg-custom-msg">\n    <p class="tfg-custom-icon"></p>\n    <p class="tfg-custom-text">\n      You can\'t collect this order in store because your cart contains items \n      which require either RICA or TV License validation.\n    </p>\n  </div>\n'
+              ),
+              (a = !0)),
+            e.showMixedProductsMsg &&
+              !s &&
+              ($('.vtex-omnishipping-1-x-addressFormPart1').prepend(
+                '\n  <div id="tfg-custom-mixed-msg" class="tfg-custom-msg">\n    <p class="tfg-custom-icon"></p>\n    <p class="tfg-custom-text">\n      We\'ll ship your furniture and other items in your cart to the selected address. \n      Only the furniture delivery fee will apply.\n      </p>\n  </div>\n'
+              ),
+              (a = !0))),
+            a &&
+              ((n = '.tfg-custom-step'),
+              $(n).addClass('custom-step-border'),
+              $(n).last().addClass('last-custom-step-border'));
+        },
+        init: () => {},
+      }
+    );
+  })();
+  const re = (() => {
+    const e = { validForm: !0, runningObserver: !1 };
+    const a = (s) => {
+      $(`#${s}`).length > 0 && !$(`#${s}`).attr('disabled') && !$(`#${s}`).val()
+        ? ($(`.${s}`).addClass('error'), $(`.${s}`).append(t), $(`.${s} span.error`).show(), (e.validForm = !1))
+        : $(`.${s}`).removeClass('error');
+    };
+    const d = (e) => {
+      e.forEach((e) => {
+        a(e);
+      });
+    };
+    const m = () => {
+      const { showFurnitureForm: t, showRICAForm: s, showTVIDForm: m } = ne.state;
+      if (
+        ($('span.help.error').remove(),
+        (e.validForm = !0),
+        $('div.address-list.vtex-omnishipping-1-x-addressList').length <= 0 &&
+          (a('ship-receiverName'),
+          h(document.querySelector('.vtex-omnishipping-1-x-address input#ship-complement').value)
+            ? $('.vtex-omnishipping-1-x-address .ship-complement').removeClass('error')
+            : ($('.vtex-omnishipping-1-x-address .ship-complement').addClass('error'),
+              $('.vtex-omnishipping-1-x-address .ship-complement').append(
+                '<span class="help error">This field is required.</span>'
+              ),
+              $('.vtex-omnishipping-1-x-address .ship-complement span.error').show(),
+              (e.validForm = !1))),
+        ne.state.showFurnitureForm &&
+          d(['tfg-building-type', 'tfg-parking-distance', 'tfg-delivery-floor', 'tfg-lift-stairs']),
+        ne.state.showRICAForm &&
+          d([
+            'tfg-rica-id-passport',
+            'tfg-rica-fullname',
+            'tfg-rica-street',
+            'tfg-rica-suburb',
+            'tfg-rica-city',
+            'tfg-rica-postal-code',
+            'tfg-rica-province',
+          ]),
+        ne.state.showTVIDForm && a('tfg-tv-licence'),
+        e.validForm,
+        e.validForm)
+      ) {
+        if (s) {
+          const e = (() => {
+            const e = {};
+            return (
+              (e.idOrPassport = $('#tfg-rica-id-passport').val()),
+              (e.sameAddress = $('#tfg-rica-same-address').is(':checked')),
+              (e.fullName = $('#tfg-rica-fullname').val()),
+              (e.streetAddress = $('#tfg-rica-street').val()),
+              (e.suburb = $('#tfg-rica-suburb').val()),
+              (e.city = $('#tfg-rica-city').val()),
+              (e.postalCode = $('#tfg-rica-postal-code').val()),
+              (e.province = $('#tfg-rica-province').val()),
+              (e.country = $('#tfg-rica-country').val()),
+              e
+            );
+          })();
+          p(n, e);
+        }
+        const e = {};
+        if (t) {
+          const t = (() => {
+            const e = { furnitureReady: !0 };
+            return (
+              (e.buildingType = $('#tfg-building-type').val()),
+              (e.parkingDistance = $('#tfg-parking-distance').val()),
+              (e.deliveryFloor = $('#tfg-delivery-floor').val()),
+              $('#tfg-lift-stairs').attr('disabled') || (e.liftOrStairs = $('#tfg-lift-stairs').val()),
+              (e.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked')),
+              (e.assembleFurniture = $('#tfg-assemble-furniture').is(':checked')),
+              e
+            );
+          })();
+          p(i, t), Object.assign(e, t);
+        }
+        if (m) {
+          const t = { tvID: $('#tfg-tv-licence').val() };
+          p(r, t), Object.assign(e, t);
+        }
+        (async (e = {}) => {
+          let t;
+          const { email: s } = window.vtexjs.checkout.orderForm.clientProfileData;
+          const { address: a } = window.vtexjs.checkout.orderForm.shippingData;
+          if (!a) return;
+          const n = a?.addressId
+            ? await (async (e, t) => {
+                let s = {};
+                const a = { headers: u({ cookie: !0, cache: !0, json: !1 }), credentials: 'include' };
+                const n = await fetch(
+                  `${o}masterdata/addresses/${t}&_where=addressName=${e}&timestamp=${Date.now()}`,
+                  a
+                )
+                  .then((e) => e.json())
+                  .catch((e) => c(`GET_ADDRESS_ERROR: ${e?.message}`));
+                return n && !n.error && n.data && n.data.length > 0 && ([s] = n.data), s;
+              })(a.addressId, '?_fields=id')
+            : {};
+          (a.addressType = localStorage.getItem('addressType')),
+            (t = n?.id ? `${o}masterdata/address/${n.id}` : `${o}masterdata/addresses`),
+            (a.complement = a.complement || l());
+          const r = { userId: s, ...a, ...e };
+          n.id || (r.addressName = a.addressId);
+          const i = {
+            method: 'PATCH',
+            headers: u({ cookie: !0, cache: !0, json: !0 }),
+            body: JSON.stringify(r),
+            credentials: 'include',
+          };
+          await fetch(t, i)
+            .then((e) => {
+              localStorage.setItem('shippingDataCompleted', !0), e.status !== 204 && e.json();
+            })
+            .catch((e) => c(`SAVE_ADDRESS_ERROR: ${e?.message}`));
+        })(e),
+          setTimeout(() => {
+            $('#btn-go-to-payment').trigger('click'),
+              (() => {
+                const e = localStorage.getItem('addressType');
+                window.vtexjs.checkout.getOrderForm().then((t) => {
+                  const { shippingData: s } = t;
+                  return (
+                    (s.selectedAddresses[0].addressType = e), window.vtexjs.checkout.sendAttachment('shippingData', s)
+                  );
+                });
+              })();
+          }, 750);
+      }
+    };
+    const v = () => {
+      $('div.address-list').length < 1 &&
+      $('#shipping-option-delivery').hasClass('shp-method-option-active') &&
+      $('body').data('delivery-view') !== 'address-list'
+        ? $('body:not(.has-no-addresses)').addClass('has-no-addresses')
+        : $('body.has-no-addresses').removeClass('has-no-addresses'),
+        window.location.hash === s &&
+          setTimeout(() => {
+            $('#shipping-option-delivery').hasClass('shp-method-option-active') &&
+              (() => {
+                if ($('#custom-go-to-payment').length <= 0) {
+                  const e = $('#btn-go-to-payment');
+                  const t = e.clone(!1);
+                  $(e).hide(),
+                    $(t).data('bind', ''),
+                    $(t).removeAttr('id').attr('id', 'custom-go-to-payment'),
+                    $(t).removeAttr('data-bind'),
+                    $(t).css('display', 'block'),
+                    $('p.btn-go-to-payment-wrapper').append(t),
+                    $(t).on('click', m);
+                }
+              })(),
+              g();
+          }, 750);
+    };
+    const g = () => {
+      if (e.runningObserver) return;
+      const t = document.querySelector('.shipping-container .box-step');
+      const a = new MutationObserver(() => {
+        (e.runningObserver = !0),
+          window.location.hash !== s || $('btn-link vtex-omnishipping-1-x-btnDelivery').length || v();
+      });
+      t && a.observe(t, { attributes: !1, childList: !0, characterData: !1 });
+    };
+    return (
+      $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-delivery-floor', function () {
+        $(this).val() === 'Ground'
+          ? ($('#tfg-lift-stairs').val(''),
+            $('#tfg-lift-stairs').attr('disabled', 'disabled'),
+            $('#tfg-lift-stairs').next('span.help.error').remove(),
+            $('.tfg-lift-stairs').removeClass('error'))
+          : $('#tfg-lift-stairs').removeAttr('disabled');
+      }),
+      $(document).on(
+        'change',
+        '.vtex-omnishipping-1-x-deliveryGroup .tfg-custom-selector, .vtex-omnishipping-1-x-deliveryGroup .tfg-input',
+        function () {
+          $(this).val()
+            ? ($(this).parent().removeClass('error'),
+              $(this).next('span.help.error').remove(),
+              $(this).addClass('tfg-input-completed'))
+            : $(this).removeClass('tfg-input-completed');
+        }
+      ),
+      $(document).on('change keyup', '.vtex-omnishipping-1-x-addressForm input, #tfg-tv-licence', function () {
+        $(this).val() && ($(this).parent().removeClass('error'), $(this).next('span.help.error').remove());
+      }),
+      $(document).on('change', '.vtex-omnishipping-1-x-deliveryGroup #tfg-rica-same-address', function () {
+        $(this).is(':checked')
+          ? ((e = 'customApps') => {
+              let t;
+              if (e === 'shippingAddress') {
+                const { address: e } = window.vtexjs.checkout.orderForm.shippingData;
+                t = {
+                  idOrPassport: '',
+                  sameAddress: 'true',
+                  fullName: e.receiverName || $('#ship-receiverName').val(),
+                  streetAddress: `${e.street}, ${e.number}`,
+                  suburb: e.neighborhood,
+                  city: e.city,
+                  postalCode: e.postalCode,
+                  province: e.state,
+                };
+              } else
+                e === 'customApps' &&
+                  (t = ((e) => {
+                    const { customData: t } = window.vtexjs.checkout.orderForm;
+                    let s = {};
+                    return (
+                      t &&
+                        t.customApps &&
+                        t.customApps.length > 0 &&
+                        t.customApps.forEach((e) => {
+                          e.id === 'ricafields' && (s = e.fields);
+                        }),
+                      s
+                    );
+                  })());
+              t &&
+                !jQuery.isEmptyObject(t) &&
+                (e === 'customApps' &&
+                  ($('#tfg-rica-id-passport').val(t.idOrPassport),
+                  $('#tfg-rica-same-address').prop('checked', t.sameAddress === 'true')),
+                $('#tfg-rica-fullname').val(t.fullName),
+                $('#tfg-rica-street').val(t.streetAddress),
+                $('#tfg-rica-suburb').val(t.suburb),
+                $('#tfg-rica-city').val(t.city),
+                $('#tfg-rica-postal-code').val(t.postalCode),
+                $('#tfg-rica-province').val(t.province));
+            })('shippingAddress')
+          : $('.rica-field').val('');
+      }),
+      $(document).on('click', '#shipping-data .btn-link.vtex-omnishipping-1-x-btnDelivery', () => {
+        v();
+      }),
+      $(document).ready(() => {
+        v();
+      }),
+      $(window).on('hashchange orderFormUpdated.vtex', () => {
+        v();
+      }),
+      { state: e, init: () => {} }
+    );
+  })();
+  ne.init(), re.init(), g.init(), ae.init();
+})();

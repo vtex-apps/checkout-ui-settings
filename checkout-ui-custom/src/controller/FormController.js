@@ -126,8 +126,6 @@ const FormController = (() => {
 
     checkForm();
 
-    console.log('!! saveShippingForm - state', state);
-
     if (!state.validForm) {
       // Click edit
     }
