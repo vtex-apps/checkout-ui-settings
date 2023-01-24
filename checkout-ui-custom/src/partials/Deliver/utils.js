@@ -538,7 +538,7 @@ export const submitDeliveryForm = async (event) => {
 
     if (furnitureData.deliveryFloor === 'ground') furnitureData.liftOrStairs = 'N/A';
     const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData, true, false);
-    console.info({ furnitureDataSent: furnitureDataSent.json() });
+    console.info({ furnitureDataSent });
   }
 
   // Not saved to address profile.
