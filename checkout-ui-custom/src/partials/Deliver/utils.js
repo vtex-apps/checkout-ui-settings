@@ -532,9 +532,13 @@ export const submitDeliveryForm = async (event) => {
       // check business/residential for the normal address
       if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
       furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val();
+
+      if (furnitureData[fields[i]] === null) furnitureData[fields[i]] = '';
     }
+
+    if (furnitureData.deliveryFloor === 'ground') furnitureData.liftOrStairs = 'N/A';
     const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData, true, false);
-    console.info({ furnitureDataSent });
+    console.info({ furnitureDataSent: furnitureDataSent.json() });
   }
 
   // Not saved to address profile.
@@ -546,6 +550,8 @@ export const submitDeliveryForm = async (event) => {
         ricaData[fields[i]] = isFieldChecked;
       }
       ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val();
+
+      if (ricaData[fields[i]] === null) ricaData[fields[i]] = '';
     }
 
     const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, false, true);
@@ -557,6 +563,9 @@ export const submitDeliveryForm = async (event) => {
     for (let i = 0; i < fields.length; i++) {
       if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
       tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
+
+      // Prevent null
+      if (tvData[fields[i]] === null) tvData[fields[i]] = '';
     }
 
     const tvDataSent = await sendOrderFormCustomData(TV_APP, tvData);
