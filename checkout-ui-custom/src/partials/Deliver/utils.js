@@ -527,12 +527,14 @@ export const submitDeliveryForm = async (event) => {
       if (fields[i] === 'hasSufficientSpace' || fields[i] === 'assembleFurniture') {
         const fieldValue = $(`#bash--input-${fields[i]}`).is(':checked');
         $(`#bash--input-${fields[i]}`).val(fieldValue);
-        furnitureData[fields[i]] = fieldValue;
+        furnitureData[fields[i]] = fieldValue ?? false;
       }
       // check business/residential for the normal address
       if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
-      furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val();
+      furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val() || '';
     }
+
+    if (furnitureData.deliveryFloor === 'ground') furnitureData.liftOrStairs = 'N/A';
     const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData, true, false);
     console.info({ furnitureDataSent });
   }
@@ -545,7 +547,7 @@ export const submitDeliveryForm = async (event) => {
         const isFieldChecked = $(`#bash--input-${fields[i]}`).is(':checked');
         ricaData[fields[i]] = isFieldChecked;
       }
-      ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val();
+      ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val() || '';
     }
 
     const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, false, true);
@@ -556,7 +558,7 @@ export const submitDeliveryForm = async (event) => {
     const fields = requiredTVFields;
     for (let i = 0; i < fields.length; i++) {
       if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
-      tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
+      tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val() || '';
     }
 
     const tvDataSent = await sendOrderFormCustomData(TV_APP, tvData);
