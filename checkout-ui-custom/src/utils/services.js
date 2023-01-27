@@ -1,6 +1,5 @@
 /* eslint-disable no-new-wrappers */
 import AddressListing from '../partials/Deliver/AddressListing';
-import { setDeliveryLoading } from '../partials/Deliver/utils';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
 import { clearLoaders } from './functions';
@@ -54,12 +53,6 @@ export const getAddresses = async () => {
     'postalCode',
     'state',
     'country',
-    'buildingType',
-    'parkingDistance',
-    'deliveryFloor',
-    'liftOrStairs',
-    'hasSufficientSpace',
-    'assembleFurniture',
     'tvID',
   ].join(',');
 
@@ -244,9 +237,8 @@ export const getOrderFormCustomData = (appId) => {
   return fields;
 };
 
-export const removeFromCart = (index) => {
-  setDeliveryLoading();
-  return window.vtexjs.checkout
+export const removeFromCart = (index) =>
+  window.vtexjs.checkout
     .updateItems([
       {
         index: `${index}`,
@@ -259,6 +251,5 @@ export const removeFromCart = (index) => {
     .done(() => {
       clearLoaders();
     });
-};
 
 export default getAddresses;
