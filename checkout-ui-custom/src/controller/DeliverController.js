@@ -60,6 +60,7 @@ const DeliverController = (() => {
     }
 
     const fieldsToValidate = 'select, input';
+    // eslint-disable-next-line func-names
     $(fieldsToValidate).on('invalid', function () {
       const field = this;
       $(field)[0].setCustomValidity(' ');

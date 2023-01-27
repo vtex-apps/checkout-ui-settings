@@ -498,7 +498,7 @@ export const submitDeliveryForm = async (event) => {
       ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val() || '';
     }
 
-    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, false, true);
+    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, true);
     console.info({ ricaDataSent });
   }
 

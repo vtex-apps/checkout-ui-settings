@@ -27,12 +27,6 @@ const FormController = (() => {
     });
   };
 
-  const checkFurnitureForm = () => {
-    const furnitureFields = ['tfg-building-type', 'tfg-parking-distance', 'tfg-delivery-floor', 'tfg-lift-stairs'];
-
-    checkFields(furnitureFields);
-  };
-
   const checkRICAForm = () => {
     const ricaFields = [
       'tfg-rica-id-passport',
@@ -67,9 +61,6 @@ const FormController = (() => {
     }
 
     /* Checking Custom Fields */
-    if (ViewController.state.showFurnitureForm) {
-      checkFurnitureForm();
-    }
     if (ViewController.state.showRICAForm) {
       checkRICAForm();
     }

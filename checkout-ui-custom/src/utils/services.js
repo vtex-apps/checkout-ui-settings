@@ -198,17 +198,12 @@ export const clearAddresses = async () => DB.clearData();
  * @param {boolean} furniture - boolean value for sending furniture.
  * @param {boolean} rica - boolean value for sending rica fields.
  */
-export const sendOrderFormCustomData = async (appId, data, furniture, rica) => {
+export const sendOrderFormCustomData = async (appId, data, rica = false) => {
   const { orderFormId } = window.vtexjs.checkout.orderForm;
-
-  if (!furniture) furniture = false;
-  if (!rica) rica = false;
 
   const path = `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`;
   const body = JSON.stringify({
     ...data,
-    ...(furniture && { assembleFurniture: new Boolean(data.assembleFurniture) }),
-    ...(furniture && { hasSufficientSpace: new Boolean(data.hasSufficientSpace) }),
     ...(rica && { sameAddress: new Boolean(data.sameAddress) }),
   });
 
