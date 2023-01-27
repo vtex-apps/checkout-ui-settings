@@ -1,4 +1,3 @@
-import FurnitureForm from './FurnitureForm';
 import RICAForm from './RICAForm';
 import TVLicenseForm from './TVLicenseForm';
 
@@ -7,19 +6,10 @@ const ExtraFieldsContainer = ({ hasFurn, hasTV, hasSim }) => {
     <div id="furniture-form">
       <hr>
       <div class="bash--heading sub-heading heading-with-description">
-        <h3>Furniture information needed</h3>
-
-        <p class="tfg-custom-subtitle">
-        We need some more information to prepare delivery of your furniture items to your address.
-        <br>
-        <br>
-        Please ensure sufficient space to receive the goods and keep in mind 
-        that our couriers aren't able to hoist goods onto balconies.
-      </p>
-
+        <h3>Furniture delivery</h3>
+          Please ensure that there is sufficient space to receive your goods and keep in mind 
+          that our couriers aren't able to hoist goods onto balconies.
       </div>
-   
-      ${FurnitureForm()}
     </div>
   `;
 

@@ -6,16 +6,14 @@ import {
   parseAttribute,
   populateAddressForm,
   populateDeliveryError,
-  populateFurnitureFields,
   populateRicaFields,
   populateTVFields,
+  preparePhoneField,
   setAddress,
   setCartClasses,
-  showHideLiftOrStairs,
   submitAddressForm,
   submitDeliveryForm,
   updateDeliveryFeeDisplay,
-  preparePhoneField
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
@@ -57,7 +55,6 @@ const DeliverController = (() => {
         })
       );
 
-      if (state.hasFurn) populateFurnitureFields();
       if (state.hasSim) populateRicaFields();
       if (state.hasTVs) populateTVFields();
     }
@@ -190,11 +187,6 @@ const DeliverController = (() => {
     } else {
       $('#bash--delivery-container').show();
     }
-  });
-
-  // Furniture - enable/disable liftOrStairs
-  $(document).on('change', '#bash--input-deliveryFloor', function () {
-    showHideLiftOrStairs(this.value);
   });
 
   $(document).on('submit', '#bash--address-form', submitAddressForm);

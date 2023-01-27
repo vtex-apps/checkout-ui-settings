@@ -82,15 +82,6 @@ export const requiredAddressFields = [
   'postalCode',
 ];
 
-export const requiredFurnitureFields = [
-  'buildingType',
-  'assembleFurniture',
-  'deliveryFloor',
-  'hasSufficientSpace',
-  'liftOrStairs',
-  'parkingDistance',
-];
-
 export const requiredRicaFields = [
   'idOrPassport',
   'sameAddress',

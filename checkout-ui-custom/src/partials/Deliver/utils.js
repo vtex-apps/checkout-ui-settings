@@ -1,4 +1,4 @@
-import { FURNITURE_APP, RICA_APP, STEPS, TV_APP } from '../../utils/const';
+import { RICA_APP, STEPS, TV_APP } from '../../utils/const';
 import { clearLoaders, getSpecialCategories } from '../../utils/functions';
 import {
   addOrUpdateAddress,
@@ -7,13 +7,7 @@ import {
   sendOrderFormCustomData,
   updateAddressListing,
 } from '../../utils/services';
-import {
-  requiredAddressFields,
-  requiredFurnitureFields,
-  requiredRicaFields,
-  requiredTVFields,
-  validAddressTypes,
-} from './constants';
+import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
 
@@ -214,12 +208,6 @@ export const showHideLiftOrStairs = (floor) => {
   }
 };
 
-export const populateFurnitureFields = async () => {
-  const data = getOrderFormCustomData(FURNITURE_APP);
-  populateExtraFields(data, requiredFurnitureFields);
-  showHideLiftOrStairs(data?.deliveryFloor);
-};
-
 export const populateTVFields = async () => {
   const data = getOrderFormCustomData(TV_APP);
   populateExtraFields(data, requiredTVFields, 'tv');
@@ -228,16 +216,12 @@ export const populateTVFields = async () => {
 // Runs when you setAddress
 export const addressIsValid = (address, validateExtraFields = true) => {
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+  const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
   let requiredFields = [];
   const invalidFields = [];
 
   requiredFields = [...requiredAddressFields];
-
-  if (hasFurniture && validateExtraFields) {
-    requiredFields = [...requiredFields, ...requiredFurnitureFields];
-  }
 
   if (hasTVs && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredTVFields];
@@ -256,15 +240,9 @@ export const addressIsValid = (address, validateExtraFields = true) => {
 
 export const setCartClasses = () => {
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards, hasFurnitureMixed } = getSpecialCategories(items);
+  const { hasTVs, hasSimCards, hasFurnitureMixed } = getSpecialCategories(items);
 
   const $container = '#shipping-data';
-
-  if (hasFurniture) {
-    $(`${$container}:not(.has-furniture)`).addClass('has-furniture');
-  } else {
-    $(`${$container}.has-furniture`).removeClass('has-furniture');
-  }
 
   if (hasTVs) {
     $(`${$container}:not(.has-tv)`).addClass('has-tv');
@@ -303,8 +281,7 @@ export const updateDeliveryFeeDisplay = () => {
 
 export const customShippingDataIsValid = () => {
   const items = window.vtexjs.checkout.orderForm?.items;
-  const { hasTVs, hasSimCards, hasFurniture } = getSpecialCategories(items);
-  const addressType = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
+  const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
   let valid = true;
 
@@ -316,11 +293,6 @@ export const customShippingDataIsValid = () => {
   if (hasSimCards) {
     const data = getOrderFormCustomData(RICA_APP);
     if (!data.idOrPassport || !data.streetAddress || !data.postalCode) valid = false;
-  }
-
-  if (hasFurniture && addressType !== 'search') {
-    const data = getOrderFormCustomData(FURNITURE_APP);
-    if (!data.buildingType || !data.parkingDistance || !data.deliveryFloor) valid = false;
   }
 
   return valid;
@@ -337,12 +309,7 @@ export const populateDeliveryError = (errors = []) => {
 export const setAddress = (address, options = { validateExtraFields: true }) => {
   const { validateExtraFields } = options;
   const { items } = window.vtexjs.checkout.orderForm;
-  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
-
-  if (hasFurniture) {
-    populateExtraFields(address, requiredFurnitureFields);
-    showHideLiftOrStairs(address.deliveryFloor);
-  }
+  const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
   if (hasTVs) populateExtraFields(address, requiredTVFields, 'tv_');
   if (hasSimCards) populateRicaFields();
@@ -488,7 +455,7 @@ export const submitDeliveryForm = async (event) => {
   event.preventDefault();
   const { items } = window.vtexjs.checkout.orderForm;
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
-  const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+  const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
   // Prevent false positive validation errors for invalid selects.
   $('select').change();
@@ -517,27 +484,8 @@ export const submitDeliveryForm = async (event) => {
     return;
   }
 
-  const furnitureData = {};
   const ricaData = {};
   const tvData = {};
-
-  if (hasFurniture) {
-    const fields = requiredFurnitureFields;
-    for (let i = 0; i < fields.length; i++) {
-      if (fields[i] === 'hasSufficientSpace' || fields[i] === 'assembleFurniture') {
-        const fieldValue = $(`#bash--input-${fields[i]}`).is(':checked');
-        $(`#bash--input-${fields[i]}`).val(fieldValue);
-        furnitureData[fields[i]] = fieldValue ?? false;
-      }
-      // check business/residential for the normal address
-      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-${fields[i]}`).val();
-      furnitureData[fields[i]] = $(`#bash--input-${fields[i]}`).val() || '';
-    }
-
-    if (furnitureData.deliveryFloor === 'ground') furnitureData.liftOrStairs = 'N/A';
-    const furnitureDataSent = await sendOrderFormCustomData(FURNITURE_APP, furnitureData, true, false);
-    console.info({ furnitureDataSent });
-  }
 
   // Not saved to address profile.
   if (hasSimCards) {
