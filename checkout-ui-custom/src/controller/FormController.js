@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
 import { InputError } from '../partials';
-import { FURNITURE_APP, RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
+import { RICA_APP, STEPS, TIMEOUT_750, TV_APP } from '../utils/const';
 import { checkoutSendCustomData, isValidNumberBash, saveAddress, setRicaFields } from '../utils/functions';
 import ViewController from './ViewController';
 
@@ -25,12 +25,6 @@ const FormController = (() => {
     fields.forEach((field) => {
       checkField(field);
     });
-  };
-
-  const checkFurnitureForm = () => {
-    const furnitureFields = ['tfg-building-type', 'tfg-parking-distance', 'tfg-delivery-floor', 'tfg-lift-stairs'];
-
-    checkFields(furnitureFields);
   };
 
   const checkRICAForm = () => {
@@ -67,31 +61,12 @@ const FormController = (() => {
     }
 
     /* Checking Custom Fields */
-    if (ViewController.state.showFurnitureForm) {
-      checkFurnitureForm();
-    }
     if (ViewController.state.showRICAForm) {
       checkRICAForm();
     }
     if (ViewController.state.showTVIDForm) {
       checkField('tfg-tv-licence');
     }
-  };
-
-  const getFurnitureFormFields = () => {
-    const furnitureFields = {};
-
-    furnitureFields.furnitureReady = true;
-    furnitureFields.buildingType = $('#tfg-building-type').val();
-    furnitureFields.parkingDistance = $('#tfg-parking-distance').val();
-    furnitureFields.deliveryFloor = $('#tfg-delivery-floor').val();
-    if (!$('#tfg-lift-stairs').attr('disabled')) {
-      furnitureFields.liftOrStairs = $('#tfg-lift-stairs').val();
-    }
-    furnitureFields.hasSufficientSpace = $('#tfg-sufficient-space').is(':checked');
-    furnitureFields.assembleFurniture = $('#tfg-assemble-furniture').is(':checked');
-
-    return furnitureFields;
   };
 
   const getRICAFields = () => {
@@ -122,13 +97,10 @@ const FormController = (() => {
   const getTVFormFields = () => ({ tvID: $('#tfg-tv-licence').val() });
 
   const saveShippingForm = () => {
-    const { showFurnitureForm, showRICAForm, showTVIDForm } = ViewController.state;
+    const { showRICAForm, showTVIDForm } = ViewController.state;
 
     checkForm();
 
-    if (!state.validForm) {
-      // Click edit
-    }
     if (state.validForm) {
       // Fields saved in orderForm
       if (showRICAForm) {
@@ -139,11 +111,6 @@ const FormController = (() => {
       // Fields saved in Masterdata
       const masterdataFields = {};
 
-      if (showFurnitureForm) {
-        const furnitureFields = getFurnitureFormFields();
-        checkoutSendCustomData(FURNITURE_APP, furnitureFields);
-        Object.assign(masterdataFields, furnitureFields);
-      }
       if (showTVIDForm) {
         const tvFields = getTVFormFields();
         checkoutSendCustomData(TV_APP, tvFields);

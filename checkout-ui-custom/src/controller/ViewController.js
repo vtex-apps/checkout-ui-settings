@@ -16,7 +16,6 @@ const ViewController = (() => {
     if (window.vtexjs.checkout.orderForm) {
       const { items } = window.vtexjs.checkout.orderForm;
       const { hasFurniture, hasTVs, hasSimCards, categories } = getSpecialCategories(items);
-      state.showFurnitureForm = hasFurniture;
       state.showTVIDForm = hasTVs;
       state.showRICAForm = hasSimCards;
       state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;

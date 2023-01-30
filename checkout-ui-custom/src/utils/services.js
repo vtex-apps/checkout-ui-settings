@@ -1,6 +1,5 @@
 /* eslint-disable no-new-wrappers */
 import AddressListing from '../partials/Deliver/AddressListing';
-import { setDeliveryLoading } from '../partials/Deliver/utils';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
 import { clearLoaders } from './functions';
@@ -15,6 +14,7 @@ const catchError = (message) => {
 
 const getHeadersByConfig = ({ cookie, cache, json }) => {
   const headers = new Headers();
+  // TODO don't use document?.cookie
   if (cookie) headers.append('Cookie', document?.cookie);
   if (cache) headers.append('Cache-Control', 'no-cache');
   if (json) headers.append('Content-type', 'application/json');
@@ -53,12 +53,6 @@ export const getAddresses = async () => {
     'postalCode',
     'state',
     'country',
-    'buildingType',
-    'parkingDistance',
-    'deliveryFloor',
-    'liftOrStairs',
-    'hasSufficientSpace',
-    'assembleFurniture',
     'tvID',
   ].join(',');
 
@@ -204,17 +198,12 @@ export const clearAddresses = async () => DB.clearData();
  * @param {boolean} furniture - boolean value for sending furniture.
  * @param {boolean} rica - boolean value for sending rica fields.
  */
-export const sendOrderFormCustomData = async (appId, data, furniture, rica) => {
+export const sendOrderFormCustomData = async (appId, data, rica = false) => {
   const { orderFormId } = window.vtexjs.checkout.orderForm;
-
-  if (!furniture) furniture = false;
-  if (!rica) rica = false;
 
   const path = `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`;
   const body = JSON.stringify({
     ...data,
-    ...(furniture && { assembleFurniture: new Boolean(data.assembleFurniture) }),
-    ...(furniture && { hasSufficientSpace: new Boolean(data.hasSufficientSpace) }),
     ...(rica && { sameAddress: new Boolean(data.sameAddress) }),
   });
 
@@ -243,9 +232,8 @@ export const getOrderFormCustomData = (appId) => {
   return fields;
 };
 
-export const removeFromCart = (index) => {
-  setDeliveryLoading();
-  return window.vtexjs.checkout
+export const removeFromCart = (index) =>
+  window.vtexjs.checkout
     .updateItems([
       {
         index: `${index}`,
@@ -258,6 +246,5 @@ export const removeFromCart = (index) => {
     .done(() => {
       clearLoaders();
     });
-};
 
 export default getAddresses;

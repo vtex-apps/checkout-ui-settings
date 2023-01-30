@@ -19,7 +19,6 @@ const TIMEOUT_750 = 750;
 // APP CONFIGURATION IDs
 const RICA_APP = 'ricafields';
 const TV_APP = 'tvfields';
-const FURNITURE_APP = 'furniturefields';
 
 // Furniture fees Url
 const FURNITURE_FEES =
@@ -60,7 +59,6 @@ export {
   AD_TYPE,
   BASE_URL_API,
   TV_APP,
-  FURNITURE_APP,
   FURNITURE_FEE_LINK,
   SIM_CAT,
   TV_CAT,
