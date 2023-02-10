@@ -30,8 +30,6 @@ const AddressListing = (address) => {
   // orderform
   const selectedAddress = window?.vtexjs?.checkout?.orderForm?.shippingData?.address;
 
-  if (!selectedAddress) return '';
-
   const addressString = encodeURIComponent(JSON.stringify(address));
 
   return `
@@ -39,7 +37,7 @@ const AddressListing = (address) => {
   <div class="address-radio">
   ${Radio({
     name: 'selected-address',
-    options: [{ checked: isSelectedAddress(address, selectedAddress), value: addressName }],
+    options: [{ checked: !!selectedAddress ?? isSelectedAddress(address, selectedAddress), value: addressName }],
   })}
   </div>
   <div class="address-text">

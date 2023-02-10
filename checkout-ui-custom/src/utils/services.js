@@ -33,52 +33,53 @@ export const getAddresses = async () => {
   if (addresses.length > 0) return { data: addresses };
 
   // Fallback to get addresses from API.
+return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+    const { email } = orderForm?.clientProfileData;
 
-  const { email } = window.vtexjs.checkout.orderForm?.clientProfileData;
+    const fields = [
+      'id',
+      'addressType',
+      'addressQuery',
+      'addressName',
+      'reference',
+      'number',
+      'geolocation',
+      'receiverName',
+      'complement',
+      'companyBuilding',
+      'street',
+      'neighborhood',
+      'city',
+      'postalCode',
+      'state',
+      'country',
+      'tvID',
+    ].join(',');
 
-  const fields = [
-    'id',
-    'addressType',
-    'addressQuery',
-    'addressName',
-    'reference',
-    'number',
-    'geolocation',
-    'receiverName',
-    'complement',
-    'companyBuilding',
-    'street',
-    'neighborhood',
-    'city',
-    'postalCode',
-    'state',
-    'country',
-    'tvID',
-  ].join(',');
+    const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
+    const options = {
+      headers,
+      credentials: 'include',
+    };
 
-  const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
-  const options = {
-    headers,
-    credentials: 'include',
-  };
+    const cacheBust = Date.now();
 
-  const cacheBust = Date.now();
-
-  return fetch(
-    `${BASE_URL_API}masterdata/addresses?t=${cacheBust}&_fields=${fields}&_where=${encodeURIComponent(
-      `userIdQuery=${email}`
-    )}`,
-    options
-  )
-    .then((res) => res.json())
-    .then(async (data) => {
-      // Store addresses locally
-      if (data.data) DB.loadAddresses(data.data);
-      // return DB.getAddresses();
-      // API can have dups.
-      return data;
-    })
-    .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
+    return fetch(
+      `${BASE_URL_API}masterdata/addresses?t=${cacheBust}&_fields=${fields}&_where=${encodeURIComponent(
+        `userIdQuery=${email}`
+      )}`,
+      options
+    )
+      .then((res) => res.json())
+      .then(async (data) => {
+        // Store addresses locally
+        if (data.data) DB.loadAddresses(data.data);
+        // return DB.getAddresses();
+        // API can have dups.
+        return data;
+      })
+      .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
+  })
 };
 
 // GET Address by ID / Name?

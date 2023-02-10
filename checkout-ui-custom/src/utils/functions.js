@@ -239,6 +239,7 @@ const getSpecialCategories = (items) => {
 };
 
 export const clearLoaders = () => {
+  ('happened')
   $('.shimmer').removeClass('shimmer');
 };
 
@@ -254,3 +255,4 @@ export {
   isValidNumberBash,
   getSpecialCategories,
 };
+

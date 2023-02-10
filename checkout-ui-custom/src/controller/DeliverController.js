@@ -38,6 +38,7 @@ const DeliverController = (() => {
       state.hasTVs = hasTVs;
       state.hasSim = hasSimCards;
     }
+
     $('.shipping-data .box-step').append(
       DeliverContainer({
         hasFurn: state.hasFurn,
@@ -83,8 +84,10 @@ const DeliverController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       setupDeliver();
       $('.bash--delivery-container.hide').removeClass('hide');
+      $('.bash--delivery-container').css('display', 'flex');
     } else if ($('.bash--delivery-container:not(.hide)').length) {
-      $('.bash--delivery-container:not(.hide)').addClass('hide');
+      $('.bash--delivery-container:not(.hide)').addClasså('hide');
+      $('.bash--delivery-container').css('display', 'none');
     }
   });
 
@@ -96,6 +99,7 @@ const DeliverController = (() => {
       $('.bash--delivery-container.hide').removeClass('hide');
     } else if ($('.bash--delivery-container:not(.hide)').length) {
       $('.bash--delivery-container:not(.hide)').addClass('hide');
+      $('.bash--delivery-container').css('display', 'none');
     }
   });
 

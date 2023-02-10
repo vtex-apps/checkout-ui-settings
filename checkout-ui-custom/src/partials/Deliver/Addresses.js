@@ -28,7 +28,7 @@ const Addresses = () => {
   return `
  <div class="bash--addresses shimmer" id="bash-address-list">
     Loading addresses...
-  </div>  
+  </div>
   `;
 };
 

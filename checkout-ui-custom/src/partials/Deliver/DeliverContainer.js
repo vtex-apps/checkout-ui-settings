@@ -1,12 +1,12 @@
 import { FURNITURE_FEE_LINK } from '../../utils/const';
-import Addresses from './Addresses';
 import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
+import Addresses from './Addresses';
 import DeliveryErrorContainer from './DeliveryError';
 import DeliveryOptions from './DeliveryOptions';
+import Alert from './Elements/Alert';
 import MixedProducts from './MixedProducts';
 import TVorRICAMsg from './TVorRICAMsg';
-import Alert from './Elements/Alert';
 
 const DeliverContainer = ({ hasFurn }) => `
   <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">

@@ -16,6 +16,12 @@ const AD_TYPE = {
 const TIMEOUT_500 = 500;
 const TIMEOUT_750 = 750;
 
+// PICKUP MAP STATES
+const GEOLOCATE = 'geolocate';
+const MANUAL = 'manual';
+const PICKUP = 'pickup';
+const NONE = 'none';
+
 // APP CONFIGURATION IDs
 const RICA_APP = 'ricafields';
 const TV_APP = 'tvfields';
@@ -63,4 +69,9 @@ export {
   SIM_CAT,
   TV_CAT,
   FURNITURE_CAT,
+  GEOLOCATE,
+  MANUAL,
+  PICKUP,
+  NONE,
 };
+

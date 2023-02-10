@@ -7,12 +7,17 @@ import {
   sendOrderFormCustomData,
   updateAddressListing,
 } from '../../utils/services';
-import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
+import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
+};
+
+export const setPickupLoading = () => {
+  document.querySelector('.delivery-group-content')?.classList?.add('shimmer');
+  document.querySelector('.vtex-omnishipping-1-x-ask')?.classList?.add('shimmer');
 };
 
 export const mapGoogleAddress = (addressComponents, geometry) => {
