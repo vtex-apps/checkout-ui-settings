@@ -89,7 +89,7 @@ const CollectController = (() => {
       $('body').css('position', 'fixed');
       $('body').css('width', '100%');
       const iframe = document.createElement('iframe');
-      iframe.src = 'https://pickup-map-staging.bashconnect.com/';
+      iframe.src = 'https://pickup-map.bashconnect.com/';
       iframe.width = '100%';
       iframe.height = '100%';
       iframe.id = 'map';
