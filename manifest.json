@@ -1,7 +1,7 @@
 {
   "name": "custom-shipping-step-by-items",
   "vendor": "thefoschini",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "title": "[TFG] Custom shipping step by cart items",
   "description": "[TFG] custom-shipping-step-by-items app",
   "builders": {
