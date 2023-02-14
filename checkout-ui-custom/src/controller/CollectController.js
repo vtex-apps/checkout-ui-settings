@@ -1,6 +1,6 @@
 import { InputError, PickupComplementField } from '../partials';
 import { setPickupLoading } from '../partials/Deliver/utils';
-import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS, TIMEOUT_750 } from '../utils/const';
+import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
 import { clearLoaders, getSpecialCategories, isValidNumberBash } from '../utils/functions';
 import { sendOrderFormCustomData } from '../utils/services';
 
@@ -210,23 +210,23 @@ const CollectController = (() => {
       localStorage.setItem('saving-shipping-collect', true);
       $('#btn-go-to-payment').trigger('click');
 
-      setTimeout(() => {
-        window.vtexjs.checkout
-          .getOrderForm()
-          .then((orderForm) => {
-            const { address } = orderForm.shippingData;
+      // setTimeout(() => {
+      window.vtexjs.checkout
+        .getOrderForm()
+        .then((orderForm) => {
+          const { address } = orderForm.shippingData;
 
-            sendOrderFormCustomData(PICKUP_APP, { phone: collectPhone }).then((data) => {
-              updateCollectSummary(address.receiverName, collectPhone);
-              console.info('PICKUP SENT', { data });
-            });
-
-            return window.vtexjs.checkout.calculateShipping(address);
-          })
-          .done(() => {
-            localStorage.removeItem('saving-shipping-collect');
+          sendOrderFormCustomData(PICKUP_APP, { phone: collectPhone }).then((data) => {
+            updateCollectSummary(address.receiverName, collectPhone);
+            console.info('PICKUP SENT', { data });
           });
-      }, TIMEOUT_750);
+
+          return window.vtexjs.checkout.calculateShipping(address);
+        })
+        .done(() => {
+          localStorage.removeItem('saving-shipping-collect');
+        });
+      // }, TIMEOUT_750);
     }
   };
 
