@@ -25,6 +25,7 @@ const NONE = 'none';
 // APP CONFIGURATION IDs
 const RICA_APP = 'ricafields';
 const TV_APP = 'tvfields';
+const PICKUP_APP = 'pickup';
 
 // Furniture fees Url
 const FURNITURE_FEES =
@@ -73,5 +74,5 @@ export {
   MANUAL,
   PICKUP,
   NONE,
+  PICKUP_APP,
 };
-
