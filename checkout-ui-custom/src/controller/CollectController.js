@@ -216,9 +216,8 @@ const CollectController = (() => {
         .then((orderForm) => {
           const { address } = orderForm.shippingData;
 
-          sendOrderFormCustomData(PICKUP_APP, { phone: collectPhone }).then((data) => {
+          sendOrderFormCustomData(PICKUP_APP, { phone: collectPhone }).then(() => {
             updateCollectSummary(address.receiverName, collectPhone);
-            console.info('PICKUP SENT', { data });
           });
 
           return window.vtexjs.checkout.calculateShipping(address);
