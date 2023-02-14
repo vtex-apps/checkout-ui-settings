@@ -80,15 +80,17 @@ const DeliverController = (() => {
   });
 
   $(document).ready(() => {
-    clearAddresses();
-    if (window.location.hash === STEPS.SHIPPING) {
-      setupDeliver();
-      $('.bash--delivery-container.hide').removeClass('hide');
-      $('.bash--delivery-container').css('display', 'flex');
-    } else if ($('.bash--delivery-container:not(.hide)').length) {
-      $('.bash--delivery-container:not(.hide)').addClasså('hide');
-      $('.bash--delivery-container').css('display', 'none');
-    }
+    window.vtexjs.checkout.getOrderForm().then(() => {
+      clearAddresses();
+      if (window.location.hash === STEPS.SHIPPING) {
+        setupDeliver();
+        $('.bash--delivery-container.hide').removeClass('hide');
+        $('.bash--delivery-container').css('display', 'flex');
+      } else if ($('.bash--delivery-container:not(.hide)').length) {
+        $('.bash--delivery-container:not(.hide)').addClass('hide');
+        $('.bash--delivery-container').css('display', 'none');
+      }
+    });
   });
 
   $(window).on('hashchange', () => {
