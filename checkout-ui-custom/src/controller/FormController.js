@@ -145,6 +145,7 @@ const FormController = (() => {
 
   const runCustomization = () => {
     // If user has no addresses, and has Deliver selected.
+
     if (
       $('div.address-list').length < 1 &&
       $('#shipping-option-delivery').hasClass('shp-method-option-active') &&
@@ -156,6 +157,11 @@ const FormController = (() => {
     }
 
     if (window.location.hash === STEPS.SHIPPING) {
+      if ($('.shipping-summary-info').length && $('.shipping-summary-info').text() === 'Waiting for more information') {
+        window.location.hash = STEPS.PROFILE;
+        return;
+      }
+
       setTimeout(() => {
         const selectedDelivery = $('#shipping-option-delivery').hasClass('shp-method-option-active');
         if (selectedDelivery) {
