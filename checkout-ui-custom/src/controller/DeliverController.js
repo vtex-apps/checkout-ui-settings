@@ -109,7 +109,7 @@ const DeliverController = (() => {
   $(window).on('orderFormUpdated.vtex', () => {
     const items = window.vtexjs.checkout.orderForm?.items;
     const addressType = window.vtexjs.checkout.orderForm.shippingData?.address?.addressType;
-    const { hasTVs, hasSimCards } = getSpecialCategories(items);
+    const { hasTVs, hasSimCards, hasFurnitureMixed } = getSpecialCategories(items);
     const { messages } = window.vtexjs.checkout.orderForm;
 
     if (window.location.hash === STEPS.SHIPPING) {
@@ -118,8 +118,9 @@ const DeliverController = (() => {
     }
 
     if (addressType === 'search') {
-      // User has Collect enabled, but has Rica or TV products.
-      if (hasTVs || hasSimCards) {
+      // User has Collect enabled, but has Rica or TV products,
+      // or Furniture + Non Furn.
+      if (hasTVs || hasSimCards || hasFurnitureMixed) {
         if (window.location.hash !== STEPS.SHIPPING) window.location.hash = STEPS.SHIPPING;
         setTimeout(() => document.getElementById('shipping-option-delivery')?.click(), 2000);
         return;
