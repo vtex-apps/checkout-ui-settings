@@ -42,6 +42,7 @@ const getShippingData = async (addressName, fields) => {
 
 // TODO remove when no longer used in favour of services.
 const saveAddress = async (fields = {}) => {
+  console.info('saveAddress STILL USED');
   let path;
   const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
   const { address } = window.vtexjs.checkout.orderForm.shippingData;
@@ -239,7 +240,8 @@ const getSpecialCategories = (items) => {
 };
 
 export const clearLoaders = () => {
-  ('happened')
+  ('happened');
+
   $('.shimmer').removeClass('shimmer');
 };
 
@@ -255,4 +257,3 @@ export {
   isValidNumberBash,
   getSpecialCategories,
 };
-

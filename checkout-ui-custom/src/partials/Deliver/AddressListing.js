@@ -22,9 +22,10 @@ const isSelectedAddress = (address, selectedAddress) => {
 const AddressListing = (address) => {
   if (!address) return '';
 
-  const { street, neighborhood, postalCode, city, receiverName, complement, addressName } = address;
+  const { number, street, neighborhood, postalCode, city, receiverName, addressName, complement } = address;
 
-  const addressLine = [street, neighborhood ?? city, postalCode].join(', ');
+  const addressLine = [`${number ? `${number} ` : ''}${street}`, neighborhood ?? city, postalCode].join(', ').trim();
+
   const contactLine = [receiverName, formatPhoneNumber(prependZero(complement))].join(' - ');
 
   // orderform
