@@ -269,12 +269,6 @@ const CollectController = (() => {
       }
     } else if ($('input#custom-pickup-complement').val() === '') {
       $('input#custom-pickup-complement').val(phoneNumber);
-
-      window.vtexjs.checkout.getOrderForm().then((orderForm) => {
-        const { shippingData } = orderForm;
-        shippingData.address.complement = phoneNumber;
-        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
-      });
     }
     prePopulateReceiverName();
   };

@@ -7,9 +7,9 @@ import {
   sendOrderFormCustomData,
   updateAddressListing,
 } from '../../utils/services';
+import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
-import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
 
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
@@ -101,6 +101,7 @@ const populateAddressFromSearch = (address) => {
 
 export const populateAddressForm = (address) => {
   const {
+    number,
     street,
     companyBuilding,
     neighborhood,
@@ -125,12 +126,14 @@ export const populateAddressForm = (address) => {
   if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
   if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
+  const streetLine = `${number ? `${number} ` : ''}${street}`;
+
   document.getElementById('bash--input-number').value = '';
-  document.getElementById('bash--input-companyBuilding').value = companyBuilding ?? '';
-  document.getElementById('bash--input-street').value = street ?? '';
-  document.getElementById('bash--input-neighborhood').value = neighborhood ?? '';
-  document.getElementById('bash--input-city').value = city ?? '';
-  document.getElementById('bash--input-postalCode').value = postalCode ?? '';
+  document.getElementById('bash--input-companyBuilding').value = companyBuilding || '';
+  document.getElementById('bash--input-street').value = streetLine || '';
+  document.getElementById('bash--input-neighborhood').value = neighborhood || '';
+  document.getElementById('bash--input-city').value = city || '';
+  document.getElementById('bash--input-postalCode').value = postalCode || '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
 
   $(':invalid').trigger('change');
@@ -341,10 +344,14 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
   if (address.addressType === 'business') address.addressType = 'commercial';
   if (!validAddressTypes.includes(address.addressType)) address.addressType = 'residential';
 
+  if (address.number) {
+    address.street = `${address.number} ${address.street}`;
+    address.number = '';
+  }
+
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
   shippingData.address = address;
-  shippingData.address.number = shippingData.address.number ?? ' ';
   shippingData.selectedAddresses = [address];
 
   // Start Shimmering
@@ -365,7 +372,7 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
         return { success: false, errors };
       }
 
-      if (address.addressName) updateAddressListing(shippingData.address);
+      if (address.addressName) updateAddressListing(address);
 
       return { success: true };
     })
@@ -412,9 +419,9 @@ export const submitAddressForm = async (event) => {
     isDisposable: false,
     reference: null,
     geoCoordinates: [],
-    number: '',
     country: 'ZAF',
     ...storedAddress,
+    number: '',
   };
 
   for (let f = 0; f < fields.length; f++) {
