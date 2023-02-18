@@ -127,6 +127,12 @@ const DeliverController = (() => {
       }
       $('#shipping-data:not(collection-active)').addClass('collection-active');
       $('.delivery-active').removeClass('delivery-active');
+
+      // Prevent Collection Active, but Delivery button is selected.
+      // Resulting in no content shown
+      if ($('#shipping-option-delivery').hasClass('vtex-omnishipping-1-x-deliveryOptionActive')) {
+        $('#shipping-option-pickup-in-point').click();
+      }
     } else {
       setupDeliver();
       $('#shipping-data:not(delivery-active)').addClass('delivery-active');
