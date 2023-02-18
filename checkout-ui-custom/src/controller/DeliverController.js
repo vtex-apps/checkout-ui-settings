@@ -28,6 +28,7 @@ const DeliverController = (() => {
   };
 
   const setupDeliver = () => {
+    console.info('SETUP DELIVER');
     if ($('#bash--delivery-container').length) return;
 
     if (window.vtexjs.checkout.orderForm) {
@@ -131,12 +132,18 @@ const DeliverController = (() => {
       // Prevent Collection Active, but Delivery button is selected.
       // Resulting in no content shown
       if ($('#shipping-option-delivery').hasClass('vtex-omnishipping-1-x-deliveryOptionActive')) {
-        $('#shipping-option-pickup-in-point').click();
+        console.info('Fix missing shipping - delivery');
+        setTimeout(() => document.getElementById('shipping-option-pickup-in-point')?.click(), 2000);
       }
     } else {
       setupDeliver();
       $('#shipping-data:not(delivery-active)').addClass('delivery-active');
       $('.collection-active').removeClass('collection-active');
+
+      if ($('#shipping-option-pickup-in-point').hasClass('vtex-omnishipping-1-x-deliveryOptionActive')) {
+        console.info('Fix missing shipping - collect');
+        setTimeout(() => document.getElementById('shipping-option-delivery')?.click(), 2000);
+      }
     }
 
     setCartClasses();
