@@ -181,10 +181,6 @@ export const addOrUpdateAddress = async (address) => {
 
   if (!address.addressId) address.addressId = address.addressName;
 
-  // if (address.complement === address.companyBuilding) {
-  //   console.info('Bad address', { address });
-  //   address.complement = window.vtexjs.checkout.orderForm.clientProfileData.phone;
-  // }
   // Add or update at local store. Update UI.
   DB.addOrUpdateAddress(address).then(() => updateAddressListing(address));
 
