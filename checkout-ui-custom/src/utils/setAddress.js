@@ -10,7 +10,6 @@ import {
 import { clearLoaders, getSpecialCategories } from './functions';
 import { updateAddressListing } from './services';
 
-// TODO move somewhere else?
 const setAddress = (address, options = { validateExtraFields: true }) => {
   const { validateExtraFields } = options;
   const { items } = window.vtexjs.checkout.orderForm;
