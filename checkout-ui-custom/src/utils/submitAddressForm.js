@@ -76,8 +76,12 @@ const submitAddressForm = async (event) => {
   await addOrUpdateAddress(address);
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
   setTimeout(() => {
-    document.getElementById('bash-delivery-options').scrollIntoView({ behavior: 'smooth' });
-  }, 200);
+    if ($('.bash--extra-fields').length > 0) {
+      document.querySelector('.bash--extra-fields').scrollIntoView({ behavior: 'smooth' });
+    } else {
+      document.getElementById('bash-delivery-options').scrollIntoView({ behavior: 'smooth' });
+    }
+  }, 500);
   showAlertBox();
 };
 
