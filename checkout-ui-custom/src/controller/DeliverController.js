@@ -9,15 +9,15 @@ import {
   populateRicaFields,
   populateTVFields,
   preparePhoneField,
-  setAddress,
   setCartClasses,
-  submitAddressForm,
-  submitDeliveryForm,
   updateDeliveryFeeDisplay,
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
-import { getSpecialCategories } from '../utils/functions';
+import { getSpecialCategories, hideBusinessName, showBusinessName } from '../utils/functions';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
+import setAddress from '../utils/setAddress';
+import submitAddressForm from '../utils/submitAddressForm';
+import submitDeliveryForm from '../utils/submitDeliveryForm';
 
 const DeliverController = (() => {
   const state = {
@@ -179,9 +179,9 @@ const DeliverController = (() => {
   $(document).on('change', 'input[name="addressType"]', function () {
     if ($(this).is(':checked')) {
       if ($(this).val() === 'business') {
-        $('#bash--label-companyBuilding').text('Business name');
+        showBusinessName({ focus: true });
       } else {
-        $('#bash--label-companyBuilding').text('Building/Complex and number');
+        hideBusinessName();
       }
     }
   });
@@ -214,7 +214,7 @@ const DeliverController = (() => {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
         if (data.view === 'address-form' || data.view === 'address-edit') {
-          preparePhoneField('#bash--input-complement');
+          preparePhoneField('#bash--input-receiverPhone');
           if (data.content) {
             const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
             populateAddressForm(address);

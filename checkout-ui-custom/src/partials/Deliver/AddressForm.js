@@ -1,4 +1,3 @@
-import { getBestPhoneNumber } from '../../utils/phoneFields';
 import FormField from './Elements/FormField';
 import { getBestRecipient } from './utils';
 
@@ -36,8 +35,16 @@ const AddressForm = () => {
     {
       name: 'number',
       required: false,
-      value: '  ',
+      value: '',
       type: 'hidden',
+    },
+
+    {
+      name: 'businessName',
+      label: 'Business name',
+      required: false,
+      value: '',
+      maxLength: 100,
     },
     {
       name: 'companyBuilding',
@@ -140,11 +147,17 @@ const AddressForm = () => {
       required: true,
       value: getBestRecipient(),
     },
+    // TODO remove field
     {
       name: 'complement',
+      required: false,
+      type: 'hidden',
+      helperText: 'We send shipping updates to this number.',
+    },
+    {
+      name: 'receiverPhone',
       label: 'Recipient’s mobile number',
       required: true,
-      value: getBestPhoneNumber(),
       type: 'tel',
       helperText: 'We send shipping updates to this number.',
     },

@@ -3,7 +3,6 @@ import AddressListing from '../partials/Deliver/AddressListing';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
 import { clearLoaders } from './functions';
-import { getBestPhoneNumber } from './phoneFields';
 
 // API Functions
 
@@ -45,9 +44,11 @@ export const getAddresses = async () => {
       'number',
       'geolocation',
       'receiverName',
-      'complement',
-      'companyBuilding',
+      'receiverPhone',
+      'complement', // todo stop populating complement, in favour of companyBuilding
       'street',
+      'businessName',
+      'companyBuilding',
       'neighborhood',
       'city',
       'postalCode',
@@ -122,9 +123,6 @@ export const upsertAddress = async (address) => {
     path = `${BASE_URL_API}masterdata/addresses`;
   }
 
-  address.complement = address.complement || getBestPhoneNumber();
-
-  // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood
   const newAddress = {
     userId: email,
     ...address,

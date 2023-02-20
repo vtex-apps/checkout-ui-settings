@@ -1,13 +1,8 @@
-import { RICA_APP, STEPS, TV_APP } from '../../utils/const';
-import { clearLoaders, getSpecialCategories } from '../../utils/functions';
-import {
-  addOrUpdateAddress,
-  getAddressByName,
-  getOrderFormCustomData,
-  sendOrderFormCustomData,
-  updateAddressListing,
-} from '../../utils/services';
-import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
+import { RICA_APP, TV_APP } from '../../utils/const';
+import { getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
+import { getBestPhoneNumber } from '../../utils/phoneFields';
+import { addOrUpdateAddress, getAddressByName, getOrderFormCustomData } from '../../utils/services';
+import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
 
@@ -103,12 +98,15 @@ export const populateAddressForm = (address) => {
   const {
     number,
     street,
+    addressType,
+    businessName,
     companyBuilding,
     neighborhood,
     postalCode,
     state,
     city,
     receiverName,
+    receiverPhone,
     complement,
     id,
     addressId,
@@ -117,16 +115,21 @@ export const populateAddressForm = (address) => {
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
-
-  // Only overwrite defaults if values exist.
-  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
-  if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
+  hideBusinessName();
 
   // addressId indicates that address is being edited / completed.
   if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
   if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
   const streetLine = `${number ? `${number} ` : ''}${street}`.replace(`, ${companyBuilding}`, '');
+
+  // Address type
+  if (addressType === 'commercial') {
+    $('#radio-addressType-business').click();
+    showBusinessName({ focus: false });
+  }
+
+  if (businessName) document.getElementById('bash--input-businessName').value = businessName;
 
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = streetLine || '';
@@ -135,6 +138,11 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-city').value = city || '';
   document.getElementById('bash--input-postalCode').value = postalCode || '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+
+  // Only overwrite defaults if values exist.
+  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
+  if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
+  document.getElementById('bash--input-receiverPhone').value = receiverPhone || complement || getBestPhoneNumber();
 
   $(':invalid').trigger('change');
 };
@@ -204,16 +212,6 @@ export const clearRicaFields = () => {
     province: '',
   };
   populateExtraFields(clearedRica, requiredRicaFields, 'rica_', true);
-};
-
-export const showHideLiftOrStairs = (floor) => {
-  if (floor && floor !== 'ground') {
-    $('.bash--dropdownfield-liftOrStairs').slideDown().addClass('required');
-    $('#bash--input-liftOrStairs').attr('required', 'required');
-  } else {
-    $('.bash--dropdownfield-liftOrStairs').slideUp();
-    $('#bash--input-liftOrStairs').removeAttr('required');
-  }
 };
 
 export const populateTVFields = async () => {
@@ -313,81 +311,6 @@ export const populateDeliveryError = (errors = []) => {
   if (errors.length > 0) $('html, body').animate({ scrollTop: $('#bash-delivery-error-container').offset().top }, 400);
 };
 
-// TODO move somewhere else?
-export const setAddress = (address, options = { validateExtraFields: true }) => {
-  const { validateExtraFields } = options;
-  const { items } = window.vtexjs.checkout.orderForm;
-  const { hasTVs, hasSimCards } = getSpecialCategories(items);
-
-  if (hasTVs) populateExtraFields(address, requiredTVFields, 'tv_');
-  if (hasSimCards) populateRicaFields();
-
-  const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
-
-  if (!isValid) {
-    populateAddressForm(address);
-    $('#bash--address-form').addClass('show-form-errors');
-    if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');
-    $(`#bash--input-${invalidFields[0]}`).focus();
-
-    if (requiredAddressFields.includes(invalidFields[0])) {
-      window.postMessage({
-        action: 'setDeliveryView',
-        view: 'address-edit',
-      });
-    }
-
-    return { success: false, error: 'Invalid address details.' };
-  }
-
-  // Fix bad addressType.
-  if (address.addressType === 'business') address.addressType = 'commercial';
-  if (!validAddressTypes.includes(address.addressType)) address.addressType = 'residential';
-
-  if (address.number) {
-    address.street = `${address.number} ${address.street}`;
-    address.number = '';
-  }
-
-  const { shippingData } = window?.vtexjs?.checkout?.orderForm;
-
-  shippingData.address = address;
-  shippingData.selectedAddresses = [address];
-
-  // map phonenumber (complement) from address.complement to clientProfileData.phone.????
-  // map phonenumber (complement) from address.complement to shippingData.address.????
-  // map companyBuilding from address.companyBuilding to shippingData.address.complement
-  // shippingData.address.complement = address.companyBuilding;
-  if (address.companyBuilding && !shippingData.address.street.includes(`, ${address.companyBuilding}`)) {
-    shippingData.address.street = `${address.street}, ${address.companyBuilding}`;
-  }
-  shippingData.selectedAddresses[0] = shippingData.address;
-
-  // Start Shimmering
-  setDeliveryLoading();
-  return window.vtexjs.checkout
-    .sendAttachment('shippingData', shippingData)
-    .then((orderForm) => {
-      const { messages } = orderForm;
-      const errors = messages.filter((msg) => msg.status === 'error');
-
-      if (errors.length > 0) {
-        populateDeliveryError(errors);
-        window.postMessage({
-          action: 'setDeliveryView',
-          view: 'address-form',
-        });
-
-        return { success: false, errors };
-      }
-
-      if (address.addressName) updateAddressListing(address);
-
-      return { success: true };
-    })
-    .done(() => clearLoaders());
-};
-
 export const showAlertBox = () => {
   $('.alert-container').addClass('show');
   $('.alert-container').slideDown();
@@ -397,158 +320,6 @@ export const showAlertBox = () => {
   setTimeout(() => {
     $('.alert-container').slideUp();
   }, 5000);
-};
-
-export const submitAddressForm = async (event) => {
-  event.preventDefault();
-
-  // Prevent false positive for invalid selects.
-  $('select').change();
-
-  const form = document.forms['bash--address-form'];
-  const addressName = $('#bash--input-addressName').val();
-  const storedAddress = await getAddressByName(addressName);
-
-  const fields = [
-    'addressId',
-    'addressName',
-    'addressType',
-    'receiverName',
-    'postalCode',
-    'city',
-    'state',
-    'country',
-    'street',
-    'neighborhood',
-    'complement',
-    'companyBuilding',
-  ];
-
-  const address = {
-    isDisposable: false,
-    reference: null,
-    geoCoordinates: [],
-    country: 'ZAF',
-    ...storedAddress,
-    number: '',
-  };
-
-  for (let f = 0; f < fields.length; f++) {
-    address[fields[f]] = form[fields[f]]?.value || null;
-  }
-
-  address.addressName = address.addressName || address.addressId;
-  address.addressId = address.addressId || address.addressName;
-
-  const shippingAddress = address;
-
-  const { isValid, invalidFields } = addressIsValid(address, false);
-
-  if (!isValid) {
-    console.error({ invalidFields });
-    $('#bash--address-form').addClass('show-form-errors');
-    $(`#bash--input-${invalidFields[0]}`).focus();
-
-    if (requiredAddressFields.includes(invalidFields[0])) {
-      window.postMessage({
-        action: 'setDeliveryView',
-        view: 'address-form',
-      });
-    }
-
-    return;
-  }
-
-  // Apply the selected address to customers orderForm.
-  const setAddressResponse = await setAddress(shippingAddress, { validateExtraFields: false });
-  const { success } = setAddressResponse;
-  if (!success) {
-    console.error('Set address error', { setAddressResponse });
-    return;
-  }
-
-  // Update the localstore, and the API
-
-  // TODO Fix address data structure.
-  // Temporarily Map company building to shippingData.address.complement
-  // Temporarily Map complement to shippingData.clientProfileData.phone
-  // address.companyBuilding = window.vtexjs.checkout.orderForm.shippingData.address.complement;
-  // address.complement = window.vtexjs.checkout.orderForm.clientProfileData.phone;
-
-  await addOrUpdateAddress(address);
-  window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
-
-  showAlertBox();
-};
-
-export const submitDeliveryForm = async (event) => {
-  event.preventDefault();
-  const { items } = window.vtexjs.checkout.orderForm;
-  const { address } = window.vtexjs.checkout.orderForm.shippingData;
-  const { hasTVs, hasSimCards } = getSpecialCategories(items);
-
-  // Prevent false positive validation errors for invalid selects.
-  $('select').change();
-
-  let fullAddress = {};
-
-  const selectedAddressRadio = "[name='selected-address']:checked";
-
-  // Prevent sending without having selected an address.
-  if ($(selectedAddressRadio).length < 1) {
-    $('html, body').animate({ scrollTop: $('#bash--delivery-form').offset().top }, 400);
-    return;
-  }
-
-  setDeliveryLoading();
-
-  const dbAddress = await getAddressByName($(selectedAddressRadio).val());
-
-  fullAddress = { ...address, ...dbAddress };
-
-  // Final check to validate that the selected address has no validation errors.
-  const { success: didSetAddress } = await setAddress(fullAddress, { validateExtraFields: false });
-  if (!didSetAddress) {
-    console.error('Delivery Form - Address Validation error');
-    clearLoaders();
-    return;
-  }
-
-  const ricaData = {};
-  const tvData = {};
-
-  // Not saved to address profile.
-  if (hasSimCards) {
-    const fields = requiredRicaFields;
-    for (let i = 0; i < fields.length; i++) {
-      if (fields[i] === 'sameAddress') {
-        const isFieldChecked = $(`#bash--input-${fields[i]}`).is(':checked');
-        ricaData[fields[i]] = isFieldChecked;
-      }
-      ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val() || '';
-    }
-
-    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, true);
-    console.info({ ricaDataSent });
-  }
-
-  if (hasTVs) {
-    const fields = requiredTVFields;
-    for (let i = 0; i < fields.length; i++) {
-      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
-      tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val() || '';
-    }
-
-    const tvDataSent = await sendOrderFormCustomData(TV_APP, tvData);
-    console.info({ tvDataSent });
-  }
-
-  await addOrUpdateAddress(fullAddress);
-
-  // after submitting hide the delivery container
-  $('.bash--delivery-container').css('display', 'none');
-  window.location.hash = STEPS.PAYMENT;
-  clearLoaders();
 };
 
 // some presaved addresses still have a missing zero,
