@@ -2,7 +2,6 @@ const path = require('path');
 // const webpack = require('webpack');
 
 const config = {
-  // TODO: Add common Configuration
   module: {},
 };
 
