@@ -33,7 +33,7 @@ export const getAddresses = async () => {
   if (addresses.length > 0) return { data: addresses };
 
   // Fallback to get addresses from API.
-return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+  return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
     const { email } = orderForm?.clientProfileData;
 
     const fields = [
@@ -79,7 +79,7 @@ return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
         return data;
       })
       .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
-  })
+  });
 };
 
 // GET Address by ID / Name?
@@ -181,6 +181,10 @@ export const addOrUpdateAddress = async (address) => {
 
   if (!address.addressId) address.addressId = address.addressName;
 
+  // if (address.complement === address.companyBuilding) {
+  //   console.info('Bad address', { address });
+  //   address.complement = window.vtexjs.checkout.orderForm.clientProfileData.phone;
+  // }
   // Add or update at local store. Update UI.
   DB.addOrUpdateAddress(address).then(() => updateAddressListing(address));
 
