@@ -33,7 +33,7 @@ export const getAddresses = async () => {
   if (addresses.length > 0) return { data: addresses };
 
   // Fallback to get addresses from API.
-return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+  return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
     const { email } = orderForm?.clientProfileData;
 
     const fields = [
@@ -79,7 +79,7 @@ return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
         return data;
       })
       .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
-  })
+  });
 };
 
 // GET Address by ID / Name?
@@ -241,9 +241,6 @@ export const removeFromCart = (index) =>
         quantity: 0,
       },
     ])
-    .then((orderForm) => {
-      console.info('ITEM REMOVED', { orderForm });
-    })
     .done(() => {
       clearLoaders();
     });

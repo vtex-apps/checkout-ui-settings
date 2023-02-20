@@ -1,5 +1,5 @@
 import { BASE_URL_API, FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
-import { getBestPhoneNumber, validatePhoneNumber } from './phoneFields';
+import { validatePhoneNumber } from './phoneFields';
 
 // API Functions
 
@@ -38,59 +38,6 @@ const getShippingData = async (addressName, fields) => {
   }
 
   return data;
-};
-
-// TODO remove when no longer used in favour of services.
-const saveAddress = async (fields = {}) => {
-  console.info('saveAddress STILL USED');
-  let path;
-  const { email } = window.vtexjs.checkout.orderForm.clientProfileData;
-  const { address } = window.vtexjs.checkout.orderForm.shippingData;
-
-  if (!address) return;
-
-  // Address already exists (?)
-  const savedAddress = address?.addressId ? await getShippingData(address.addressId, '?_fields=id') : {};
-
-  // Guardado del nuevo addressType
-  address.addressType = localStorage.getItem('addressType');
-
-  if (savedAddress?.id) {
-    path = `${BASE_URL_API}masterdata/address/${savedAddress.id}`;
-  } else {
-    path = `${BASE_URL_API}masterdata/addresses`;
-  }
-
-  address.complement = address.complement || getBestPhoneNumber();
-
-  // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood
-  const newAddress = {
-    userId: email,
-    ...address,
-    ...fields,
-  };
-
-  if (!savedAddress.id) {
-    newAddress.addressName = address.addressId;
-  }
-
-  const headers = getHeadersByConfig({ cookie: true, cache: true, json: true });
-
-  const options = {
-    method: 'PATCH',
-    headers,
-    body: JSON.stringify(newAddress),
-    credentials: 'include',
-  };
-
-  await fetch(path, options)
-    .then((res) => {
-      localStorage.setItem('shippingDataCompleted', true);
-      if (res.status !== 204) {
-        res.json();
-      }
-    })
-    .catch((error) => catchError(`SAVE_ADDRESS_ERROR: ${error?.message}`));
 };
 
 const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {
@@ -247,7 +194,6 @@ export const clearLoaders = () => {
 
 export {
   getShippingData,
-  saveAddress,
   addBorderTop,
   waitAndResetLocalStorage,
   checkoutGetCustomData,

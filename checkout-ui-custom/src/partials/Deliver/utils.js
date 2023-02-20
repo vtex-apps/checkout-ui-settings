@@ -126,11 +126,11 @@ export const populateAddressForm = (address) => {
   if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
   if (addressName) document.getElementById('bash--input-addressName').value = addressName;
 
-  const streetLine = `${number ? `${number} ` : ''}${street}`;
+  const streetLine = `${number ? `${number} ` : ''}${street}`.replace(`, ${companyBuilding}`, '');
 
   document.getElementById('bash--input-number').value = '';
-  document.getElementById('bash--input-companyBuilding').value = companyBuilding || '';
   document.getElementById('bash--input-street').value = streetLine || '';
+  document.getElementById('bash--input-companyBuilding').value = companyBuilding || '';
   document.getElementById('bash--input-neighborhood').value = neighborhood || '';
   document.getElementById('bash--input-city').value = city || '';
   document.getElementById('bash--input-postalCode').value = postalCode || '';
@@ -354,6 +354,15 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
   shippingData.address = address;
   shippingData.selectedAddresses = [address];
 
+  // map phonenumber (complement) from address.complement to clientProfileData.phone.????
+  // map phonenumber (complement) from address.complement to shippingData.address.????
+  // map companyBuilding from address.companyBuilding to shippingData.address.complement
+  // shippingData.address.complement = address.companyBuilding;
+  if (address.companyBuilding && !shippingData.address.street.includes(`, ${address.companyBuilding}`)) {
+    shippingData.address.street = `${address.street}, ${address.companyBuilding}`;
+  }
+  shippingData.selectedAddresses[0] = shippingData.address;
+
   // Start Shimmering
   setDeliveryLoading();
   return window.vtexjs.checkout
@@ -431,6 +440,8 @@ export const submitAddressForm = async (event) => {
   address.addressName = address.addressName || address.addressId;
   address.addressId = address.addressId || address.addressName;
 
+  const shippingAddress = address;
+
   const { isValid, invalidFields } = addressIsValid(address, false);
 
   if (!isValid) {
@@ -449,7 +460,7 @@ export const submitAddressForm = async (event) => {
   }
 
   // Apply the selected address to customers orderForm.
-  const setAddressResponse = await setAddress(address, { validateExtraFields: false });
+  const setAddressResponse = await setAddress(shippingAddress, { validateExtraFields: false });
   const { success } = setAddressResponse;
   if (!success) {
     console.error('Set address error', { setAddressResponse });
@@ -457,6 +468,13 @@ export const submitAddressForm = async (event) => {
   }
 
   // Update the localstore, and the API
+
+  // TODO Fix address data structure.
+  // Temporarily Map company building to shippingData.address.complement
+  // Temporarily Map complement to shippingData.clientProfileData.phone
+  // address.companyBuilding = window.vtexjs.checkout.orderForm.shippingData.address.complement;
+  // address.complement = window.vtexjs.checkout.orderForm.clientProfileData.phone;
+
   await addOrUpdateAddress(address);
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
 
@@ -536,6 +554,7 @@ export const submitDeliveryForm = async (event) => {
 // some presaved addresses still have a missing zero,
 // this adds a zero to the phone number, if it's not there.
 export const prependZero = (tel) => {
+  if (!tel) return '';
   let phoneNumber = tel.replace(/\s/g, '');
   if (phoneNumber.length === 9 && phoneNumber[0] !== '0') {
     phoneNumber = `0${phoneNumber}`;
