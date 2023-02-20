@@ -128,8 +128,6 @@ export const populateAddressForm = (address) => {
 
   const streetLine = `${number ? `${number} ` : ''}${street}`.replace(`, ${companyBuilding}`, '');
 
-  console.info({ streetLine, companyBuilding });
-
   document.getElementById('bash--input-number').value = '';
   document.getElementById('bash--input-street').value = streetLine || '';
   document.getElementById('bash--input-companyBuilding').value = companyBuilding || '';
@@ -444,7 +442,6 @@ export const submitAddressForm = async (event) => {
 
   const shippingAddress = address;
 
-  console.info('address after', { address });
   const { isValid, invalidFields } = addressIsValid(address, false);
 
   if (!isValid) {

@@ -245,9 +245,6 @@ export const removeFromCart = (index) =>
         quantity: 0,
       },
     ])
-    .then((orderForm) => {
-      console.info('ITEM REMOVED', { orderForm });
-    })
     .done(() => {
       clearLoaders();
     });

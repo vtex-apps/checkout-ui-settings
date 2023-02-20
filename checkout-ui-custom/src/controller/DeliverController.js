@@ -28,7 +28,6 @@ const DeliverController = (() => {
   };
 
   const setupDeliver = () => {
-    console.info('SETUP DELIVER');
     if ($('#bash--delivery-container').length) return;
 
     if (window.vtexjs.checkout.orderForm) {
