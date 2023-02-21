@@ -339,7 +339,7 @@ const CollectController = (() => {
           const savingCollect = localStorage.getItem('saving-shipping-collect');
 
           if (!savingCollect) {
-            const { phone } = console.log(getOrderFormCustomData(PICKUP_APP))
+            const { phone } = getOrderFormCustomData(PICKUP_APP)
 
             /* Redirect to shipping if required fields are empty */
             if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {
