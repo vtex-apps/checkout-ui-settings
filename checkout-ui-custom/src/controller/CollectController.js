@@ -2,7 +2,7 @@ import { InputError, PickupComplementField } from '../partials';
 import { setPickupLoading } from '../partials/Deliver/utils';
 import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
 import { clearLoaders, getSpecialCategories, isValidNumberBash } from '../utils/functions';
-import { sendOrderFormCustomData } from '../utils/services';
+import { getOrderFormCustomData, sendOrderFormCustomData } from '../utils/services';
 
 const CollectController = (() => {
   const state = {
@@ -339,8 +339,10 @@ const CollectController = (() => {
           const savingCollect = localStorage.getItem('saving-shipping-collect');
 
           if (!savingCollect) {
+            const { phone } = console.log(getOrderFormCustomData(PICKUP_APP))
+
             /* Redirect to shipping if required fields are empty */
-            if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !address.complement)) {
+            if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {
               window.location.hash = STEPS.SHIPPING;
               localStorage.setItem('shipping-incomplete-values', true);
             }
