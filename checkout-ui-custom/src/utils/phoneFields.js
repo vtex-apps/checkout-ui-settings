@@ -67,20 +67,21 @@ export const preparePhoneField = (input) => {
   });
 };
 
-export const getBestPhoneNumber = (type = 'profile') => {
-  switch (type) {
-    case 'profile':
-      return (
-        window.vtexjs.checkout.orderForm?.clientProfileData?.phone || document?.getElementById('client-phone')?.value
-      );
-    case 'collect':
-      const fields = getOrderFormCustomData(PICKUP);
-      return fields?.phone || document?.getElementById('client-phone')?.value;
-    default:
-      return (
-        window.vtexjs.checkout.orderForm?.clientProfileData?.phone || document?.getElementById('client-phone')?.value
-      );
+export const getBestPhoneNumber = ({ preferred = undefined, type = 'profile' }) => {
+  const fields = getOrderFormCustomData(PICKUP);
+
+  if (type === 'collect') {
+    return preferred || fields?.phone
+      || document?.getElementById('client-phone')?.value
+      || window.vtexjs.checkout.orderForm?.clientProfileData?.phone
+      || '';
   }
+
+  return (preferred
+    || window.vtexjs.checkout.orderForm?.clientProfileData?.phone
+    || document?.getElementById('client-phone')?.value
+    || ''
+  );
 };
 
 export default { validatePhoneNumber };

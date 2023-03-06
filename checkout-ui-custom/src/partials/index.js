@@ -1,4 +1,4 @@
-import AddressForm, { PickupComplementField, SuburbField } from './AddressForm';
+import AddressForm, { PickupPhoneField, SuburbField } from './AddressForm';
 import AlertBox from './AlertBox';
 import MixedProducts from './Deliver/MixedProducts';
 import TVorRICAMsg from './Deliver/TVorRICAMsg';
@@ -15,5 +15,6 @@ export {
   AddressForm,
   SuburbField,
   AlertBox,
-  PickupComplementField,
+  PickupPhoneField,
 };
+

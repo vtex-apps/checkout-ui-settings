@@ -10,10 +10,10 @@ import {
   populateTVFields,
   preparePhoneField,
   setCartClasses,
-  updateDeliveryFeeDisplay,
+  updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
-import { getSpecialCategories, hideBusinessName, showBusinessName } from '../utils/functions';
+import { clearLoaders, getSpecialCategories, hideBusinessName, showBusinessName } from '../utils/functions';
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 import setAddress from '../utils/setAddress';
@@ -43,7 +43,7 @@ const DeliverController = (() => {
     $('.shipping-data .box-step').append(
       DeliverContainer({
         hasFurn: state.hasFurn,
-      })
+      }),
     );
 
     const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
@@ -54,7 +54,7 @@ const DeliverController = (() => {
           hasFurn: state.hasFurn,
           hasSim: state.hasSim,
           hasTV: state.hasTVs,
-        })
+        }),
       );
 
       if (state.hasSim) populateRicaFields();
@@ -208,7 +208,9 @@ const DeliverController = (() => {
 
   $(document).on('click', '.remove-cart-item', function (e) {
     e.preventDefault();
-    removeFromCart($(this).data('index'));
+    removeFromCart($(this).data('index')).done(() => {
+      clearLoaders();
+    });
   });
 
   // Form validation
@@ -238,7 +240,7 @@ const DeliverController = (() => {
 
   return {
     state,
-    init: () => {},
+    init: () => { },
   };
 })();
 export default DeliverController;

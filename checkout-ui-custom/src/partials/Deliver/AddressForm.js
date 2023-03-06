@@ -145,14 +145,15 @@ const AddressForm = () => {
       name: 'receiverName',
       label: 'Recipient’s name',
       required: true,
-      value: getBestRecipient(),
+      value: getBestRecipient({ type: 'delivery' }),
     },
-    // TODO remove field
+    // Note: historically used incorrectly for Address line 2
     {
       name: 'complement',
       required: false,
       type: 'hidden',
       helperText: 'We send shipping updates to this number.',
+      value: '',
     },
     {
       name: 'receiverPhone',
@@ -172,8 +173,7 @@ const AddressForm = () => {
     <button 
       class="submit btn-go-to-payment btn btn-large btn-success"
       id="btn-save-address" 
-      type="submit"
-    >
+      type="submit">
       Save address
     </button>
   </form>

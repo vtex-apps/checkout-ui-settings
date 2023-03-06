@@ -5,7 +5,7 @@ import {
   populateDeliveryError,
   populateExtraFields,
   populateRicaFields,
-  setDeliveryLoading,
+  setDeliveryLoading
 } from '../partials/Deliver/utils';
 import { clearLoaders, getSpecialCategories } from './functions';
 import { updateAddressListing } from './services';

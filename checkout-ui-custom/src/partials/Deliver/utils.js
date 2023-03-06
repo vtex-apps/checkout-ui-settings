@@ -68,12 +68,15 @@ const provinceShortCode = (province) => {
   }
 };
 
-export const getBestRecipient = () => {
-  const receiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
+export const getBestRecipient = ({ preferred = undefined, type = 'delivery' }) => {
   const firstName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.firstName;
   const lastName = window?.vtexjs?.checkout?.orderForm?.clientProfileData?.lastName;
+  const shippingReceiverName = window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName;
   const clientProfileName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
-  return receiverName || document.getElementById('client-first-name')?.value || clientProfileName;
+
+  if (type === 'collect') return preferred || shippingReceiverName || clientProfileName || '';
+
+  return preferred || document.getElementById('client-first-name')?.value || clientProfileName || '';
 };
 
 const populateAddressFromSearch = (address) => {
@@ -142,7 +145,9 @@ export const populateAddressForm = (address) => {
   // Only overwrite defaults if values exist.
   if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
   if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
-  document.getElementById('bash--input-receiverPhone').value = receiverPhone || getBestPhoneNumber('delivery');
+  document
+    .getElementById('#bash--input-receiverPhone')
+    .value = getBestPhoneNumber({ preferred: receiverPhone, type: 'delivery' });
 
   $(':invalid').trigger('change');
 };
@@ -175,9 +180,9 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
   for (let i = 0; i < fields.length; i++) {
     const fieldId = `bash--input-${prefix}${fields[i]}`;
     if (
-      document.getElementById(fieldId) &&
-      (address[fields[i]] || override) &&
-      (!document.getElementById(fieldId).value || override)
+      document.getElementById(fieldId)
+      && (address[fields[i]] || override)
+      && (!document.getElementById(fieldId).value || override)
     ) {
       document.getElementById(fieldId).value = address[fields[i]];
     }
@@ -190,7 +195,7 @@ export const populateRicaFields = () => {
 
   if (document.getElementById('bash--input-rica_streetAddress')?.value || !address) return;
 
-  address.fullName = getBestRecipient();
+  address.fullName = getBestRecipient({ type: 'delivery' });
   address.streetAddress = address.street;
   address.suburb = address.neighborhood;
   address.province = address.state;
