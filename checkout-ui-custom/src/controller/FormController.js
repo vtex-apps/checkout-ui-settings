@@ -1,5 +1,6 @@
 /* eslint-disable func-names */
 import { STEPS } from '../utils/const';
+import sendEvent from '../utils/sendEvent';
 
 const FormController = (() => {
   const state = {
@@ -11,6 +12,11 @@ const FormController = (() => {
     if (window.location.hash === STEPS.SHIPPING) {
       if ($('.shipping-summary-info').length && $('.shipping-summary-info').text() === 'Waiting for more information') {
         window.location.hash = STEPS.PROFILE;
+        sendEvent({
+          action: 'stepRedirect',
+          label: 'redirectShippingToProfile',
+          description: 'User redirect to profile - "Waiting for more information" error.',
+        });
       }
     }
   };

@@ -14,6 +14,7 @@ import {
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories, hideBusinessName, showBusinessName } from '../utils/functions';
+import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 import setAddress from '../utils/setAddress';
 import submitAddressForm from '../utils/submitAddressForm';
@@ -138,6 +139,11 @@ const DeliverController = (() => {
 
     if (window.location.hash === STEPS.PAYMENT && !customShippingDataIsValid()) {
       window.location.hash = STEPS.SHIPPING;
+      sendEvent({
+        action: 'stepRedirect',
+        label: 'redirectPaymentToShipping',
+        description: 'User redirect to shipping because Extra Fields are invalid.',
+      });
     }
   });
 

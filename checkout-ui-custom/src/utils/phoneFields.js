@@ -1,3 +1,6 @@
+import { PICKUP } from './const';
+import { getOrderFormCustomData } from './services';
+
 /**
  * validatePhoneNumber
  * Determine if number is valid.
@@ -64,9 +67,20 @@ export const preparePhoneField = (input) => {
   });
 };
 
-export const getBestPhoneNumber = () =>
-  window.vtexjs.checkout.orderForm?.shippingData?.address?.complement ||
-  window.vtexjs.checkout.orderForm?.clientProfileData?.phone ||
-  document?.getElementById('client-phone')?.value;
+export const getBestPhoneNumber = (type = 'profile') => {
+  switch (type) {
+    case 'profile':
+      return (
+        window.vtexjs.checkout.orderForm?.clientProfileData?.phone || document?.getElementById('client-phone')?.value
+      );
+    case 'collect':
+      const fields = getOrderFormCustomData(PICKUP);
+      return fields?.phone || document?.getElementById('client-phone')?.value;
+    default:
+      return (
+        window.vtexjs.checkout.orderForm?.clientProfileData?.phone || document?.getElementById('client-phone')?.value
+      );
+  }
+};
 
 export default { validatePhoneNumber };

@@ -1,7 +1,7 @@
 import { RICA_APP, TV_APP } from '../../utils/const';
 import { getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
 import { getBestPhoneNumber } from '../../utils/phoneFields';
-import { addOrUpdateAddress, getAddressByName, getOrderFormCustomData } from '../../utils/services';
+import { getOrderFormCustomData } from '../../utils/services';
 import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
@@ -142,7 +142,7 @@ export const populateAddressForm = (address) => {
   // Only overwrite defaults if values exist.
   if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
   if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
-  document.getElementById('bash--input-receiverPhone').value = receiverPhone || complement || getBestPhoneNumber();
+  document.getElementById('bash--input-receiverPhone').value = receiverPhone || getBestPhoneNumber('delivery');
 
   $(':invalid').trigger('change');
 };

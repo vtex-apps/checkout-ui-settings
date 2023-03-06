@@ -2,6 +2,7 @@ import { InputError, PickupComplementField } from '../partials';
 import { setPickupLoading } from '../partials/Deliver/utils';
 import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
 import { clearLoaders, getSpecialCategories, isValidNumberBash } from '../utils/functions';
+import sendEvent from '../utils/sendEvent';
 import { getOrderFormCustomData, sendOrderFormCustomData } from '../utils/services';
 
 const CollectController = (() => {
@@ -339,12 +340,17 @@ const CollectController = (() => {
           const savingCollect = localStorage.getItem('saving-shipping-collect');
 
           if (!savingCollect) {
-            const { phone } = getOrderFormCustomData(PICKUP_APP)
+            const { phone } = getOrderFormCustomData(PICKUP_APP);
 
             /* Redirect to shipping if required fields are empty */
             if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {
               window.location.hash = STEPS.SHIPPING;
               localStorage.setItem('shipping-incomplete-values', true);
+              sendEvent({
+                action: 'stepRedirect',
+                label: 'redirectPaymentToShipping',
+                description: 'User redirect to shipping because Collection is missing receiverName or phone number.',
+              });
             }
           }
         }, 1000);

@@ -7,6 +7,9 @@
   "builders": {
     "checkout-ui-custom": "0.x"
   },
+  "scripts": {
+    "postreleasy": "vtex publish --verbose --force"
+  },
   "credentialType": "absolute",
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema",
   "settingsSchema": {
