@@ -308,13 +308,11 @@ const CollectController = (() => {
       state.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active');
       state.pickupSelected = $('div.ask-for-geolocation').length === 0;
 
-      pickupMap();
       if (state.inCollect) {
         if ((!$('#tfg-pickup-button').length && !$('#tfg-pickup-see-more-button').length) || (!$('#find-pickups-manually-search').length && !$('#find-pickups-button-new').length)) {
-          resetPickup();
+          pickupMap();
         }
         clearLoaders();
-        pickupMap();
         if (state.pickupSelected && !state.collectReset) {
           $('button.shp-pickup-receiver__btn').trigger('click');
           $('div.shp-pickup-receiver').addClass('show');
