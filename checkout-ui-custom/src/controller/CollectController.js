@@ -45,11 +45,16 @@ const CollectController = (() => {
     };
     window.vtexjs.checkout.sendAttachment('shippingData', retShipping);
     setPickupLoading();
+    pickupMap();
   };
 
+  // Pickup Point Map
   const pickupMap = () => {
-    // Pickup Point Map
+    // Remove potential postal code warnings
+    $('.shp-alert.vtex-omnishipping-1-x-warning').remove();
     $('.pickup-marker-blue').remove();
+
+    // Modify view to match design for a selected pickup point
     if ($('#change-pickup-button').length) {
       $(
         '<button class="vtex-omnishipping-1-x-pickupPointSeeMore button-see-pickup-point btn btn-link" id="tfg-pickup-see-more-button" type="button">Collect Point Details</button>'
@@ -61,6 +66,7 @@ const CollectController = (() => {
       $('#details-pickup-button').remove();
     }
 
+    // Remove vtex no point selected and replace with our own html
     if ($('.vtex-omnishipping-1-x-ask').length) {
       $('.vtex-omnishipping-1-x-ask').empty();
       $(`<div class="pickup-map-container">
@@ -302,7 +308,11 @@ const CollectController = (() => {
       state.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active');
       state.pickupSelected = $('div.ask-for-geolocation').length === 0;
 
+      pickupMap();
       if (state.inCollect) {
+        if ((!$('#tfg-pickup-button').length && !$('#tfg-pickup-see-more-button').length) || (!$('#find-pickups-manually-search').length && !$('#find-pickups-button-new').length)) {
+          resetPickup();
+        }
         clearLoaders();
         pickupMap();
         if (state.pickupSelected && !state.collectReset) {
