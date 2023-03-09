@@ -55,7 +55,7 @@ const DeliverContainer = ({ hasFurn }) => `
           data-view="address-form"
           onClick="document.getElementById('bash--input-street').focus()"
           style="text-decoration: underline" 
-        >enter it address manually here</a>.
+        >enter it manually</a>.
       </p>
     </section>
     
