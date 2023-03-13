@@ -54,6 +54,7 @@ export const getAddresses = async () => {
       'state',
       'country',
       'tvID',
+      'geoCoordinate',
     ].join(',');
 
     const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
@@ -66,9 +67,9 @@ export const getAddresses = async () => {
 
     return fetch(
       `${BASE_URL_API}masterdata/addresses?t=${cacheBust}&_fields=${fields}&_where=${encodeURIComponent(
-        `userIdQuery=${email}`
+        `userIdQuery=${email}`,
       )}`,
-      options
+      options,
     )
       .then((res) => res.json())
       .then(async (data) => {
@@ -93,7 +94,7 @@ const getAddress = async (addressName, fields) => {
 
   const response = await fetch(
     `${BASE_URL_API}masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
-    options
+    options,
   )
     .then((res) => res.json())
     .catch((error) => catchError(`GET_ADDRESS_ERROR: ${error?.message}`));
@@ -233,16 +234,15 @@ export const getOrderFormCustomData = (appId) => {
   return fields;
 };
 
-export const removeFromCart = (index) =>
-  window.vtexjs.checkout
-    .updateItems([
-      {
-        index: `${index}`,
-        quantity: 0,
-      },
-    ])
-    .done(() => {
-      clearLoaders();
-    });
+export const removeFromCart = (index) => window.vtexjs.checkout
+  .updateItems([
+    {
+      index: `${index}`,
+      quantity: 0,
+    },
+  ])
+  .done(() => {
+    clearLoaders();
+  });
 
 export default getAddresses;

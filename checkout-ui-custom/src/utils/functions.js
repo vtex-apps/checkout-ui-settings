@@ -28,7 +28,7 @@ const getShippingData = async (addressName, fields) => {
 
   const response = await fetch(
     `${BASE_URL_API}masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
-    options
+    options,
   )
     .then((res) => res.json())
     .catch((error) => catchError(`GET_ADDRESS_ERROR: ${error?.message}`));
@@ -46,8 +46,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
     const { address } = window.vtexjs.checkout.orderForm.shippingData;
 
     /* Setting Masterdata custom fields */
-    const fields =
-      '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID';
+    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID,geoCoordinate';
 
     const shippingData = await getShippingData(address.addressId, fields);
 
@@ -203,3 +202,4 @@ export {
   isValidNumberBash,
   getSpecialCategories,
 };
+

@@ -18,6 +18,18 @@ const AddressForm = () => {
       maxLength: 50,
     },
     {
+      name: 'lat',
+      required: false,
+      type: 'hidden',
+      value: '',
+    },
+    {
+      name: 'lng',
+      required: false,
+      type: 'hidden',
+      value: '',
+    },
+    {
       name: 'street',
       label: 'Street address',
       required: true,
