@@ -47,8 +47,10 @@ const DeliverContainer = ({ hasFurn }) => `
         <h3>Add a new delivery address</h3>
         <a href='#' data-view='select-address' id='back-button-select-address'>&lt; Back</a>
       </div>
-      ${AddressSearch()} 
-      <p style="font-size: 12px; margin: 16px 0">
+      <div class="address-search-field-container" id="address-search-field-container">
+          ${AddressSearch()} 
+      </div>
+      <p style="font-size: 12px; margin: 16px 0" id="type-your-address-above">
         Type your address above or 
         <a 
           href="" id="link-manual-address-entry"

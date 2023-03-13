@@ -13,7 +13,7 @@ import {
   setCartClasses,
   submitAddressForm,
   submitDeliveryForm,
-  updateDeliveryFeeDisplay,
+  updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
 import { getSpecialCategories } from '../utils/functions';
@@ -42,7 +42,7 @@ const DeliverController = (() => {
     $('.shipping-data .box-step').append(
       DeliverContainer({
         hasFurn: state.hasFurn,
-      })
+      }),
     );
 
     const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
@@ -53,7 +53,7 @@ const DeliverController = (() => {
           hasFurn: state.hasFurn,
           hasSim: state.hasSim,
           hasTV: state.hasTVs,
-        })
+        }),
       );
 
       if (state.hasSim) populateRicaFields();
@@ -155,6 +155,9 @@ const DeliverController = (() => {
 
     if (document.forms['bash--delivery-form']) {
       document.forms['bash--delivery-form'].reset();
+      // reset prepopulated lat and long
+      $('#bash--input-lat').val('');
+      $('#bash--input-lng').val('');
       document.forms['bash--delivery-form'].classList.remove('show-form-errors');
     }
 
@@ -232,7 +235,7 @@ const DeliverController = (() => {
 
   return {
     state,
-    init: () => {},
+    init: () => { },
   };
 })();
 export default DeliverController;

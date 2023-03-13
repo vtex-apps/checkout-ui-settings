@@ -5,7 +5,7 @@ import {
   getAddressByName,
   getOrderFormCustomData,
   sendOrderFormCustomData,
-  updateAddressListing,
+  updateAddressListing
 } from '../../utils/services';
 import { requiredAddressFields, requiredRicaFields, requiredTVFields, validAddressTypes } from './constants';
 import { DeliveryError } from './DeliveryError';
@@ -82,7 +82,7 @@ export const getBestRecipient = () => {
 };
 
 const populateAddressFromSearch = (address) => {
-  const { street, neighborhood, postalCode, state, city } = address;
+  const { street, neighborhood, postalCode, state, city, lat, lng } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -97,6 +97,8 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-city').value = city ?? '';
   document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-lat').value = lat || '';
+  document.getElementById('bash--input-lng').value = lng || '';
 };
 
 export const populateAddressForm = (address) => {
@@ -113,10 +115,18 @@ export const populateAddressForm = (address) => {
     id,
     addressId,
     addressName,
+    geoCoordinate,
   } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
+  let lat;
+  let lng;
+  try {
+    [lat, lng] = JSON.parse(JSON.stringify(geoCoordinate));
+  } catch (e) {
+    console.error('Could not parse geo coords', { address, geoCoordinate });
+  }
 
   // Only overwrite defaults if values exist.
   if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
@@ -135,8 +145,22 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-city').value = city || '';
   document.getElementById('bash--input-postalCode').value = postalCode || '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-lat').value = lat || '';
+  document.getElementById('bash--input-lng').value = lng || '';
 
   $(':invalid').trigger('change');
+};
+
+const checkForAddressResults = (event) => {
+  setTimeout(() => {
+    const pacContainers = document.querySelectorAll('.pac-container');
+    const hiddenPacContainers = document.querySelectorAll(".pac-container[style*='display: none']");
+    if (pacContainers?.length === hiddenPacContainers?.length && event.target?.value?.length > 3) {
+      $('#address-search-field-container:not(.no-results)').addClass('no-results');
+    } else {
+      $('#address-search-field-container.no-results').removeClass('no-results');
+    }
+  }, 250);
 };
 
 export const initGoogleAutocomplete = () => {
@@ -146,6 +170,7 @@ export const initGoogleAutocomplete = () => {
   const autocomplete = new window.google.maps.places.Autocomplete(input, {
     componentRestrictions: { country: 'ZA' },
   });
+
   window.google.maps.event.addListener(autocomplete, 'place_changed', () => {
     const place = autocomplete.getPlace();
     const { address_components: addressComponents, geometry } = place;
@@ -158,6 +183,8 @@ export const initGoogleAutocomplete = () => {
     window.postMessage({ action: 'setDeliveryView', view: 'address-form' });
     input.value = '';
   });
+
+  input.addEventListener('keyup', checkForAddressResults);
 };
 
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
@@ -167,9 +194,9 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
   for (let i = 0; i < fields.length; i++) {
     const fieldId = `bash--input-${prefix}${fields[i]}`;
     if (
-      document.getElementById(fieldId) &&
-      (address[fields[i]] || override) &&
-      (!document.getElementById(fieldId).value || override)
+      document.getElementById(fieldId)
+      && (address[fields[i]] || override)
+      && (!document.getElementById(fieldId).value || override)
     ) {
       document.getElementById(fieldId).value = address[fields[i]];
     }
@@ -422,12 +449,13 @@ export const submitAddressForm = async (event) => {
     'neighborhood',
     'complement',
     'companyBuilding',
+    'lat',
+    'lng',
   ];
 
   const address = {
     isDisposable: false,
     reference: null,
-    geoCoordinates: [],
     country: 'ZAF',
     ...storedAddress,
     number: '',
@@ -439,6 +467,10 @@ export const submitAddressForm = async (event) => {
 
   address.addressName = address.addressName || address.addressId;
   address.addressId = address.addressId || address.addressName;
+  // for MasterData
+  address.geoCoordinate = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
+  // for shippingData
+  address.geoCoordinates = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
 
   const shippingAddress = address;
 
