@@ -9,7 +9,8 @@ import MixedProducts from './MixedProducts';
 import TVorRICAMsg from './TVorRICAMsg';
 
 const DeliverContainer = ({ hasFurn }) => `
-  <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
+  <div class="bash--delivery-container ${hasFurn && 'has-furniture'}"
+   id="bash--delivery-container" data-view="select-address">
     <div id="bash--shipping-messages">
       ${Alert()}
       ${TVorRICAMsg()}

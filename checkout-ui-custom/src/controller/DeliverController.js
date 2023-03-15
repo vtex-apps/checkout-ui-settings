@@ -46,12 +46,17 @@ const DeliverController = (() => {
       }),
     );
 
+    if (state.hasFurn) {
+      $('#shipping-data:not(.has-furniture)').addClass('has-furniture');
+    } else {
+      $('#shipping-data.has-furniture').removeClass('has-furniture');
+    }
+
     const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
 
     if (showExtraFields) {
       $('#bash-delivery-options').before(
         ExtraFieldsContainer({
-          hasFurn: state.hasFurn,
           hasSim: state.hasSim,
           hasTV: state.hasTVs,
         }),
@@ -95,7 +100,13 @@ const DeliverController = (() => {
   });
 
   $(window).on('hashchange', () => {
+    console.info('hashchange TO SHIPPING');
+
     if (window.location.hash === STEPS.SHIPPING) {
+      setTimeout(() => {
+        console.info('SCROLL TO SHIPPING');
+        document.getElementById('shipping-data').scrollIntoView({ behavior: 'smooth' });
+      }, 500);
       setupDeliver();
       setCartClasses();
       $('.bash--delivery-container').css('display', 'flex');

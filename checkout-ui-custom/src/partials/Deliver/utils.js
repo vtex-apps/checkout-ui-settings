@@ -5,6 +5,7 @@ import {
   addOrUpdateAddress,
   getAddressByName, getOrderFormCustomData, sendOrderFormCustomData
 } from '../../utils/services';
+import setAddress from '../../utils/setAddress';
 import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
@@ -165,7 +166,7 @@ export const populateAddressForm = (address) => {
   if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
   if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
   document
-    .getElementById('#bash--input-receiverPhone')
+    .getElementById('bash--input-receiverPhone')
     .value = getBestPhoneNumber({ preferred: receiverPhone, type: 'delivery' });
 
   $(':invalid').trigger('change');
