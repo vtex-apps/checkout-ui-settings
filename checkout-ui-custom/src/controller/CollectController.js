@@ -2,7 +2,7 @@ import { InputError } from '../partials';
 import { PickupPhoneField } from '../partials/AddressForm';
 import { getBestRecipient, setPickupLoading } from '../partials/Deliver/utils';
 import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
-import { clearLoaders, getSpecialCategories, isValidNumberBash } from '../utils/functions';
+import { clearLoaders, getSpecialCategories, isValidNumberBash, scrollToInvalidField } from '../utils/functions';
 import { getBestPhoneNumber } from '../utils/phoneFields';
 import sendEvent from '../utils/sendEvent';
 import { getOrderFormCustomData, sendOrderFormCustomData } from '../utils/services';
@@ -182,6 +182,7 @@ const CollectController = (() => {
         $(parent).addClass('error');
         $(parent).append(InputError());
         $(`${parent} span.error`).show();
+        scrollToInvalidField();
         state.validForm = false;
       } else {
         $(parent).removeClass('error');

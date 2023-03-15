@@ -15,7 +15,13 @@ import {
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
-import { clearLoaders, getSpecialCategories, hideBusinessName, showBusinessName } from '../utils/functions';
+import {
+  clearLoaders,
+  getSpecialCategories,
+  hideBusinessName,
+  scrollToInvalidField,
+  showBusinessName
+} from '../utils/functions';
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 import setAddress from '../utils/setAddress';
@@ -149,6 +155,7 @@ const DeliverController = (() => {
     updateDeliveryFeeDisplay();
 
     if (window.location.hash === STEPS.PAYMENT && !customShippingDataIsValid()) {
+      scrollToInvalidField();
       window.location.hash = STEPS.SHIPPING;
       sendEvent({
         action: 'stepRedirect',
