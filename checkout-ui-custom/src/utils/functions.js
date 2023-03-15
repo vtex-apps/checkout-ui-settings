@@ -1,21 +1,6 @@
 import { FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { validatePhoneNumber } from './phoneFields';
 
-// API Functions
-
-const catchError = (message) => {
-  console.error('ERROR', message);
-  throw new Error(message);
-};
-
-const getHeadersByConfig = ({ cookie, cache, json }) => {
-  const headers = new Headers();
-  if (cookie) headers.append('Cookie', document?.cookie);
-  if (cache) headers.append('Cache-Control', 'no-cache');
-  if (json) headers.append('Content-type', 'application/json');
-  return headers;
-};
-
 // Functions to manage CustomData
 const checkoutGetCustomData = (appId) => {
   const { customData } = window.vtexjs.checkout.orderForm;
@@ -153,3 +138,4 @@ export {
   isValidNumberBash,
   getSpecialCategories,
 };
+

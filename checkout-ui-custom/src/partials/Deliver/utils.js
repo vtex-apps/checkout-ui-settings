@@ -1,7 +1,10 @@
-import { RICA_APP, TV_APP } from '../../utils/const';
-import { getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
+import { RICA_APP, STEPS, TV_APP } from '../../utils/const';
+import { clearLoaders, getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
 import { getBestPhoneNumber } from '../../utils/phoneFields';
-import { getOrderFormCustomData } from '../../utils/services';
+import {
+  addOrUpdateAddress,
+  getAddressByName, getOrderFormCustomData, sendOrderFormCustomData
+} from '../../utils/services';
 import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './constants';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
@@ -80,7 +83,7 @@ export const getBestRecipient = ({ preferred = undefined, type = 'delivery' }) =
 };
 
 const populateAddressFromSearch = (address) => {
-  const { street, neighborhood, postalCode, state, city } = address;
+  const { street, neighborhood, postalCode, state, city, lat, lng } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
@@ -95,6 +98,8 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-city').value = city ?? '';
   document.getElementById('bash--input-postalCode').value = postalCode ?? '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-lat').value = lat || '';
+  document.getElementById('bash--input-lng').value = lng || '';
 };
 
 export const populateAddressForm = (address) => {
@@ -114,11 +119,23 @@ export const populateAddressForm = (address) => {
     id,
     addressId,
     addressName,
+    geoCoordinate,
   } = address;
 
   // Clear any populated fields
   document.getElementById('bash--address-form').reset();
   hideBusinessName();
+  let lat;
+  let lng;
+  try {
+    [lat, lng] = JSON.parse(JSON.stringify(geoCoordinate));
+  } catch (e) {
+    console.error('Could not parse geo coords', { address, geoCoordinate });
+  }
+
+  // Only overwrite defaults if values exist.
+  if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
+  if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
 
   // addressId indicates that address is being edited / completed.
   if (id || addressId) document.getElementById('bash--input-addressId').value = id || addressId; // TODO remove this?
@@ -141,6 +158,8 @@ export const populateAddressForm = (address) => {
   document.getElementById('bash--input-city').value = city || '';
   document.getElementById('bash--input-postalCode').value = postalCode || '';
   document.getElementById('bash--input-state').value = provinceShortCode(state);
+  document.getElementById('bash--input-lat').value = lat || '';
+  document.getElementById('bash--input-lng').value = lng || '';
 
   // Only overwrite defaults if values exist.
   if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
@@ -152,6 +171,18 @@ export const populateAddressForm = (address) => {
   $(':invalid').trigger('change');
 };
 
+const checkForAddressResults = (event) => {
+  setTimeout(() => {
+    const pacContainers = document.querySelectorAll('.pac-container');
+    const hiddenPacContainers = document.querySelectorAll(".pac-container[style*='display: none']");
+    if (pacContainers?.length === hiddenPacContainers?.length && event.target?.value?.length > 3) {
+      $('#address-search-field-container:not(.no-results)').addClass('no-results');
+    } else {
+      $('#address-search-field-container.no-results').removeClass('no-results');
+    }
+  }, 250);
+};
+
 export const initGoogleAutocomplete = () => {
   if (!window.google) return;
 
@@ -159,6 +190,7 @@ export const initGoogleAutocomplete = () => {
   const autocomplete = new window.google.maps.places.Autocomplete(input, {
     componentRestrictions: { country: 'ZA' },
   });
+
   window.google.maps.event.addListener(autocomplete, 'place_changed', () => {
     const place = autocomplete.getPlace();
     const { address_components: addressComponents, geometry } = place;
@@ -171,6 +203,8 @@ export const initGoogleAutocomplete = () => {
     window.postMessage({ action: 'setDeliveryView', view: 'address-form' });
     input.value = '';
   });
+
+  input.addEventListener('keyup', checkForAddressResults);
 };
 
 export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
@@ -325,6 +359,163 @@ export const showAlertBox = () => {
   setTimeout(() => {
     $('.alert-container').slideUp();
   }, 5000);
+};
+
+export const submitAddressForm = async (event) => {
+  event.preventDefault();
+
+  // Prevent false positive for invalid selects.
+  $('select').change();
+
+  const form = document.forms['bash--address-form'];
+  const addressName = $('#bash--input-addressName').val();
+  const storedAddress = await getAddressByName(addressName);
+
+  const fields = [
+    'addressId',
+    'addressName',
+    'addressType',
+    'receiverName',
+    'postalCode',
+    'city',
+    'state',
+    'country',
+    'street',
+    'neighborhood',
+    'complement',
+    'companyBuilding',
+    'lat',
+    'lng',
+  ];
+
+  const address = {
+    isDisposable: false,
+    reference: null,
+    country: 'ZAF',
+    ...storedAddress,
+    number: '',
+  };
+
+  for (let f = 0; f < fields.length; f++) {
+    address[fields[f]] = form[fields[f]]?.value || null;
+  }
+
+  address.addressName = address.addressName || address.addressId;
+  address.addressId = address.addressId || address.addressName;
+  // for MasterData
+  address.geoCoordinate = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
+  // for shippingData
+  address.geoCoordinates = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
+
+  const shippingAddress = address;
+
+  const { isValid, invalidFields } = addressIsValid(address, false);
+
+  if (!isValid) {
+    console.error({ invalidFields });
+    $('#bash--address-form').addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-form',
+      });
+    }
+
+    return;
+  }
+
+  // Apply the selected address to customers orderForm.
+  const setAddressResponse = await setAddress(shippingAddress, { validateExtraFields: false });
+  const { success } = setAddressResponse;
+  if (!success) {
+    console.error('Set address error', { setAddressResponse });
+    return;
+  }
+
+  // Update the localstore, and the API
+
+  // TODO Fix address data structure.
+  // Temporarily Map company building to shippingData.address.complement
+  // Temporarily Map complement to shippingData.clientProfileData.phone
+  // address.companyBuilding = window.vtexjs.checkout.orderForm.shippingData.address.complement;
+  // address.complement = window.vtexjs.checkout.orderForm.clientProfileData.phone;
+
+  await addOrUpdateAddress(address);
+  window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
+
+  showAlertBox();
+};
+
+export const submitDeliveryForm = async (event) => {
+  event.preventDefault();
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { address } = window.vtexjs.checkout.orderForm.shippingData;
+  const { hasTVs, hasSimCards } = getSpecialCategories(items);
+
+  // Prevent false positive validation errors for invalid selects.
+  $('select').change();
+
+  let fullAddress = {};
+
+  const selectedAddressRadio = "[name='selected-address']:checked";
+
+  // Prevent sending without having selected an address.
+  if ($(selectedAddressRadio).length < 1) {
+    $('html, body').animate({ scrollTop: $('#bash--delivery-form').offset().top }, 400);
+    return;
+  }
+
+  setDeliveryLoading();
+
+  const dbAddress = await getAddressByName($(selectedAddressRadio).val());
+
+  fullAddress = { ...address, ...dbAddress };
+
+  // Final check to validate that the selected address has no validation errors.
+  const { success: didSetAddress } = await setAddress(fullAddress, { validateExtraFields: false });
+  if (!didSetAddress) {
+    console.error('Delivery Form - Address Validation error');
+    clearLoaders();
+    return;
+  }
+
+  const ricaData = {};
+  const tvData = {};
+
+  // Not saved to address profile.
+  if (hasSimCards) {
+    const fields = requiredRicaFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (fields[i] === 'sameAddress') {
+        const isFieldChecked = $(`#bash--input-${fields[i]}`).is(':checked');
+        ricaData[fields[i]] = isFieldChecked;
+      }
+      ricaData[fields[i]] = $(`#bash--input-rica_${fields[i]}`).val() || '';
+    }
+
+    const ricaDataSent = await sendOrderFormCustomData(RICA_APP, ricaData, true);
+    console.info({ ricaDataSent });
+  }
+
+  if (hasTVs) {
+    const fields = requiredTVFields;
+    for (let i = 0; i < fields.length; i++) {
+      if (!address[fields[i]]) fullAddress[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val();
+      tvData[fields[i]] = $(`#bash--input-tv_${fields[i]}`).val() || '';
+    }
+
+    const tvDataSent = await sendOrderFormCustomData(TV_APP, tvData);
+    console.info({ tvDataSent });
+  }
+
+  await addOrUpdateAddress(fullAddress);
+
+  // after submitting hide the delivery container
+  $('.bash--delivery-container').css('display', 'none');
+  window.location.hash = STEPS.PAYMENT;
+  clearLoaders();
 };
 
 // some presaved addresses still have a missing zero,

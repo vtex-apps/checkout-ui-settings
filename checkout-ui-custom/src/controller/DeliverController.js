@@ -10,6 +10,8 @@ import {
   populateTVFields,
   preparePhoneField,
   setCartClasses,
+  submitAddressForm,
+  submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
@@ -17,8 +19,6 @@ import { clearLoaders, getSpecialCategories, hideBusinessName, showBusinessName 
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 import setAddress from '../utils/setAddress';
-import submitAddressForm from '../utils/submitAddressForm';
-import submitDeliveryForm from '../utils/submitDeliveryForm';
 
 const DeliverController = (() => {
   const state = {
@@ -161,6 +161,9 @@ const DeliverController = (() => {
 
     if (document.forms['bash--delivery-form']) {
       document.forms['bash--delivery-form'].reset();
+      // reset prepopulated lat and long
+      $('#bash--input-lat').val('');
+      $('#bash--input-lng').val('');
       document.forms['bash--delivery-form'].classList.remove('show-form-errors');
     }
 

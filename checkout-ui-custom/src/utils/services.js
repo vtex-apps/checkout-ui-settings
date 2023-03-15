@@ -2,6 +2,7 @@
 import AddressListing from '../partials/Deliver/AddressListing';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
+import { clearLoaders } from './functions';
 
 // API Functions
 
@@ -54,6 +55,7 @@ export const getAddresses = async () => {
       'state',
       'country',
       'tvID',
+      'geoCoordinate',
     ].join(',');
 
     const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
@@ -236,6 +238,9 @@ export const removeFromCart = (index) => window.vtexjs.checkout
       index: `${index}`,
       quantity: 0,
     },
-  ]);
+  ])
+  .done(() => {
+    clearLoaders();
+  });
 
 export default getAddresses;
