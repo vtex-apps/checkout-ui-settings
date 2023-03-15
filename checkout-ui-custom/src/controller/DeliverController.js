@@ -27,7 +27,23 @@ const DeliverController = (() => {
     hasSim: false,
   };
 
+  const unblockShippingError = () => {
+    if (window.location.hash === STEPS.SHIPPING) {
+      if ($('.shipping-summary-info').length && $('.shipping-summary-info').text() === 'Waiting for more information') {
+        window.location.hash = STEPS.PROFILE;
+        sendEvent({
+          action: 'stepRedirect',
+          label: 'redirectShippingToProfile',
+          description: 'User redirect to profile - "Waiting for more information" error.',
+        });
+      }
+    }
+  }
+
   const setupDeliver = () => {
+
+    unblockShippingError();
+
     if ($('#bash--delivery-container').length) return;
 
     if (window.vtexjs.checkout.orderForm) {
@@ -72,6 +88,8 @@ const DeliverController = (() => {
       });
     });
   };
+
+
 
   // EVENTS
 
