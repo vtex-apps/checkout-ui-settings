@@ -191,6 +191,15 @@ export const clearLoaders = () => {
   $('.shimmer').removeClass('shimmer');
 };
 
+export const scrollToInvalidField = () => {
+  const invalidInputs = Array.from($('form.form-step.box-edit > :invalid, .error'));
+  // sort inputs by offset from top of viewport
+  // to handle elements that may be invalid but
+  // aren't necessarily highest on the page
+  invalidInputs.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+  invalidInputs[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+};
+
 export {
   getShippingData,
   addBorderTop,

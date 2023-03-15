@@ -1,7 +1,7 @@
 import { InputError, PickupComplementField } from '../partials';
 import { setPickupLoading } from '../partials/Deliver/utils';
 import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
-import { clearLoaders, getSpecialCategories, isValidNumberBash } from '../utils/functions';
+import { clearLoaders, getSpecialCategories, isValidNumberBash, scrollToInvalidField } from '../utils/functions';
 import { getOrderFormCustomData, sendOrderFormCustomData } from '../utils/services';
 
 const CollectController = (() => {
@@ -179,6 +179,7 @@ const CollectController = (() => {
         $(parent).addClass('error');
         $(parent).append(InputError());
         $(`${parent} span.error`).show();
+        scrollToInvalidField();
         state.validForm = false;
       } else {
         $(parent).removeClass('error');
@@ -347,7 +348,7 @@ const CollectController = (() => {
           const savingCollect = localStorage.getItem('saving-shipping-collect');
 
           if (!savingCollect) {
-            const { phone } = getOrderFormCustomData(PICKUP_APP)
+            const { phone } = getOrderFormCustomData(PICKUP_APP);
 
             /* Redirect to shipping if required fields are empty */
             if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {

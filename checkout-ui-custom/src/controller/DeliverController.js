@@ -16,7 +16,7 @@ import {
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { STEPS } from '../utils/const';
-import { getSpecialCategories } from '../utils/functions';
+import { getSpecialCategories, scrollToInvalidField } from '../utils/functions';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 
 const DeliverController = (() => {
@@ -137,6 +137,7 @@ const DeliverController = (() => {
     updateDeliveryFeeDisplay();
 
     if (window.location.hash === STEPS.PAYMENT && !customShippingDataIsValid()) {
+      scrollToInvalidField();
       window.location.hash = STEPS.SHIPPING;
     }
   });
