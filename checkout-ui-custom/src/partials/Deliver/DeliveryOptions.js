@@ -9,13 +9,15 @@ const RadioButton = () => Radio({
 const DeliveryOptions = () => `
   <label class="bash--delivery-option-display" >
   ${RadioButton()}
-   
-   <div id="bash--delivery-option-text" class="bash--delivery-option-text">
+   <div id="bash--delivery-option-text"  class="bash--delivery-option-text">
       <span class="normal-delivery normal-delivery-period">
-        Deliver within 3 - 5 days
+        Deliver within 3 - 5 working days
       </span>
       <span class="furniture-delivery furniture-delivery-period">
         Deliver within 5 - 10 working days
+      </span>
+      <span class="furniture-mixed-delivery-period">
+        Deliver within 3 - 10 working days
       </span>
    </div>
 
