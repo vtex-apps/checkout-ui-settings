@@ -376,6 +376,9 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
     address.number = '';
   }
 
+  // Country must always be 'ZAF'
+  address.country = 'ZAF'
+
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
   shippingData.address = address;
@@ -444,7 +447,6 @@ export const submitAddressForm = async (event) => {
     'postalCode',
     'city',
     'state',
-    'country',
     'street',
     'neighborhood',
     'complement',
@@ -456,10 +458,11 @@ export const submitAddressForm = async (event) => {
   const address = {
     isDisposable: false,
     reference: null,
-    country: 'ZAF',
     ...storedAddress,
+    country: 'ZAF',
     number: '',
   };
+
 
   for (let f = 0; f < fields.length; f++) {
     address[fields[f]] = form[fields[f]]?.value || null;
