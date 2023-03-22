@@ -1,7 +1,7 @@
 {
   "name": "custom-shipping-step-by-items",
   "version": "0.1.0",
-  "description": "[TFG] custom-shipping-step-by-items app",
+  "description": "[BASH] custom-shipping-step-by-items app",
   "main": "index.js",
   "engines": {
     "node": ">=16.0.0",
@@ -16,14 +16,11 @@
   },
   "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
   "license": "VTEX",
-  "dependencies": {
-    "classnames": "^2.3.2",
-    "concurrently": "^7.3.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "@babel/runtime-corejs2": "^7.0.0",
     "babel-loader": "^8.0.0",
+    "concurrently": "^7.3.0",
     "cross-env": "^5.2.0",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
