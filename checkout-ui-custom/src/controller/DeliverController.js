@@ -15,7 +15,7 @@ import {
   submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
-import { STEPS } from '../utils/const';
+import { FURNITURE_CAT, STEPS } from '../utils/const';
 import { getSpecialCategories, scrollToInvalidField } from '../utils/functions';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 
@@ -25,6 +25,8 @@ const DeliverController = (() => {
     hasFurn: false,
     hasTVs: false,
     hasSim: false,
+    hasFurnMixed: false,
+    hasFurnOnly: false,
   };
 
   const unblockShippingError = () => {
@@ -48,16 +50,19 @@ const DeliverController = (() => {
 
     if (window.vtexjs.checkout.orderForm) {
       const items = window.vtexjs.checkout.orderForm?.items;
-      const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+      const { hasFurniture, hasTVs, hasSimCards, hasFurnitureMixed, categories } = getSpecialCategories(items);
 
       state.hasFurn = hasFurniture;
       state.hasTVs = hasTVs;
       state.hasSim = hasSimCards;
+      state.hasFurnOnly = hasFurniture && categories.every((c) => c === FURNITURE_CAT);
+      state.hasFurnMixed = hasFurnitureMixed;
     }
 
     $('.shipping-data .box-step').append(
       DeliverContainer({
-        hasFurn: state.hasFurn,
+        hasFurnOnly: state.hasFurnOnly,
+        hasFurnMixed: state.hasFurnMixed,
       }),
     );
 
