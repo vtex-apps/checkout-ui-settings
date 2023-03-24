@@ -32,7 +32,7 @@ const DeliverContainer = ({ hasFurnOnly, hasFurnMixed }) => `
         <h3>Delivery method</h3>
         ${hasFurnOnly || hasFurnMixed ? FURNITURE_FEE_LINK : ''}
       </div>
-      ${DeliveryOptions({ hasFurnOnly })}
+      ${DeliveryOptions({ hasFurnOnly, hasFurnitureMixed: hasFurnMixed })}
       <button 
         class="submit btn-go-to-payment btn btn-large btn-success"
         id="btn-save-delivery" 
