@@ -17,6 +17,7 @@ import {
 } from '../partials/Deliver/utils';
 import { FURNITURE_CAT, STEPS } from '../utils/const';
 import { getSpecialCategories, scrollToInvalidField } from '../utils/functions';
+import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 
 const DeliverController = (() => {
