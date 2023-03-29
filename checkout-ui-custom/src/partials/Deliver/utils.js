@@ -125,7 +125,7 @@ export const populateAddressForm = (address) => {
   try {
     [lat, lng] = JSON.parse(JSON.stringify(geoCoordinate));
   } catch (e) {
-    console.error('Could not parse geo coords', { address, geoCoordinate });
+    console.warn('Could not parse geo coords', { address, geoCoordinate });
   }
 
   // Only overwrite defaults if values exist.
@@ -187,7 +187,13 @@ export const initGoogleAutocomplete = () => {
   input.addEventListener('keyup', checkForAddressResults);
 };
 
-export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
+export const parseAttribute = (data) => {
+  try {
+    return JSON.parse(decodeURIComponent(data));
+  } catch (e) {
+    return undefined;
+  }
+};
 
 export const populateExtraFields = (address, fields, prefix = '', override = false) => {
   if (!address) return;
@@ -377,7 +383,7 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
   }
 
   // Country must always be 'ZAF'
-  address.country = 'ZAF'
+  address.country = 'ZAF';
 
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
@@ -462,7 +468,6 @@ export const submitAddressForm = async (event) => {
     country: 'ZAF',
     number: '',
   };
-
 
   for (let f = 0; f < fields.length; f++) {
     address[fields[f]] = form[fields[f]]?.value || null;

@@ -183,6 +183,8 @@ const DeliverController = (() => {
       document.forms['bash--delivery-form'].classList.remove('show-form-errors');
     }
 
+    if (!address) return;
+
     getAddressByName(address.addressName).then((addressByName) => {
       setAddress(addressByName || address, { validateExtraFields: false });
       $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
@@ -241,8 +243,12 @@ const DeliverController = (() => {
         if (data.view === 'address-form' || data.view === 'address-edit') {
           preparePhoneField('#bash--input-complement');
           if (data.content) {
-            const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
-            populateAddressForm(address);
+            try {
+              const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
+              populateAddressForm(address);
+            } catch (e) {
+              console.warn('Could not parse address Json', data.content);
+            }
           }
         }
         break;
