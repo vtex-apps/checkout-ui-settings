@@ -79,7 +79,7 @@ const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, trie
 
 // Functions to manage CustomData
 const checkoutGetCustomData = (appId) => {
-  const { customData } = window.vtexjs.checkout.orderForm;
+  const customData = window?.vtexjs?.checkout?.orderForm?.customData;
   let fields = {};
 
   if (customData && customData.customApps && customData.customApps.length > 0) {
