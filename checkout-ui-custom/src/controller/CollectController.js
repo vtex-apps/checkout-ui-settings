@@ -2,6 +2,7 @@ import { InputError, PickupComplementField } from '../partials';
 import { setPickupLoading } from '../partials/Deliver/utils';
 import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
 import { clearLoaders, getSpecialCategories, isValidNumberBash, scrollToInvalidField } from '../utils/functions';
+import sendEvent from '../utils/sendEvent';
 import { getOrderFormCustomData, sendOrderFormCustomData } from '../utils/services';
 
 const CollectController = (() => {
@@ -237,7 +238,7 @@ const CollectController = (() => {
             label: 'Could not getOrderForm() from vtex',
             description: 'Could not load orderForm for Collect.'
           });
-        });
+        })
         .done(() => {
           localStorage.removeItem('saving-shipping-collect');
         });
@@ -245,163 +246,163 @@ const CollectController = (() => {
     }
   };
 
-//! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
-const setInputPhone = () => {
-  const phoneInput = document.querySelector('input#custom-pickup-complement');
+  //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
+  const setInputPhone = () => {
+    const phoneInput = document.querySelector('input#custom-pickup-complement');
 
-  if (phoneInput) {
-    phoneInput.setAttribute('placeholder', '');
-  }
-};
+    if (phoneInput) {
+      phoneInput.setAttribute('placeholder', '');
+    }
+  };
 
-const prePopulateReceiverName = () => {
-  const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
-  const firstNameInput = $('#client-first-name').val();
-  const lastNameInput = $('#client-last-name').val();
+  const prePopulateReceiverName = () => {
+    const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
+    const firstNameInput = $('#client-first-name').val();
+    const lastNameInput = $('#client-last-name').val();
 
-  const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');
+    const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');
 
-  if ($('input#pickup-receiver').val() === '') {
-    $('input#pickup-receiver').val(receiverName.trim());
+    if ($('input#pickup-receiver').val() === '') {
+      $('input#pickup-receiver').val(receiverName.trim());
 
-    window.vtexjs.checkout.getOrderForm().then((orderForm) => {
-      const { shippingData } = orderForm;
-      shippingData.address.receiverName = receiverName.trim();
-      return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
-    });
-  }
-};
+      window.vtexjs.checkout.getOrderForm().then((orderForm) => {
+        const { shippingData } = orderForm;
+        shippingData.address.receiverName = receiverName.trim();
+        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
+      });
+    }
+  };
 
-const addCustomPhoneInput = () => {
-  /* Set orderForm value if exists */
-  const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
+  const addCustomPhoneInput = () => {
+    /* Set orderForm value if exists */
+    const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
 
-  if ($('input#custom-pickup-complement').length === 0) {
-    $('.btn-go-to-payment-wrapper').before(PickupComplementField);
-    setInputPhone();
+    if ($('input#custom-pickup-complement').length === 0) {
+      $('.btn-go-to-payment-wrapper').before(PickupComplementField);
+      setInputPhone();
 
-    if (phoneNumber) {
+      if (phoneNumber) {
+        $('input#custom-pickup-complement').val(phoneNumber);
+      }
+    } else if ($('input#custom-pickup-complement').val() === '') {
       $('input#custom-pickup-complement').val(phoneNumber);
     }
-  } else if ($('input#custom-pickup-complement').val() === '') {
-    $('input#custom-pickup-complement').val(phoneNumber);
-  }
-  prePopulateReceiverName();
-};
+    prePopulateReceiverName();
+  };
 
-//! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
-const addCustomBtnPayment = () => {
-  if ($('#custom-go-to-payment').length <= 0) {
-    const nativePaymentBtn = $('#btn-go-to-payment');
-    const customPaymentBtn = nativePaymentBtn.clone(false);
+  //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
+  const addCustomBtnPayment = () => {
+    if ($('#custom-go-to-payment').length <= 0) {
+      const nativePaymentBtn = $('#btn-go-to-payment');
+      const customPaymentBtn = nativePaymentBtn.clone(false);
 
-    $(nativePaymentBtn).hide();
-    $(customPaymentBtn).data('bind', '');
-    $(customPaymentBtn).removeAttr('id').attr('id', 'custom-go-to-payment');
-    $(customPaymentBtn).removeAttr('data-bind');
-    $(customPaymentBtn).css('display', 'block');
+      $(nativePaymentBtn).hide();
+      $(customPaymentBtn).data('bind', '');
+      $(customPaymentBtn).removeAttr('id').attr('id', 'custom-go-to-payment');
+      $(customPaymentBtn).removeAttr('data-bind');
+      $(customPaymentBtn).css('display', 'block');
 
-    $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);
+      $('p.btn-go-to-payment-wrapper').append(customPaymentBtn);
 
-    $(customPaymentBtn).on('click', saveCollectFields);
-  }
-};
-
-const runCustomization = () => {
-  const shippingLoaded = $('div#postalCode-finished-loading').length > 0;
-
-  $('#shipping-option-pickup-in-point').one('click', () => {
-    state.collectReset = true;
-  });
-
-  if (window.location.hash === STEPS.SHIPPING && shippingLoaded) {
-    state.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active');
-    state.pickupSelected = $('div.ask-for-geolocation').length === 0;
-
-    if (state.inCollect) {
-      if ((!$('#tfg-pickup-button').length && !$('#tfg-pickup-see-more-button').length) || (!$('#find-pickups-manually-search').length && !$('#find-pickups-button-new').length)) {
-        pickupMap();
-      }
-      clearLoaders();
-      if (state.pickupSelected && !state.collectReset) {
-        $('button.shp-pickup-receiver__btn').trigger('click');
-        $('div.shp-pickup-receiver').addClass('show');
-        $('p#box-pickup-complement').addClass('show');
-
-        addCustomPhoneInput();
-        addCustomBtnPayment();
-      } else {
-        $('div.shp-pickup-receiver').removeClass('show');
-        $('p#box-pickup-complement').removeClass('show');
-      }
-      if (state.collectReset) {
-        resetPickup();
-        state.collectReset = false;
-      }
-
-      changeTranslations();
+      $(customPaymentBtn).on('click', saveCollectFields);
     }
+  };
 
-    /* If it has been redirected because of missing values, the click is forced to show the errors */
-    if (localStorage.getItem('shipping-incomplete-values')) {
-      $('#custom-go-to-payment').trigger('click');
-      localStorage.removeItem('shipping-incomplete-values');
-    }
-  } else {
-    /* Remove box-pickup-complement so that the input does not appear in the other steps of the checkout process  */
-    $('#box-pickup-complement').remove();
+  const runCustomization = () => {
+    const shippingLoaded = $('div#postalCode-finished-loading').length > 0;
 
-    if (window.location.hash === STEPS.PAYMENT) {
-      setTimeout(() => {
-        const address = window.vtexjs.checkout.orderForm?.shippingData?.address;
-        const savingCollect = localStorage.getItem('saving-shipping-collect');
+    $('#shipping-option-pickup-in-point').one('click', () => {
+      state.collectReset = true;
+    });
 
-        if (!savingCollect) {
-          const { phone } = getOrderFormCustomData(PICKUP_APP);
+    if (window.location.hash === STEPS.SHIPPING && shippingLoaded) {
+      state.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active');
+      state.pickupSelected = $('div.ask-for-geolocation').length === 0;
 
-          /* Redirect to shipping if required fields are empty */
-          if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {
-            window.location.hash = STEPS.SHIPPING;
-            localStorage.setItem('shipping-incomplete-values', true);
-          }
+      if (state.inCollect) {
+        if ((!$('#tfg-pickup-button').length && !$('#tfg-pickup-see-more-button').length) || (!$('#find-pickups-manually-search').length && !$('#find-pickups-button-new').length)) {
+          pickupMap();
         }
-      }, 1000);
+        clearLoaders();
+        if (state.pickupSelected && !state.collectReset) {
+          $('button.shp-pickup-receiver__btn').trigger('click');
+          $('div.shp-pickup-receiver').addClass('show');
+          $('p#box-pickup-complement').addClass('show');
+
+          addCustomPhoneInput();
+          addCustomBtnPayment();
+        } else {
+          $('div.shp-pickup-receiver').removeClass('show');
+          $('p#box-pickup-complement').removeClass('show');
+        }
+        if (state.collectReset) {
+          resetPickup();
+          state.collectReset = false;
+        }
+
+        changeTranslations();
+      }
+
+      /* If it has been redirected because of missing values, the click is forced to show the errors */
+      if (localStorage.getItem('shipping-incomplete-values')) {
+        $('#custom-go-to-payment').trigger('click');
+        localStorage.removeItem('shipping-incomplete-values');
+      }
+    } else {
+      /* Remove box-pickup-complement so that the input does not appear in the other steps of the checkout process  */
+      $('#box-pickup-complement').remove();
+
+      if (window.location.hash === STEPS.PAYMENT) {
+        setTimeout(() => {
+          const address = window.vtexjs.checkout.orderForm?.shippingData?.address;
+          const savingCollect = localStorage.getItem('saving-shipping-collect');
+
+          if (!savingCollect) {
+            const { phone } = getOrderFormCustomData(PICKUP_APP);
+
+            /* Redirect to shipping if required fields are empty */
+            if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {
+              window.location.hash = STEPS.SHIPPING;
+              localStorage.setItem('shipping-incomplete-values', true);
+            }
+          }
+        }, 1000);
+      }
     }
-  }
 
-  // eslint-disable-next-line no-use-before-define
-  runCollectObserver();
-};
+    // eslint-disable-next-line no-use-before-define
+    runCollectObserver();
+  };
 
-/* We need this observer to detect the change in the deliver and collect buttons */
-const runCollectObserver = () => {
-  if (state.runningObserver) return;
+  /* We need this observer to detect the change in the deliver and collect buttons */
+  const runCollectObserver = () => {
+    if (state.runningObserver) return;
 
-  const elementToObserveChange = document.querySelector('.shipping-container .box-step');
-  const observerConfig = { attributes: false, childList: true, characterData: false };
-  const observer = new MutationObserver(() => {
-    state.runningObserver = true;
+    const elementToObserveChange = document.querySelector('.shipping-container .box-step');
+    const observerConfig = { attributes: false, childList: true, characterData: false };
+    const observer = new MutationObserver(() => {
+      state.runningObserver = true;
+      runCustomization();
+    });
+
+    if (elementToObserveChange) {
+      observer.observe(elementToObserveChange, observerConfig);
+    }
+  };
+
+  // EVENTS SUBSCRIPTION
+  $(document).ready(() => {
     runCustomization();
   });
 
-  if (elementToObserveChange) {
-    observer.observe(elementToObserveChange, observerConfig);
-  }
-};
+  $(window).on('hashchange orderFormUpdated.vtex', () => {
+    runCustomization();
+  });
 
-// EVENTS SUBSCRIPTION
-$(document).ready(() => {
-  runCustomization();
-});
-
-$(window).on('hashchange orderFormUpdated.vtex', () => {
-  runCustomization();
-});
-
-return {
-  state,
-  init: () => { },
-};
-}) ();
+  return {
+    state,
+    init: () => { },
+  };
+})();
 
 export default CollectController;
