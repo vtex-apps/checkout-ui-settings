@@ -197,7 +197,7 @@ export const scrollToInvalidField = () => {
   // to handle elements that may be invalid but
   // aren't necessarily highest on the page
   invalidInputs.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
-  invalidInputs[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  invalidInputs?.[0]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
 };
 
 export {
