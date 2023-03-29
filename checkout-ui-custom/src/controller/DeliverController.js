@@ -111,6 +111,14 @@ const DeliverController = (() => {
         $('.bash--delivery-container:not(.hide)').addClass('hide');
         $('.bash--delivery-container').css('display', 'none');
       }
+    }).catch((e) => {
+      console.error('VTEX_ORDERFORM_ERROR: Could not load at Deliver controller', e);
+      sendEvent({
+        eventCategory: 'Checkout_SystemError',
+        action: 'OrderFormFailed',
+        label: 'Could not getOrderForm() from vtex',
+        description: 'Could not load orderForm at Deliver.'
+      });
     });
   });
 

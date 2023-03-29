@@ -4,6 +4,7 @@ import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
 import { clearLoaders } from './functions';
 import { getBestPhoneNumber } from './phoneFields';
+import sendEvent from './sendEvent';
 
 // API Functions
 
@@ -80,6 +81,14 @@ export const getAddresses = async () => {
         return data;
       })
       .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
+  }).catch((e) => {
+    console.error('VTEX_ORDERFORM_ERROR: Could not load at getAddresses', e);
+    sendEvent({
+      eventCategory: 'Checkout_SystemError',
+      action: 'OrderFormFailed',
+      label: 'Could not getOrderForm() from vtex',
+      description: 'Could not load orderForm at getAddresses'
+    });
   });
 };
 
