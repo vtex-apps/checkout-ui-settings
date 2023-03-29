@@ -21,6 +21,7 @@ export const setPickupLoading = () => {
 };
 
 export const mapGoogleAddress = (addressComponents, geometry) => {
+  if (!addressComponents || addressComponents.length < 1) return {};
   const streetNumber = addressComponents.find((item) => item.types.includes('street_number'))?.long_name;
   const street = addressComponents.find((item) => item.types.includes('route'))?.long_name;
   const neighborhood = addressComponents.find((item) => item.types.includes('sublocality'))?.long_name;
