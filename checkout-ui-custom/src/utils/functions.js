@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/browser';
 import { BASE_URL_API, FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { validatePhoneNumber } from './phoneFields';
 
@@ -5,7 +6,8 @@ import { validatePhoneNumber } from './phoneFields';
 
 const catchError = (message) => {
   console.error('ERROR', message);
-  throw new Error(message);
+  Sentry.captureException(message);
+  // throw new Error(message);
 };
 
 const getHeadersByConfig = ({ cookie, cache, json }) => {

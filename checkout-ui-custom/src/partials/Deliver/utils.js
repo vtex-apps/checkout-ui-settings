@@ -171,6 +171,7 @@ export const initGoogleAutocomplete = () => {
   if (!window.google) return;
 
   const input = document.getElementById('bash--input-address-search');
+  if (!input) return;
   const autocomplete = new window.google.maps.places.Autocomplete(input, {
     componentRestrictions: { country: 'ZA' },
   });
@@ -188,7 +189,7 @@ export const initGoogleAutocomplete = () => {
     input.value = '';
   });
 
-  input.addEventListener('keyup', checkForAddressResults);
+  input?.addEventListener('keyup', checkForAddressResults);
 };
 
 export const parseAttribute = (data) => {
