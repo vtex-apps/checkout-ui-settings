@@ -101,17 +101,19 @@ const DeliverController = (() => {
   });
 
   $(document).ready(() => {
-    window.vtexjs.checkout.getOrderForm().then(() => {
-      clearAddresses();
-      if (window.location.hash === STEPS.SHIPPING) {
-        setupDeliver();
-        $('.bash--delivery-container.hide').removeClass('hide');
-        $('.bash--delivery-container').css('display', 'flex');
-      } else if ($('.bash--delivery-container:not(.hide)').length) {
-        $('.bash--delivery-container:not(.hide)').addClass('hide');
-        $('.bash--delivery-container').css('display', 'none');
-      }
-    }).catch((e) => {
+    try {
+      window.vtexjs.checkout.getOrderForm().then(() => {
+        clearAddresses();
+        if (window.location.hash === STEPS.SHIPPING) {
+          setupDeliver();
+          $('.bash--delivery-container.hide').removeClass('hide');
+          $('.bash--delivery-container').css('display', 'flex');
+        } else if ($('.bash--delivery-container:not(.hide)').length) {
+          $('.bash--delivery-container:not(.hide)').addClass('hide');
+          $('.bash--delivery-container').css('display', 'none');
+        }
+      });
+    } catch (e) {
       console.error('VTEX_ORDERFORM_ERROR: Could not load at Deliver controller', e);
       sendEvent({
         eventCategory: 'Checkout_SystemError',
@@ -119,7 +121,7 @@ const DeliverController = (() => {
         label: 'Could not getOrderForm() from vtex',
         description: 'Could not load orderForm at Deliver.'
       });
-    });
+    }
   });
 
   $(window).on('hashchange', () => {

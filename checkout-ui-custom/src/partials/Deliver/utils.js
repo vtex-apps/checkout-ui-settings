@@ -100,6 +100,9 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-state').value = provinceShortCode(state);
   document.getElementById('bash--input-lat').value = lat || '';
   document.getElementById('bash--input-lng').value = lng || '';
+
+  // Update previously invalid fields.
+  $(':invalid').trigger('change');
 };
 
 export const populateAddressForm = (address) => {
