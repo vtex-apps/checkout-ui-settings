@@ -69,7 +69,7 @@ const ViewController = (() => {
   };
 
   const setView = (view) => {
-    document.body.setAttribute('data-delivery-view', view);
+    document?.body?.setAttribute('data-delivery-view', view);
   };
 
   // EVENTS SUBSCRIPTION
@@ -89,7 +89,7 @@ const ViewController = (() => {
     state,
     setView,
     showCustomSections,
-    init: () => {},
+    init: () => { },
   };
 })();
 

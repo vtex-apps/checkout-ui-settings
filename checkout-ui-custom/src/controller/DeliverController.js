@@ -40,10 +40,9 @@ const DeliverController = (() => {
         });
       }
     }
-  }
+  };
 
   const setupDeliver = () => {
-
     unblockShippingError();
 
     if ($('#bash--delivery-container').length) return;
@@ -93,8 +92,6 @@ const DeliverController = (() => {
       });
     });
   };
-
-
 
   // EVENTS
 
@@ -239,7 +236,7 @@ const DeliverController = (() => {
 
     switch (data.action) {
       case 'setDeliveryView':
-        document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
+        document.querySelector('.bash--delivery-container')?.setAttribute('data-view', data.view);
         if (data.view === 'address-form' || data.view === 'address-edit') {
           preparePhoneField('#bash--input-complement');
           if (data.content) {
