@@ -1,4 +1,4 @@
-import { RICA_APP, STEPS, TV_APP } from '../../utils/const';
+import { AD_TYPE, RICA_APP, STEPS, TV_APP } from '../../utils/const';
 import { clearLoaders, getSpecialCategories } from '../../utils/functions';
 import {
   addOrUpdateAddress,
@@ -379,8 +379,8 @@ export const setAddress = (address, options = { validateExtraFields: true }) => 
   }
 
   // Fix bad addressType.
-  if (address.addressType === 'business') address.addressType = 'commercial';
-  if (!validAddressTypes.includes(address.addressType)) address.addressType = 'residential';
+  if (address.addressType === AD_TYPE.BUSINESS) address.addressType = AD_TYPE.COMMERCIAL;
+  if (!validAddressTypes.includes(address.addressType)) address.addressType = AD_TYPE.DELIVERY;
 
   if (address.number) {
     address.street = `${address.number} ${address.street}`;
