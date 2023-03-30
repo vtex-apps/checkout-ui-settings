@@ -15,7 +15,7 @@ import {
   submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
-import { FURNITURE_CAT, STEPS } from '../utils/const';
+import { AD_TYPE, FURNITURE_CAT, STEPS } from '../utils/const';
 import { getSpecialCategories, scrollToInvalidField } from '../utils/functions';
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
@@ -148,7 +148,7 @@ const DeliverController = (() => {
       if (errors) populateDeliveryError(errors);
     }
 
-    if (addressType === 'search') {
+    if (addressType === AD_TYPE.PICKUP) {
       // User has Collect enabled, but has Rica or TV products,
       // or Furniture + Non Furn.
       if (hasTVs || hasSimCards || hasFurnitureMixed) {
