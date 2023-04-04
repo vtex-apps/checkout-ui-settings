@@ -12,7 +12,8 @@
     "build": "cross-env NODE_ENV=production webpack",
     "watch": "yarn build && webpack --watch",
     "app": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
-    "dev": "rm ./checkout6-custom.js && concurrently \"vtex link\" \"yarn watch\""
+    "dev": "rm ./checkout6-custom.js && concurrently \"vtex link\" \"yarn watch\"",
+    "lint": "eslint ./"
   },
   "author": "Lucas Vyskubenko <lucas.vysk@vtex.com> (https://github.com/lucvysk)",
   "license": "VTEX",
@@ -34,5 +35,8 @@
     "webpack": "^5.41.1",
     "webpack-cli": "^4.7.2"
   },
-  "keywords": []
+  "keywords": [],
+  "dependencies": {
+    "@sentry/browser": "^7.45.0"
+  }
 }
