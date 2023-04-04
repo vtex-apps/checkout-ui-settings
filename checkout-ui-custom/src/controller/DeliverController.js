@@ -14,7 +14,7 @@ import {
   submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
-import { STEPS } from '../utils/const';
+import { AD_TYPE, FURNITURE_CAT, STEPS } from '../utils/const';
 import {
   clearLoaders,
   getSpecialCategories,
@@ -32,23 +32,43 @@ const DeliverController = (() => {
     hasFurn: false,
     hasTVs: false,
     hasSim: false,
+    hasFurnMixed: false,
+    hasFurnOnly: false,
+  };
+
+  const unblockShippingError = () => {
+    if (window.location.hash === STEPS.SHIPPING) {
+      if ($('.shipping-summary-info').length && $('.shipping-summary-info').text() === 'Waiting for more information') {
+        window.location.hash = STEPS.PROFILE;
+        sendEvent({
+          action: 'stepRedirect',
+          label: 'redirectShippingToProfile',
+          description: 'User redirect to profile - "Waiting for more information" error.',
+        });
+      }
+    }
   };
 
   const setupDeliver = () => {
+    unblockShippingError();
+
     if ($('#bash--delivery-container').length) return;
 
     if (window.vtexjs.checkout.orderForm) {
       const items = window.vtexjs.checkout.orderForm?.items;
-      const { hasFurniture, hasTVs, hasSimCards } = getSpecialCategories(items);
+      const { hasFurniture, hasTVs, hasSimCards, hasFurnitureMixed, categories } = getSpecialCategories(items);
 
       state.hasFurn = hasFurniture;
       state.hasTVs = hasTVs;
       state.hasSim = hasSimCards;
+      state.hasFurnOnly = hasFurniture && categories.every((c) => c === FURNITURE_CAT);
+      state.hasFurnMixed = hasFurnitureMixed;
     }
 
     $('.shipping-data .box-step').append(
       DeliverContainer({
-        hasFurn: state.hasFurn,
+        hasFurnOnly: state.hasFurnOnly,
+        hasFurnMixed: state.hasFurnMixed,
       }),
     );
 
@@ -92,17 +112,27 @@ const DeliverController = (() => {
   });
 
   $(document).ready(() => {
-    window.vtexjs.checkout.getOrderForm().then(() => {
-      clearAddresses();
-      if (window.location.hash === STEPS.SHIPPING) {
-        setupDeliver();
-        $('.bash--delivery-container.hide').removeClass('hide');
-        $('.bash--delivery-container').css('display', 'flex');
-      } else if ($('.bash--delivery-container:not(.hide)').length) {
-        $('.bash--delivery-container:not(.hide)').addClass('hide');
-        $('.bash--delivery-container').css('display', 'none');
-      }
-    });
+    try {
+      window.vtexjs.checkout.getOrderForm().then(() => {
+        clearAddresses();
+        if (window.location.hash === STEPS.SHIPPING) {
+          setupDeliver();
+          $('.bash--delivery-container.hide').removeClass('hide');
+          $('.bash--delivery-container').css('display', 'flex');
+        } else if ($('.bash--delivery-container:not(.hide)').length) {
+          $('.bash--delivery-container:not(.hide)').addClass('hide');
+          $('.bash--delivery-container').css('display', 'none');
+        }
+      });
+    } catch (e) {
+      console.error('VTEX_ORDERFORM_ERROR: Could not load at Deliver controller', e);
+      sendEvent({
+        eventCategory: 'Checkout_SystemError',
+        action: 'OrderFormFailed',
+        label: 'Could not getOrderForm() from vtex',
+        description: 'Could not load orderForm at Deliver.'
+      });
+    }
   });
 
   $(window).on('hashchange', () => {
@@ -135,7 +165,7 @@ const DeliverController = (() => {
       if (errors) populateDeliveryError(errors);
     }
 
-    if (addressType === 'search') {
+    if (addressType === AD_TYPE.PICKUP) {
       // User has Collect enabled, but has Rica or TV products,
       // or Furniture + Non Furn.
       if (hasTVs || hasSimCards || hasFurnitureMixed) {
@@ -184,6 +214,8 @@ const DeliverController = (() => {
       $('#bash--input-lng').val('');
       document.forms['bash--delivery-form'].classList.remove('show-form-errors');
     }
+
+    if (!address) return;
 
     getAddressByName(address.addressName).then((addressByName) => {
       setAddress(addressByName || address, { validateExtraFields: false });
@@ -241,15 +273,20 @@ const DeliverController = (() => {
 
     switch (data.action) {
       case 'setDeliveryView':
-        document.querySelector('.bash--delivery-container').setAttribute('data-view', data.view);
+        document.querySelector('.bash--delivery-container')?.setAttribute('data-view', data.view);
         if (data.view === 'address-form' || data.view === 'address-edit') {
           preparePhoneField('#bash--input-receiverPhone');
           if (data.content) {
-            const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
-            populateAddressForm(address);
+            try {
+              const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
+              populateAddressForm(address);
+            } catch (e) {
+              console.warn('Could not parse address Json', data.content);
+            }
           }
         }
-
+        break;
+      case 'FB_LOG':
         break;
       default:
         console.error('Unknown action', data.action);

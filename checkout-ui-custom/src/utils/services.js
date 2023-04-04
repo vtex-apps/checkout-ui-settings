@@ -218,7 +218,7 @@ export const sendOrderFormCustomData = async (appId, data, rica = false) => {
 };
 
 export const getOrderFormCustomData = (appId) => {
-  const { customData } = window.vtexjs.checkout.orderForm;
+  const customData = window?.vtexjs?.checkout?.orderForm?.customData;
   let fields = {};
 
   if (customData && customData.customApps && customData.customApps.length > 0) {

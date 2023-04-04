@@ -1,4 +1,4 @@
-import { RICA_APP, STEPS, TV_APP } from '../../utils/const';
+import { AD_TYPE, RICA_APP, STEPS, TV_APP } from '../../utils/const';
 import { clearLoaders, getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
 import { getBestPhoneNumber } from '../../utils/phoneFields';
 import {
@@ -20,6 +20,7 @@ export const setPickupLoading = () => {
 };
 
 export const mapGoogleAddress = (addressComponents, geometry) => {
+  if (!addressComponents || addressComponents.length < 1) return {};
   const streetNumber = addressComponents.find((item) => item.types.includes('street_number'))?.long_name;
   const street = addressComponents.find((item) => item.types.includes('route'))?.long_name;
   const neighborhood = addressComponents.find((item) => item.types.includes('sublocality'))?.long_name;
@@ -101,6 +102,9 @@ const populateAddressFromSearch = (address) => {
   document.getElementById('bash--input-state').value = provinceShortCode(state);
   document.getElementById('bash--input-lat').value = lat || '';
   document.getElementById('bash--input-lng').value = lng || '';
+
+  // Update previously invalid fields.
+  $(':invalid').trigger('change');
 };
 
 export const populateAddressForm = (address) => {
@@ -131,7 +135,7 @@ export const populateAddressForm = (address) => {
   try {
     [lat, lng] = JSON.parse(JSON.stringify(geoCoordinate));
   } catch (e) {
-    console.error('Could not parse geo coords', { address, geoCoordinate });
+    console.warn('Could not parse geo coords', { address, geoCoordinate });
   }
 
   // Only overwrite defaults if values exist.
@@ -188,6 +192,7 @@ export const initGoogleAutocomplete = () => {
   if (!window.google) return;
 
   const input = document.getElementById('bash--input-address-search');
+  if (!input) return;
   const autocomplete = new window.google.maps.places.Autocomplete(input, {
     componentRestrictions: { country: 'ZA' },
   });
@@ -205,10 +210,16 @@ export const initGoogleAutocomplete = () => {
     input.value = '';
   });
 
-  input.addEventListener('keyup', checkForAddressResults);
+  input?.addEventListener('keyup', checkForAddressResults);
 };
 
-export const parseAttribute = (data) => JSON.parse(decodeURIComponent(data));
+export const parseAttribute = (data) => {
+  try {
+    return JSON.parse(decodeURIComponent(data));
+  } catch (e) {
+    return undefined;
+  }
+};
 
 export const populateExtraFields = (address, fields, prefix = '', override = false) => {
   if (!address) return;
@@ -351,6 +362,84 @@ export const populateDeliveryError = (errors = []) => {
   if (errors.length > 0) $('html, body').animate({ scrollTop: $('#bash-delivery-error-container').offset().top }, 400);
 };
 
+// TODO move somewhere else?
+export const setAddress = (address, options = { validateExtraFields: true }) => {
+  const { validateExtraFields } = options;
+  const { items } = window.vtexjs.checkout.orderForm;
+  const { hasTVs, hasSimCards } = getSpecialCategories(items);
+
+  if (hasTVs) populateExtraFields(address, requiredTVFields, 'tv_');
+  if (hasSimCards) populateRicaFields();
+
+  const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
+
+  if (!isValid) {
+    populateAddressForm(address);
+    $('#bash--address-form').addClass('show-form-errors');
+    if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');
+    $(`#bash--input-${invalidFields[0]}`).focus();
+
+    if (requiredAddressFields.includes(invalidFields[0])) {
+      window.postMessage({
+        action: 'setDeliveryView',
+        view: 'address-edit',
+      });
+    }
+
+    return { success: false, error: 'Invalid address details.' };
+  }
+
+  // Fix bad addressType.
+  if (address.addressType === AD_TYPE.BUSINESS) address.addressType = AD_TYPE.COMMERCIAL;
+  if (!validAddressTypes.includes(address.addressType)) address.addressType = AD_TYPE.DELIVERY;
+
+  if (address.number) {
+    address.street = `${address.number} ${address.street}`;
+    address.number = '';
+  }
+
+  // Country must always be 'ZAF'
+  address.country = 'ZAF';
+
+  const { shippingData } = window?.vtexjs?.checkout?.orderForm;
+
+  shippingData.address = address;
+  shippingData.selectedAddresses = [address];
+
+  // map phonenumber (complement) from address.complement to clientProfileData.phone.????
+  // map phonenumber (complement) from address.complement to shippingData.address.????
+  // map companyBuilding from address.companyBuilding to shippingData.address.complement
+  // shippingData.address.complement = address.companyBuilding;
+  if (address.companyBuilding && !shippingData.address.street.includes(`, ${address.companyBuilding}`)) {
+    shippingData.address.street = `${address.street}, ${address.companyBuilding}`;
+  }
+  shippingData.selectedAddresses[0] = shippingData.address;
+
+  // Start Shimmering
+  setDeliveryLoading();
+  return window.vtexjs.checkout
+    .sendAttachment('shippingData', shippingData)
+    .then((orderForm) => {
+      const { messages } = orderForm;
+      const errors = messages.filter((msg) => msg.status === 'error');
+
+      if (errors.length > 0) {
+        populateDeliveryError(errors);
+        window.postMessage({
+          action: 'setDeliveryView',
+          view: 'address-form',
+        });
+
+        return { success: false, errors };
+      }
+
+      if (address.addressName) updateAddressListing(address);
+
+      return { success: true };
+    })
+    .done(() => clearLoaders());
+};
+
 export const showAlertBox = () => {
   $('.alert-container').addClass('show');
   $('.alert-container').slideDown();
@@ -380,7 +469,6 @@ export const submitAddressForm = async (event) => {
     'postalCode',
     'city',
     'state',
-    'country',
     'street',
     'neighborhood',
     'complement',
@@ -392,8 +480,8 @@ export const submitAddressForm = async (event) => {
   const address = {
     isDisposable: false,
     reference: null,
-    country: 'ZAF',
     ...storedAddress,
+    country: 'ZAF',
     number: '',
   };
 

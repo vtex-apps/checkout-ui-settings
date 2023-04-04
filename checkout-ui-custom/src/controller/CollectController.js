@@ -220,20 +220,31 @@ const CollectController = (() => {
       localStorage.setItem('saving-shipping-collect', true);
       $('#btn-go-to-payment').trigger('click');
 
-      window.vtexjs.checkout
-        .getOrderForm()
-        .then((orderForm) => {
-          const { address } = orderForm.shippingData;
+      try {
+        window.vtexjs.checkout
+          .getOrderForm()
+          .then((orderForm) => {
+            const { address } = orderForm.shippingData;
 
-          sendOrderFormCustomData(PICKUP_APP, { phone: collectPhone }).then(() => {
-            updateCollectSummary(address.receiverName, collectPhone);
+            sendOrderFormCustomData(PICKUP_APP, { phone: collectPhone }).then(() => {
+              updateCollectSummary(address.receiverName, collectPhone);
+            });
+
+            return window.vtexjs.checkout.calculateShipping(address);
+          })
+
+          .done(() => {
+            localStorage.removeItem('saving-shipping-collect');
           });
-
-          return window.vtexjs.checkout.calculateShipping(address);
-        })
-        .done(() => {
-          localStorage.removeItem('saving-shipping-collect');
+      } catch (e) {
+        console.error('VTEX_ORDERFORM_ERROR: Could not load at CollectController', e);
+        sendEvent({
+          eventCategory: 'Checkout_SystemError',
+          action: 'OrderFormFailed',
+          label: 'Could not getOrderForm() from vtex',
+          description: 'Could not load orderForm for Collect.'
         });
+      }
     }
   };
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import Radio from './Elements/Radio';
 import FurnitureDeliveryOptions from './FurnitureDelivery';
 
@@ -6,7 +7,7 @@ const RadioButton = () => Radio({
   options: [{ checked: true, value: true }],
 });
 
-const DeliveryOptions = () => `
+const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => `
   <label class="bash--delivery-option-display" >
   ${RadioButton()}
    <div id="bash--delivery-option-text"  class="bash--delivery-option-text">
@@ -29,4 +30,10 @@ const DeliveryOptions = () => `
 ${FurnitureDeliveryOptions()}
   `;
 
+/*
+<div id="bash--delivery-option-text" class="bash--delivery-option-text">
+    <span class="normal-delivery">
+      Deliver within ${hasFurnitureMixed ? '3 - 10' : hasFurnOnly ? '5 - 10' : '3 - 5'} working days
+    </span>
+*/
 export default DeliveryOptions;

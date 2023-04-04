@@ -1,9 +1,24 @@
+import * as Sentry from '@sentry/browser';
 import { FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { validatePhoneNumber } from './phoneFields';
 
+export const catchError = (message) => {
+  console.error('ERROR', message);
+  Sentry.captureException(message);
+  // throw new Error(message);
+};
+
+export const getHeadersByConfig = ({ cookie, cache, json }) => {
+  const headers = new Headers();
+  if (cookie) headers.append('Cookie', document?.cookie);
+  if (cache) headers.append('Cache-Control', 'no-cache');
+  if (json) headers.append('Content-type', 'application/json');
+  return headers;
+};
+
 // Functions to manage CustomData
 const checkoutGetCustomData = (appId) => {
-  const { customData } = window.vtexjs.checkout.orderForm;
+  const customData = window?.vtexjs?.checkout?.orderForm?.customData;
   let fields = {};
 
   if (customData && customData.customApps && customData.customApps.length > 0) {
@@ -135,7 +150,7 @@ export const scrollToInvalidField = () => {
   // to handle elements that may be invalid but
   // aren't necessarily highest on the page
   invalidInputs.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
-  invalidInputs[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  invalidInputs?.[0]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
 };
 
 export {

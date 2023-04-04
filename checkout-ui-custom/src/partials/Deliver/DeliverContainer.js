@@ -8,7 +8,7 @@ import Alert from './Elements/Alert';
 import MixedProducts from './MixedProducts';
 import TVorRICAMsg from './TVorRICAMsg';
 
-const DeliverContainer = ({ hasFurn }) => `
+const DeliverContainer = ({ hasFurn, hasFurnOnly, hasFurnMixed }) => `
   <div class="bash--delivery-container ${hasFurn && 'has-furniture'}"
    id="bash--delivery-container" data-view="select-address">
     <div id="bash--shipping-messages">
@@ -30,10 +30,10 @@ const DeliverContainer = ({ hasFurn }) => `
     <section id="bash-delivery-options" class="shipping-method bash--delivery-view" data-section="select-address">
       <hr>
       <div class="bash--heading sub-heading">
-        <h3>Delivery options</h3>
-        ${hasFurn ? FURNITURE_FEE_LINK : ''}
+        <h3>Delivery method</h3>
+        ${hasFurnOnly || hasFurnMixed ? FURNITURE_FEE_LINK : ''}
       </div>
-      ${DeliveryOptions()}
+      ${DeliveryOptions({ hasFurnOnly, hasFurnitureMixed: hasFurnMixed })}
       <button 
         class="submit btn-go-to-payment btn btn-large btn-success"
         id="btn-save-delivery" 

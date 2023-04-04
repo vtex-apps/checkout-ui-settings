@@ -10,6 +10,8 @@ const STEPS = {
 const AD_TYPE = {
   PICKUP: 'search',
   DELIVERY: 'residential',
+  BUSINESS: 'business',
+  COMMERCIAL: 'commercial',
 };
 
 // TIMEOUT
@@ -76,3 +78,4 @@ export {
   NONE,
   PICKUP_APP,
 };
+
