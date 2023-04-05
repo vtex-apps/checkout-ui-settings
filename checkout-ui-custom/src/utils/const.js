@@ -29,6 +29,8 @@ const RICA_APP = 'ricafields';
 const TV_APP = 'tvfields';
 const PICKUP_APP = 'pickup';
 
+const DELIVER_APP = 'deliver';
+
 // Furniture fees Url
 const FURNITURE_FEES =
   'http://image.tfgmedia.co.za/image/1/process/500x790?source=http://cdn.tfgmedia.co.za' +

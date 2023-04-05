@@ -2,23 +2,23 @@
 import AddressListing from '../partials/Deliver/AddressListing';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
-import { clearLoaders } from './functions';
+import { catchError, clearLoaders, getHeadersByConfig } from './functions';
 
 // API Functions
 
-const catchError = (message) => {
-  console.error('ERROR', message);
-  throw new Error(message);
-};
+// const catchError = (message) => {
+//   console.error('ERROR', message);
+//   throw new Error(message);
+// };
 
-const getHeadersByConfig = ({ cookie, cache, json }) => {
-  const headers = new Headers();
-  // TODO don't use document?.cookie
-  if (cookie) headers.append('Cookie', document?.cookie);
-  if (cache) headers.append('Cache-Control', 'no-cache');
-  if (json) headers.append('Content-type', 'application/json');
-  return headers;
-};
+// const getHeadersByConfig = ({ cookie, cache, json }) => {
+//   const headers = new Headers();
+//   // TODO don't use document?.cookie
+//   if (cookie) headers.append('Cookie', document?.cookie);
+//   if (cache) headers.append('Cache-Control', 'no-cache');
+//   if (json) headers.append('Content-type', 'application/json');
+//   return headers;
+// };
 
 // GET addresses
 

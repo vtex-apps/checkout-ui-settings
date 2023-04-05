@@ -1,4 +1,4 @@
-import { AD_TYPE, RICA_APP, STEPS, TV_APP } from '../../utils/const';
+import { RICA_APP, STEPS, TV_APP } from '../../utils/const';
 import { clearLoaders, getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
 import { getBestPhoneNumber } from '../../utils/phoneFields';
 import {
@@ -362,83 +362,83 @@ export const populateDeliveryError = (errors = []) => {
   if (errors.length > 0) $('html, body').animate({ scrollTop: $('#bash-delivery-error-container').offset().top }, 400);
 };
 
-// TODO move somewhere else?
-export const setAddress = (address, options = { validateExtraFields: true }) => {
-  const { validateExtraFields } = options;
-  const { items } = window.vtexjs.checkout.orderForm;
-  const { hasTVs, hasSimCards } = getSpecialCategories(items);
+// // TODO move somewhere else?
+// export const setAddress = (address, options = { validateExtraFields: true }) => {
+//   const { validateExtraFields } = options;
+//   const { items } = window.vtexjs.checkout.orderForm;
+//   const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
-  if (hasTVs) populateExtraFields(address, requiredTVFields, 'tv_');
-  if (hasSimCards) populateRicaFields();
+//   if (hasTVs) populateExtraFields(address, requiredTVFields, 'tv_');
+//   if (hasSimCards) populateRicaFields();
 
-  const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
+//   const { isValid, invalidFields } = addressIsValid(address, validateExtraFields);
 
-  if (!isValid) {
-    populateAddressForm(address);
-    $('#bash--address-form').addClass('show-form-errors');
-    if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');
-    $(`#bash--input-${invalidFields[0]}`).focus();
+//   if (!isValid) {
+//     populateAddressForm(address);
+//     $('#bash--address-form').addClass('show-form-errors');
+//     if (validateExtraFields) $('#bash--delivery-form')?.addClass('show-form-errors');
+//     $(`#bash--input-${invalidFields[0]}`).focus();
 
-    if (requiredAddressFields.includes(invalidFields[0])) {
-      window.postMessage({
-        action: 'setDeliveryView',
-        view: 'address-edit',
-      });
-    }
+//     if (requiredAddressFields.includes(invalidFields[0])) {
+//       window.postMessage({
+//         action: 'setDeliveryView',
+//         view: 'address-edit',
+//       });
+//     }
 
-    return { success: false, error: 'Invalid address details.' };
-  }
+//     return { success: false, error: 'Invalid address details.' };
+//   }
 
-  // Fix bad addressType.
-  if (address.addressType === AD_TYPE.BUSINESS) address.addressType = AD_TYPE.COMMERCIAL;
-  if (!validAddressTypes.includes(address.addressType)) address.addressType = AD_TYPE.DELIVERY;
+//   // Fix bad addressType.
+//   if (address.addressType === AD_TYPE.BUSINESS) address.addressType = AD_TYPE.COMMERCIAL;
+//   if (!validAddressTypes.includes(address.addressType)) address.addressType = AD_TYPE.DELIVERY;
 
-  if (address.number) {
-    address.street = `${address.number} ${address.street}`;
-    address.number = '';
-  }
+//   if (address.number) {
+//     address.street = `${address.number} ${address.street}`;
+//     address.number = '';
+//   }
 
-  // Country must always be 'ZAF'
-  address.country = 'ZAF';
+//   // Country must always be 'ZAF'
+//   address.country = 'ZAF';
 
-  const { shippingData } = window?.vtexjs?.checkout?.orderForm;
+//   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
-  shippingData.address = address;
-  shippingData.selectedAddresses = [address];
+//   shippingData.address = address;
+//   shippingData.selectedAddresses = [address];
 
-  // map phonenumber (complement) from address.complement to clientProfileData.phone.????
-  // map phonenumber (complement) from address.complement to shippingData.address.????
-  // map companyBuilding from address.companyBuilding to shippingData.address.complement
-  // shippingData.address.complement = address.companyBuilding;
-  if (address.companyBuilding && !shippingData.address.street.includes(`, ${address.companyBuilding}`)) {
-    shippingData.address.street = `${address.street}, ${address.companyBuilding}`;
-  }
-  shippingData.selectedAddresses[0] = shippingData.address;
+//   // map phonenumber (complement) from address.complement to clientProfileData.phone.????
+//   // map phonenumber (complement) from address.complement to shippingData.address.????
+//   // map companyBuilding from address.companyBuilding to shippingData.address.complement
+//   // shippingData.address.complement = address.companyBuilding;
+//   if (address.companyBuilding && !shippingData.address.street.includes(`, ${address.companyBuilding}`)) {
+//     shippingData.address.street = `${address.street}, ${address.companyBuilding}`;
+//   }
+//   shippingData.selectedAddresses[0] = shippingData.address;
 
-  // Start Shimmering
-  setDeliveryLoading();
-  return window.vtexjs.checkout
-    .sendAttachment('shippingData', shippingData)
-    .then((orderForm) => {
-      const { messages } = orderForm;
-      const errors = messages.filter((msg) => msg.status === 'error');
+//   // Start Shimmering
+//   setDeliveryLoading();
+//   return window.vtexjs.checkout
+//     .sendAttachment('shippingData', shippingData)
+//     .then((orderForm) => {
+//       const { messages } = orderForm;
+//       const errors = messages.filter((msg) => msg.status === 'error');
 
-      if (errors.length > 0) {
-        populateDeliveryError(errors);
-        window.postMessage({
-          action: 'setDeliveryView',
-          view: 'address-form',
-        });
+//       if (errors.length > 0) {
+//         populateDeliveryError(errors);
+//         window.postMessage({
+//           action: 'setDeliveryView',
+//           view: 'address-form',
+//         });
 
-        return { success: false, errors };
-      }
+//         return { success: false, errors };
+//       }
 
-      if (address.addressName) updateAddressListing(address);
+//       if (address.addressName) updateAddressListing(address);
 
-      return { success: true };
-    })
-    .done(() => clearLoaders());
-};
+//       return { success: true };
+//     })
+//     .done(() => clearLoaders());
+// };
 
 export const showAlertBox = () => {
   $('.alert-container').addClass('show');

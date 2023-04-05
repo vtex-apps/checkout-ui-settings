@@ -32,18 +32,6 @@ const checkoutGetCustomData = (appId) => {
   return fields;
 };
 
-const checkoutSendCustomData = (appId, customData) => {
-  const { orderFormId } = window.vtexjs.checkout.orderForm;
-
-  return $.ajax({
-    type: 'PUT',
-    url: `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,
-    dataType: 'json',
-    contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(customData),
-  });
-};
-
 const setRicaFields = (getDataFrom = 'customApps') => {
   let ricaFields;
 
@@ -157,7 +145,6 @@ export {
   addBorderTop,
   waitAndResetLocalStorage,
   checkoutGetCustomData,
-  checkoutSendCustomData,
   setRicaFields,
   isValidNumberBash,
   getSpecialCategories,
