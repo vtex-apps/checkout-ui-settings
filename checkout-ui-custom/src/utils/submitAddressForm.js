@@ -28,6 +28,8 @@ const submitAddressForm = async (event) => {
     'neighborhood',
     'complement',
     'companyBuilding',
+    'lat',
+    'lng'
   ];
 
   const address = {
@@ -46,6 +48,12 @@ const submitAddressForm = async (event) => {
 
   address.addressName = address.addressName || address.addressId;
   address.addressId = address.addressId || address.addressName;
+  // for MasterData
+  address.geoCoordinate = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
+  // for shippingData
+  address.geoCoordinates = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
+
+  console.info('### submitAddressForm @@##', { address, fields });
 
   const shippingAddress = address;
 
@@ -74,7 +82,10 @@ const submitAddressForm = async (event) => {
   }
 
   await addOrUpdateAddress(address);
+
   window.postMessage({ action: 'setDeliveryView', view: 'select-address' });
+
+  // Scroll up
   setTimeout(() => {
     if ($('.bash--extra-fields').length > 0) {
       document.querySelector('.bash--extra-fields').scrollIntoView({ behavior: 'smooth' });

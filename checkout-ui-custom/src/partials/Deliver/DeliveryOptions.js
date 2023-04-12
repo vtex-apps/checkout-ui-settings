@@ -7,7 +7,7 @@ const RadioButton = () => Radio({
   options: [{ checked: true, value: true }],
 });
 
-const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => `
+const DeliveryOptions = () => `
   <label class="bash--delivery-option-display" >
   ${RadioButton()}
    <div id="bash--delivery-option-text"  class="bash--delivery-option-text">

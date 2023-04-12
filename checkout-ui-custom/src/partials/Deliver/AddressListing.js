@@ -1,5 +1,5 @@
+import { formatPhoneNumber, prependZero } from '../../utils/phoneFields';
 import Radio from './Elements/Radio';
-import { formatPhoneNumber, prependZero } from './utils';
 
 const isSelectedAddress = (address, selectedAddress) => {
   const addressObject = JSON.stringify({

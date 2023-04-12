@@ -263,7 +263,8 @@ const CollectController = (() => {
 
   const addCustomPhoneInput = () => {
     /* Set orderForm value if exists */
-    const phoneNumber = getBestPhoneNumber({ type: 'collect' });
+    const fields = getOrderFormCustomData(PICKUP)
+    const phoneNumber = getBestPhoneNumber({ type: 'collect', fields });
 
     if ($('#custom-pickup-complement').length === 0) {
       $('.btn-go-to-payment-wrapper').before(PickupPhoneField);

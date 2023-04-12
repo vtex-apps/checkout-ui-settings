@@ -1,6 +1,3 @@
-import { PICKUP } from './const';
-import { getOrderFormCustomData } from './services';
-
 /**
  * validatePhoneNumber
  * Determine if number is valid.
@@ -67,9 +64,7 @@ export const preparePhoneField = (input) => {
   });
 };
 
-export const getBestPhoneNumber = ({ preferred = undefined, type = 'profile' }) => {
-  const fields = getOrderFormCustomData(PICKUP);
-
+export const getBestPhoneNumber = ({ preferred = undefined, type = 'profile', fields }) => {
   if (type === 'collect') {
     return preferred || fields?.phone
       || document?.getElementById('client-phone')?.value
@@ -83,5 +78,20 @@ export const getBestPhoneNumber = ({ preferred = undefined, type = 'profile' }) 
     || ''
   );
 };
+
+// some presaved addresses still have a missing zero,
+// this adds a zero to the phone number, if it's not there.
+export const prependZero = (tel) => {
+  if (!tel) return '';
+  let phoneNumber = tel.replace(/\s/g, '');
+  if (phoneNumber.length === 9 && phoneNumber[0] !== '0') {
+    phoneNumber = `0${phoneNumber}`;
+  }
+
+  return phoneNumber;
+};
+
+// add spaces between 3rd and 6th digit
+export const formatPhoneNumber = (value) => [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');
 
 export default { validatePhoneNumber };

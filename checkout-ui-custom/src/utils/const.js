@@ -79,5 +79,6 @@ export {
   PICKUP,
   NONE,
   PICKUP_APP,
+  DELIVER_APP
 };
 

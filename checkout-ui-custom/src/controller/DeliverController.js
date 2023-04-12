@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
@@ -8,10 +9,7 @@ import {
   populateDeliveryError,
   populateRicaFields,
   populateTVFields,
-  preparePhoneField,
   setCartClasses,
-  submitAddressForm,
-  submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { AD_TYPE, FURNITURE_CAT, STEPS } from '../utils/const';
@@ -22,9 +20,12 @@ import {
   scrollToInvalidField,
   showBusinessName
 } from '../utils/functions';
+import { preparePhoneField } from '../utils/phoneFields';
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
 import setAddress from '../utils/setAddress';
+import submitAddressForm from '../utils/submitAddressForm';
+import submitDeliveryForm from '../utils/submitDeliveryForm';
 
 const DeliverController = (() => {
   const state = {
@@ -112,26 +113,14 @@ const DeliverController = (() => {
   });
 
   $(document).ready(() => {
-    try {
-      window.vtexjs.checkout.getOrderForm().then(() => {
-        clearAddresses();
-        if (window.location.hash === STEPS.SHIPPING) {
-          setupDeliver();
-          $('.bash--delivery-container.hide').removeClass('hide');
-          $('.bash--delivery-container').css('display', 'flex');
-        } else if ($('.bash--delivery-container:not(.hide)').length) {
-          $('.bash--delivery-container:not(.hide)').addClass('hide');
-          $('.bash--delivery-container').css('display', 'none');
-        }
-      });
-    } catch (e) {
-      console.error('VTEX_ORDERFORM_ERROR: Could not load at Deliver controller', e);
-      sendEvent({
-        eventCategory: 'Checkout_SystemError',
-        action: 'OrderFormFailed',
-        label: 'Could not getOrderForm() from vtex',
-        description: 'Could not load orderForm at Deliver.'
-      });
+    clearAddresses();
+    if (window.location.hash === STEPS.SHIPPING) {
+      setupDeliver();
+      $('.bash--delivery-container.hide').removeClass('hide');
+      $('.bash--delivery-container').css('display', 'flex');
+    } else if ($('.bash--delivery-container:not(.hide)').length) {
+      $('.bash--delivery-container:not(.hide)').addClass('hide');
+      $('.bash--delivery-container').css('display', 'none');
     }
   });
 
@@ -196,7 +185,7 @@ const DeliverController = (() => {
   });
 
   // Change view
-  $(document).on('click', 'a[data-view]', function (e) {
+  $(document).on('click', 'a[data-view]', (e) => {
     e.preventDefault();
     const viewTarget = $(this).data('view');
     const content = decodeURIComponent($(this).data('content'));

@@ -7,10 +7,17 @@ import {
   populateRicaFields,
   setDeliveryLoading
 } from '../partials/Deliver/utils';
+import { AD_TYPE, DELIVER_APP } from './const';
 import { clearLoaders, getSpecialCategories } from './functions';
-import { updateAddressListing } from './services';
+import sendEvent from './sendEvent';
+import { sendOrderFormCustomData, updateAddressListing } from './services';
+
+const updateDeliveryData = ({ businessName, receiverPhone }) => {
+  sendOrderFormCustomData(DELIVER_APP, JSON.stringify({ businessName, receiverPhone }));
+};
 
 const setAddress = (address, options = { validateExtraFields: true }) => {
+  console.info('### setAddress ###', { address });
   const { validateExtraFields } = options;
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasTVs, hasSimCards } = getSpecialCategories(items);
@@ -38,13 +45,16 @@ const setAddress = (address, options = { validateExtraFields: true }) => {
   }
 
   // Fix bad addressType.
-  if (address.addressType === 'business') address.addressType = 'commercial';
-  if (!validAddressTypes.includes(address.addressType)) address.addressType = 'residential';
+  if (address.addressType === AD_TYPE.BUSINESS) address.addressType = AD_TYPE.COMMERCIAL;
+  if (!validAddressTypes.includes(address.addressType)) address.addressType = AD_TYPE.DELIVERY;
 
   if (address.number) {
     address.street = `${address.number} ${address.street}`;
     address.number = '';
   }
+
+  // Country must always be 'ZAF'
+  address.country = 'ZAF';
 
   const { shippingData } = window?.vtexjs?.checkout?.orderForm;
 
@@ -82,6 +92,18 @@ const setAddress = (address, options = { validateExtraFields: true }) => {
       }
 
       if (address.addressName) updateAddressListing(address);
+
+      console.info('### Update customData ###', { address });
+      try {
+        updateDeliveryData({ businessName: address.businessName, receiverPhone: address.receiverPhone });
+      } catch (e) {
+        sendEvent({
+          eventCategory: 'Checkout_SystemError',
+          action: 'OrderFormFailed',
+          label: 'Could not update businessName and/or receiverPhone ',
+          description: 'Could not update businessName and/or receiverPhone.'
+        });
+      }
 
       return { success: true };
     })

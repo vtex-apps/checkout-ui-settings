@@ -5,7 +5,6 @@ import { validatePhoneNumber } from './phoneFields';
 export const catchError = (message) => {
   console.error('ERROR', message);
   Sentry.captureException(message);
-  // throw new Error(message);
 };
 
 export const getHeadersByConfig = ({ cookie, cache, json }) => {
