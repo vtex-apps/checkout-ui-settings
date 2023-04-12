@@ -185,11 +185,17 @@ const DeliverController = (() => {
   });
 
   // Change view
-  $(document).on('click', 'a[data-view]', (e) => {
+  $(document).on('click', 'a[data-view]', function (e) {
     e.preventDefault();
     const viewTarget = $(this).data('view');
     const content = decodeURIComponent($(this).data('content'));
     window.postMessage({ action: 'setDeliveryView', view: viewTarget, content });
+  });
+
+  // Clear form on adding new address
+  $(document).on('click', '#no-address-search-results', () => {
+    document.getElementById('bash--address-form').reset();
+    document.getElementById('bash--input-street').focus();
   });
 
   // Select address
