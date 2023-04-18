@@ -1,7 +1,16 @@
 /* eslint-disable no-nested-ternary */
 import Radio from './Elements/Radio';
 
-const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => `
+const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => {
+  let deliveryMessage = 'Delivery within 3 - 5 working days';
+
+  if (hasFurnitureMixed) deliveryMessage = 'Delivery within 3 - 10 working days';
+  if (hasFurnOnly) deliveryMessage = 'Delivery within 5 - 10 working days';
+
+  // Update the message in the Delivery Summary.
+  $('.shp-summary-package-time > span').html(deliveryMessage);
+
+  return `
   <label class="bash--delivery-option-display" >
   ${Radio({
     name: 'delivery-option',
@@ -10,7 +19,7 @@ const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => `
    
    <div id="bash--delivery-option-text" class="bash--delivery-option-text">
       <span class="normal-delivery">
-        Deliver within ${hasFurnitureMixed ? '3 - 10' : hasFurnOnly ? '5 - 10' : '3 - 5'} working days
+        ${deliveryMessage}
       </span>
    </div>
 
@@ -19,5 +28,6 @@ const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => `
   </div>
 </label>
   `;
+};
 
 export default DeliveryOptions;

@@ -15,7 +15,7 @@ import {
   submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
-import { AD_TYPE, FURNITURE_CAT, STEPS } from '../utils/const';
+import { AD_TYPE, STEPS } from '../utils/const';
 import { getSpecialCategories, scrollToInvalidField } from '../utils/functions';
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
@@ -50,12 +50,12 @@ const DeliverController = (() => {
 
     if (window.vtexjs.checkout.orderForm) {
       const items = window.vtexjs.checkout.orderForm?.items;
-      const { hasFurniture, hasTVs, hasSimCards, hasFurnitureMixed, categories } = getSpecialCategories(items);
+      const { hasFurniture, hasTVs, hasSimCards, hasFurnitureMixed, hasFurnitureOnly } = getSpecialCategories(items);
 
       state.hasFurn = hasFurniture;
       state.hasTVs = hasTVs;
       state.hasSim = hasSimCards;
-      state.hasFurnOnly = hasFurniture && categories.every((c) => c === FURNITURE_CAT);
+      state.hasFurnOnly = hasFurnitureOnly;
       state.hasFurnMixed = hasFurnitureMixed;
     }
 
