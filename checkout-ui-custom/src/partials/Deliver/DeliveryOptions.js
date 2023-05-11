@@ -2,23 +2,25 @@
 import Radio from './Elements/Radio';
 import FurnitureDeliveryOptions from './FurnitureDelivery';
 
-const RadioButton = () => Radio({
-  name: 'delivery-option',
-  options: [{ checked: true, value: true }],
-});
+const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => {
+  let deliveryMessage = 'Delivery within 3 - 5 working days';
 
-const DeliveryOptions = () => `
+  if (hasFurnitureMixed) deliveryMessage = 'Delivery within 3 - 10 working days';
+  if (hasFurnOnly) deliveryMessage = 'Delivery within 5 - 10 working days';
+
+  // Update the message in the Delivery Summary.
+  $('.shp-summary-package-time > span').html(deliveryMessage);
+
+  return `
   <label class="bash--delivery-option-display" >
-  ${RadioButton()}
-   <div id="bash--delivery-option-text"  class="bash--delivery-option-text">
-      <span class="normal-delivery normal-delivery-period">
-        Deliver within 3 - 5 working days
-      </span>
-      <span class="furniture-delivery furniture-delivery-period">
-        Deliver within 5 - 10 working days
-      </span>
-      <span class="furniture-mixed-delivery-period">
-        Deliver within 3 - 10 working days
+  ${Radio({
+    name: 'delivery-option',
+    options: [{ checked: true, value: true }],
+  })}
+   
+   <div id="bash--delivery-option-text" class="bash--delivery-option-text">
+      <span class="normal-delivery">
+        ${deliveryMessage}
       </span>
    </div>
 
@@ -29,11 +31,6 @@ const DeliveryOptions = () => `
 
 ${FurnitureDeliveryOptions()}
   `;
+};
 
-/*
-<div id="bash--delivery-option-text" class="bash--delivery-option-text">
-    <span class="normal-delivery">
-      Deliver within ${hasFurnitureMixed ? '3 - 10' : hasFurnOnly ? '5 - 10' : '3 - 5'} working days
-    </span>
-*/
 export default DeliveryOptions;
