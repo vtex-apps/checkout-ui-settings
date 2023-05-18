@@ -1,7 +1,9 @@
-import { InputError, PickupComplementField } from '../partials';
-import { setPickupLoading } from '../partials/Deliver/utils';
+import { InputError } from '../partials';
+import { PickupPhoneField } from '../partials/AddressForm';
+import { getBestRecipient, setPickupLoading } from '../partials/Deliver/utils';
 import { AD_TYPE, GEOLOCATE, MANUAL, NONE, PICKUP, PICKUP_APP, STEPS } from '../utils/const';
 import { clearLoaders, getSpecialCategories, isValidNumberBash, scrollToInvalidField } from '../utils/functions';
+import { getBestPhoneNumber } from '../utils/phoneFields';
 import sendEvent from '../utils/sendEvent';
 import { getOrderFormCustomData, sendOrderFormCustomData } from '../utils/services';
 
@@ -19,7 +21,7 @@ const CollectController = (() => {
     $('#change-pickup-button').text('Available pickup points');
     $('h2.vtex-omnishipping-1-x-geolocationTitle.ask-for-geolocation-title').text('Find nearby Click & Collect points');
     $('h3.vtex-omnishipping-1-x-subtitle.ask-for-geolocation-subtitle').text(
-      "Search for addresses that you frequently use and we'll locate stores nearby."
+      "Search for addresses that you frequently use and we'll locate stores nearby.",
     );
 
     if (state.pickupSelected) {
@@ -31,7 +33,7 @@ const CollectController = (() => {
     $('.delivery-group-content').empty();
     $('.btn-go-to-payment-wrapper').empty();
     $(
-      '<div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" stroke="#FCFCFC" fill="#FCFCFC"/><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" stroke="#000" fill="#000"><animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite"/></path></svg><div>'
+      '<div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" stroke="#FCFCFC" fill="#FCFCFC"/><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" stroke="#000" fill="#000"><animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite"/></path></svg><div>',
     )
       .css({ display: 'flex', 'justify-content': 'center', 'align-items': 'center', 'min-height': '100px' })
       .appendTo('.delivery-group-content');
@@ -58,10 +60,10 @@ const CollectController = (() => {
     // Modify view to match design for a selected pickup point
     if ($('#change-pickup-button').length) {
       $(
-        '<button class="vtex-omnishipping-1-x-pickupPointSeeMore button-see-pickup-point btn btn-link" id="tfg-pickup-see-more-button" type="button">Collect Point Details</button>'
+        '<button class="vtex-omnishipping-1-x-pickupPointSeeMore button-see-pickup-point btn btn-link" id="tfg-pickup-see-more-button" type="button">Collect Point Details</button>',
       ).appendTo('.vtex-omnishipping-1-x-PickupPoint');
       $(
-        '<button class="vtex-change-pickup button-change-pickup-point" id="tfg-pickup-button" type="button">Change</button>'
+        '<button class="vtex-change-pickup button-change-pickup-point" id="tfg-pickup-button" type="button">Change</button>',
       ).appendTo('.vtex-omnishipping-1-x-PickupPoint');
       $('#change-pickup-button').remove();
       $('#details-pickup-button').remove();
@@ -101,7 +103,7 @@ const CollectController = (() => {
 
     const iframeFunctions = function (state) {
       $('<div class="tfg-pickup-map" id="tfg-pickup-map"><div class="tfg-pickup-map-content"></div></div>').appendTo(
-        $('body')
+        $('body'),
       );
       $('body').css('position', 'fixed');
       $('body').css('width', '100%');
@@ -246,47 +248,30 @@ const CollectController = (() => {
     }
   };
 
-  //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
-  const setInputPhone = () => {
-    const phoneInput = document.querySelector('input#custom-pickup-complement');
-
-    if (phoneInput) {
-      phoneInput.setAttribute('placeholder', '');
-    }
-  };
-
   const prePopulateReceiverName = () => {
-    const { firstName, lastName } = window.vtexjs.checkout.orderForm?.clientProfileData;
-    const firstNameInput = $('#client-first-name').val();
-    const lastNameInput = $('#client-last-name').val();
+    const receiverName = getBestRecipient(
+      {
+        preferred: window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName,
+        type: 'collect',
+      },
+    ).trim();
 
-    const receiverName = firstName ? [firstName, lastName].join(' ') : [firstNameInput, lastNameInput].join(' ');
+    console.info('prePopulateReceiverName', { receiverName });
 
-    if ($('input#pickup-receiver').val() === '') {
-      $('input#pickup-receiver').val(receiverName.trim());
-
-      window.vtexjs.checkout.getOrderForm().then((orderForm) => {
-        const { shippingData } = orderForm;
-        shippingData.address.receiverName = receiverName.trim();
-        return window.vtexjs.checkout.sendAttachment('shippingData', shippingData);
-      });
-    }
+    $('#pickup-receiver').val(receiverName.trim());
   };
 
   const addCustomPhoneInput = () => {
     /* Set orderForm value if exists */
-    const phoneNumber = window.vtexjs.checkout.orderForm?.clientProfileData?.phone ?? $('#client-phone').val() ?? '';
+    const fields = getOrderFormCustomData(PICKUP)
+    const phoneNumber = getBestPhoneNumber({ type: 'collect', fields });
 
-    if ($('input#custom-pickup-complement').length === 0) {
-      $('.btn-go-to-payment-wrapper').before(PickupComplementField);
-      setInputPhone();
-
-      if (phoneNumber) {
-        $('input#custom-pickup-complement').val(phoneNumber);
-      }
-    } else if ($('input#custom-pickup-complement').val() === '') {
-      $('input#custom-pickup-complement').val(phoneNumber);
+    if ($('#custom-pickup-complement').length === 0) {
+      $('.btn-go-to-payment-wrapper').before(PickupPhoneField);
     }
+
+    if (phoneNumber) $('#custom-pickup-complement').val(phoneNumber);
+
     prePopulateReceiverName();
   };
 
@@ -309,7 +294,7 @@ const CollectController = (() => {
   };
 
   const runCustomization = () => {
-    const shippingLoaded = $('div#postalCode-finished-loading').length > 0;
+    const shippingLoaded = $('#postalCode-finished-loading').length > 0;
 
     $('#shipping-option-pickup-in-point').one('click', () => {
       state.collectReset = true;
@@ -364,6 +349,11 @@ const CollectController = (() => {
             if (address && address.addressType === AD_TYPE.PICKUP && (!address.receiverName || !phone)) {
               window.location.hash = STEPS.SHIPPING;
               localStorage.setItem('shipping-incomplete-values', true);
+              sendEvent({
+                action: 'stepRedirect',
+                label: 'redirectPaymentToShipping',
+                description: 'User redirect to shipping because Collection is missing receiverName or phone number.',
+              });
             }
           }
         }, 1000);

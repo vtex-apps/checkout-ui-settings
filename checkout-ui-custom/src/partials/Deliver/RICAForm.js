@@ -32,7 +32,7 @@ const RICAForm = () => {
       name: 'rica_fullName',
       label: 'Full name and surname',
       required: true,
-      value: getBestRecipient() || '',
+      value: getBestRecipient({ type: 'delivery' }) || '',
     },
     {
       name: 'rica_streetAddress',

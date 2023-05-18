@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import Radio from './Elements/Radio';
+import FurnitureDeliveryOptions from './FurnitureDelivery';
 
 const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => {
   let deliveryMessage = 'Delivery within 3 - 5 working days';
@@ -27,6 +28,8 @@ const DeliveryOptions = ({ hasFurnOnly, hasFurnitureMixed }) => {
     R50
   </div>
 </label>
+
+${FurnitureDeliveryOptions()}
   `;
 };
 

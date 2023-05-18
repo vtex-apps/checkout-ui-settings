@@ -1,4 +1,3 @@
-import { getBestPhoneNumber } from '../../utils/phoneFields';
 import FormField from './Elements/FormField';
 import { getBestRecipient } from './utils';
 
@@ -48,8 +47,16 @@ const AddressForm = () => {
     {
       name: 'number',
       required: false,
-      value: '  ',
+      value: '',
       type: 'hidden',
+    },
+
+    {
+      name: 'businessName',
+      label: 'Business name',
+      required: false,
+      value: '',
+      maxLength: 100,
     },
     {
       name: 'companyBuilding',
@@ -150,13 +157,20 @@ const AddressForm = () => {
       name: 'receiverName',
       label: 'Recipient’s name',
       required: true,
-      value: getBestRecipient(),
+      value: getBestRecipient({ type: 'delivery' }),
     },
+    // Note: historically used incorrectly for Address line 2
     {
       name: 'complement',
+      required: false,
+      type: 'hidden',
+      helperText: 'We send shipping updates to this number.',
+      value: '',
+    },
+    {
+      name: 'receiverPhone',
       label: 'Recipient’s mobile number',
       required: true,
-      value: getBestPhoneNumber(),
       type: 'tel',
       helperText: 'We send shipping updates to this number.',
     },
@@ -171,8 +185,7 @@ const AddressForm = () => {
     <button 
       class="submit btn-go-to-payment btn btn-large btn-success"
       id="btn-save-address" 
-      type="submit"
-    >
+      type="submit">
       Save address
     </button>
   </form>

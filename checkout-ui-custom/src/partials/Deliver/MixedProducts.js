@@ -3,7 +3,7 @@ const MixedProducts = () => `
     <p class="tfg-custom-icon"></p>
     <p class="tfg-custom-text">
       We'll ship your furniture and other items in your cart to the selected address. 
-      Only the furniture delivery fee will apply.
+      Only the furniture delivery fee will apply for your whole order.
       </p>
   </div>
 `;

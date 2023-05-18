@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 export const requiredAddressFields = [
   'receiverName',
-  'complement',
   'street',
   'neighborhood',
   'state',

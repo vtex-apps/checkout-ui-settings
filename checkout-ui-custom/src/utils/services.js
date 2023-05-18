@@ -2,25 +2,9 @@
 import AddressListing from '../partials/Deliver/AddressListing';
 import CheckoutDB from './checkoutDB';
 import { BASE_URL_API } from './const';
-import { clearLoaders } from './functions';
-import { getBestPhoneNumber } from './phoneFields';
+import { catchError, clearLoaders, getHeadersByConfig } from './functions';
 
 // API Functions
-
-const catchError = (message) => {
-  console.error('ERROR', message);
-  throw new Error(message);
-};
-
-const getHeadersByConfig = ({ cookie, cache, json }) => {
-  const headers = new Headers();
-  // TODO don't use document?.cookie
-  if (cookie) headers.append('Cookie', document?.cookie);
-  if (cache) headers.append('Cache-Control', 'no-cache');
-  if (json) headers.append('Content-type', 'application/json');
-  return headers;
-};
-
 // GET addresses
 
 const DB = new CheckoutDB();
@@ -33,54 +17,55 @@ export const getAddresses = async () => {
   if (addresses.length > 0) return { data: addresses };
 
   // Fallback to get addresses from API.
-  return window.vtexjs.checkout.getOrderForm().then((orderForm) => {
-    const { email } = orderForm?.clientProfileData;
 
-    const fields = [
-      'id',
-      'addressType',
-      'addressQuery',
-      'addressName',
-      'reference',
-      'number',
-      'geolocation',
-      'receiverName',
-      'complement',
-      'companyBuilding',
-      'street',
-      'neighborhood',
-      'city',
-      'postalCode',
-      'state',
-      'country',
-      'tvID',
-      'geoCoordinate',
-    ].join(',');
+  const { email } = window?.vtexjs?.checkout?.orderForm?.clientProfileData;
 
-    const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
-    const options = {
-      headers,
-      credentials: 'include',
-    };
+  const fields = [
+    'id',
+    'addressType',
+    'addressQuery',
+    'addressName',
+    'reference',
+    'number',
+    'geolocation',
+    'receiverName',
+    'receiverPhone',
+    'complement', // todo stop populating complement, in favour of companyBuilding
+    'street',
+    'businessName',
+    'companyBuilding',
+    'neighborhood',
+    'city',
+    'postalCode',
+    'state',
+    'country',
+    'tvID',
+    'geoCoordinate',
+  ].join(',');
 
-    const cacheBust = Date.now();
+  const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
+  const options = {
+    headers,
+    credentials: 'include',
+  };
 
-    return fetch(
-      `${BASE_URL_API}masterdata/addresses?t=${cacheBust}&_fields=${fields}&_where=${encodeURIComponent(
-        `userIdQuery=${email}`,
-      )}`,
-      options,
-    )
-      .then((res) => res.json())
-      .then(async (data) => {
-        // Store addresses locally
-        if (data.data) DB.loadAddresses(data.data);
-        // return DB.getAddresses();
-        // API can have dups.
-        return data;
-      })
-      .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
-  });
+  const cacheBust = Date.now();
+
+  return fetch(
+    `${BASE_URL_API}masterdata/addresses?t=${cacheBust}&_fields=${fields}&_where=${encodeURIComponent(
+      `userIdQuery=${email}`,
+    )}`,
+    options,
+  )
+    .then((res) => res.json())
+    .then(async (data) => {
+      // Store addresses locally
+      if (data.data) DB.loadAddresses(data.data);
+      // return DB.getAddresses();
+      // API can have dups.
+      return data;
+    })
+    .catch((error) => catchError(`GET_ADDRESSES_ERROR: ${error?.message}`));
 };
 
 // GET Address by ID / Name?
@@ -123,9 +108,6 @@ export const upsertAddress = async (address) => {
     path = `${BASE_URL_API}masterdata/addresses`;
   }
 
-  address.complement = address.complement || getBestPhoneNumber();
-
-  // Importante respetar el orden de address para no sobreescribir receiver, complement y neighborhood
   const newAddress = {
     userId: email,
     ...address,

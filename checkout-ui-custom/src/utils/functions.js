@@ -1,82 +1,18 @@
 import * as Sentry from '@sentry/browser';
-import { BASE_URL_API, FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
+import { FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { validatePhoneNumber } from './phoneFields';
 
-// API Functions
-
-const catchError = (message) => {
+export const catchError = (message) => {
   console.error('ERROR', message);
   Sentry.captureException(message);
-  // throw new Error(message);
 };
 
-const getHeadersByConfig = ({ cookie, cache, json }) => {
+export const getHeadersByConfig = ({ cookie, cache, json }) => {
   const headers = new Headers();
   if (cookie) headers.append('Cookie', document?.cookie);
   if (cache) headers.append('Cache-Control', 'no-cache');
   if (json) headers.append('Content-type', 'application/json');
   return headers;
-};
-
-// TODO remove when no longer used in favour of services.
-
-const getShippingData = async (addressName, fields) => {
-  let data = {};
-  const headers = getHeadersByConfig({ cookie: true, cache: true, json: false });
-  const options = {
-    headers,
-    credentials: 'include',
-  };
-
-  const response = await fetch(
-    `${BASE_URL_API}masterdata/addresses/${fields}&_where=addressName=${addressName}&timestamp=${Date.now()}`,
-    options,
-  )
-    .then((res) => res.json())
-    .catch((error) => catchError(`GET_ADDRESS_ERROR: ${error?.message}`));
-
-  if (response && !response.error && response.data && response.data.length > 0) {
-    [data] = response.data;
-  }
-
-  return data;
-};
-
-const setMasterdataFields = async (completeFurnitureForm, completeTVIDForm, tries = 1) => {
-  /* Data will only be searched and set if any of the custom fields for TFG are displayed. */
-  if (completeFurnitureForm || completeTVIDForm) {
-    const { address } = window.vtexjs.checkout.orderForm.shippingData;
-
-    /* Setting Masterdata custom fields */
-    const fields = '?_fields=buildingType,parkingDistance,deliveryFloor,liftOrStairs,hasSufficientSpace,assembleFurniture,tvID,geoCoordinate';
-
-    const shippingData = await getShippingData(address.addressId, fields);
-
-    if (shippingData && !jQuery.isEmptyObject(shippingData)) {
-      /* Setting furniture form values */
-      if (completeFurnitureForm) {
-        $('#tfg-building-type').val(shippingData.buildingType);
-        $('#tfg-parking-distance').val(shippingData.parkingDistance);
-        $('#tfg-delivery-floor').val(shippingData.deliveryFloor);
-        if ($('#tfg-delivery-floor').val() === 'Ground') {
-          $('#tfg-lift-stairs').attr('disabled', 'disabled');
-        } else {
-          $('#tfg-lift-stairs').val(shippingData.liftOrStairs);
-        }
-        $('#tfg-sufficient-space').prop('checked', shippingData.hasSufficientSpace);
-        $('#tfg-assemble-furniture').prop('checked', shippingData.assembleFurniture);
-      }
-
-      /* Setting TV form values */
-      if (completeTVIDForm) {
-        $('#tfg-tv-licence').val(shippingData.tvID);
-      }
-    } else if (tries <= 5) {
-      setTimeout(() => {
-        setMasterdataFields(completeFurnitureForm, completeTVIDForm, (tries += 1));
-      }, 3000);
-    }
-  }
 };
 
 // Functions to manage CustomData
@@ -93,18 +29,6 @@ const checkoutGetCustomData = (appId) => {
   }
 
   return fields;
-};
-
-const checkoutSendCustomData = (appId, customData) => {
-  const { orderFormId } = window.vtexjs.checkout.orderForm;
-
-  return $.ajax({
-    type: 'PUT',
-    url: `/api/checkout/pub/orderForm/${orderFormId}/customData/${appId}`,
-    dataType: 'json',
-    contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(customData),
-  });
 };
 
 const setRicaFields = (getDataFrom = 'customApps') => {
@@ -197,6 +121,20 @@ export const clearLoaders = () => {
   $('.shimmer').removeClass('shimmer');
 };
 
+export const showBusinessName = ({ focus = false }) => {
+  $('.bash--textfield-businessName')
+    .removeClass('optional')
+    .slideDown(() => {
+      $('#bash--input-businessName').attr('required', 'required');
+      if (!$('#bash--input-businessName').val() && focus) $('#bash--input-businessName')?.focus();
+    });
+};
+
+export const hideBusinessName = () => {
+  $('.bash--textfield-businessName').addClass('optional').slideUp();
+  $('#bash--input-businessName').removeAttr('required');
+};
+
 export const scrollToInvalidField = () => {
   const invalidInputs = Array.from($('form.form-step.box-edit > :invalid, .error'));
   // sort inputs by offset from top of viewport
@@ -207,13 +145,10 @@ export const scrollToInvalidField = () => {
 };
 
 export {
-  getShippingData,
   addBorderTop,
   waitAndResetLocalStorage,
   checkoutGetCustomData,
-  checkoutSendCustomData,
   setRicaFields,
-  setMasterdataFields,
   isValidNumberBash,
   getSpecialCategories,
 };

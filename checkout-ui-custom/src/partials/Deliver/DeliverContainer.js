@@ -2,16 +2,17 @@ import { FURNITURE_FEE_LINK } from '../../utils/const';
 import Addresses from './Addresses';
 import AddressForm from './AddressForm';
 import AddressSearch from './AddressSearch';
-import DeliveryErrorContainer from './DeliveryError';
+import { DeliveryErrorContainer } from './DeliveryError';
 import DeliveryOptions from './DeliveryOptions';
-import Alert from './Elements/Alert';
+import { AlertContainer } from './Elements/Alert';
 import MixedProducts from './MixedProducts';
 import TVorRICAMsg from './TVorRICAMsg';
 
-const DeliverContainer = ({ hasFurnOnly, hasFurnMixed }) => `
-  <div class="bash--delivery-container" id="bash--delivery-container" data-view="select-address">
+const DeliverContainer = ({ hasFurn, hasFurnOnly, hasFurnMixed }) => `
+  <div class="bash--delivery-container ${hasFurn && 'has-furniture'}"
+   id="bash--delivery-container" data-view="select-address">
     <div id="bash--shipping-messages">
-      ${Alert()}
+      ${AlertContainer()}
       ${TVorRICAMsg()}
       ${MixedProducts()}
       ${DeliveryErrorContainer()}

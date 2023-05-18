@@ -1,5 +1,5 @@
+import { formatPhoneNumber, prependZero } from '../../utils/phoneFields';
 import Radio from './Elements/Radio';
-import { formatPhoneNumber, prependZero } from './utils';
 
 const isSelectedAddress = (address, selectedAddress) => {
   const addressObject = JSON.stringify({
@@ -22,15 +22,30 @@ const isSelectedAddress = (address, selectedAddress) => {
 const AddressListing = (address) => {
   if (!address) return '';
 
-  const { number, street, neighborhood, postalCode, city, receiverName, addressName, complement } = address;
+  const {
+    businessName,
+    number,
+    street,
+    neighborhood,
+    postalCode,
+    city,
+    receiverName,
+    addressName,
+    complement,
+    receiverPhone,
+  } = address;
 
-  const addressLine = [`${number ? `${number} ` : ''}${street}`, neighborhood ?? city, postalCode].join(', ').trim();
-
-  const contactLine = [receiverName, formatPhoneNumber(prependZero(complement))].join(' - ');
+  const addressLine = [
+    `${businessName ? `${businessName}, ` : ''} ${number ? `${number.trim()} ` : ''}${street}`,
+    neighborhood ?? city,
+    postalCode,
+  ]
+    .join(', ')
+    .trim();
+  const contactLine = [receiverName, formatPhoneNumber(prependZero(receiverPhone || complement))].join(' - ');
 
   // orderform
   const selectedAddress = window?.vtexjs?.checkout?.orderForm?.shippingData?.address;
-
   const addressString = encodeURIComponent(JSON.stringify(address));
 
   return `

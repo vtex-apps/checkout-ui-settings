@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 import DeliverContainer from '../partials/Deliver/DeliverContainer';
 import ExtraFieldsContainer from '../partials/Deliver/ExtraFieldsContainer';
 import {
@@ -8,17 +9,23 @@ import {
   populateDeliveryError,
   populateRicaFields,
   populateTVFields,
-  preparePhoneField,
-  setAddress,
   setCartClasses,
-  submitAddressForm,
-  submitDeliveryForm,
   updateDeliveryFeeDisplay
 } from '../partials/Deliver/utils';
 import { AD_TYPE, STEPS } from '../utils/const';
-import { getSpecialCategories, scrollToInvalidField } from '../utils/functions';
+import {
+  clearLoaders,
+  getSpecialCategories,
+  hideBusinessName,
+  scrollToInvalidField,
+  showBusinessName
+} from '../utils/functions';
+import { preparePhoneField } from '../utils/phoneFields';
 import sendEvent from '../utils/sendEvent';
 import { clearAddresses, getAddressByName, removeFromCart } from '../utils/services';
+import setAddress from '../utils/setAddress';
+import submitAddressForm from '../utils/submitAddressForm';
+import submitDeliveryForm from '../utils/submitDeliveryForm';
 
 const DeliverController = (() => {
   const state = {
@@ -66,12 +73,17 @@ const DeliverController = (() => {
       }),
     );
 
+    if (state.hasFurn) {
+      $('#shipping-data:not(.has-furniture)').addClass('has-furniture');
+    } else {
+      $('#shipping-data.has-furniture').removeClass('has-furniture');
+    }
+
     const showExtraFields = state.hasFurn || state.hasSim || state.hasTVs;
 
     if (showExtraFields) {
       $('#bash-delivery-options').before(
         ExtraFieldsContainer({
-          hasFurn: state.hasFurn,
           hasSim: state.hasSim,
           hasTV: state.hasTVs,
         }),
@@ -101,31 +113,25 @@ const DeliverController = (() => {
   });
 
   $(document).ready(() => {
-    try {
-      window.vtexjs.checkout.getOrderForm().then(() => {
-        clearAddresses();
-        if (window.location.hash === STEPS.SHIPPING) {
-          setupDeliver();
-          $('.bash--delivery-container.hide').removeClass('hide');
-          $('.bash--delivery-container').css('display', 'flex');
-        } else if ($('.bash--delivery-container:not(.hide)').length) {
-          $('.bash--delivery-container:not(.hide)').addClass('hide');
-          $('.bash--delivery-container').css('display', 'none');
-        }
-      });
-    } catch (e) {
-      console.error('VTEX_ORDERFORM_ERROR: Could not load at Deliver controller', e);
-      sendEvent({
-        eventCategory: 'Checkout_SystemError',
-        action: 'OrderFormFailed',
-        label: 'Could not getOrderForm() from vtex',
-        description: 'Could not load orderForm at Deliver.'
-      });
+    clearAddresses();
+    if (window.location.hash === STEPS.SHIPPING) {
+      setupDeliver();
+      $('.bash--delivery-container.hide').removeClass('hide');
+      $('.bash--delivery-container').css('display', 'flex');
+    } else if ($('.bash--delivery-container:not(.hide)').length) {
+      $('.bash--delivery-container:not(.hide)').addClass('hide');
+      $('.bash--delivery-container').css('display', 'none');
     }
   });
 
   $(window).on('hashchange', () => {
+    console.info('hashchange TO SHIPPING');
+
     if (window.location.hash === STEPS.SHIPPING) {
+      setTimeout(() => {
+        console.info('SCROLL TO SHIPPING');
+        document.getElementById('shipping-data').scrollIntoView({ behavior: 'smooth' });
+      }, 500);
       setupDeliver();
       setCartClasses();
       $('.bash--delivery-container').css('display', 'flex');
@@ -170,6 +176,11 @@ const DeliverController = (() => {
     if (window.location.hash === STEPS.PAYMENT && !customShippingDataIsValid()) {
       scrollToInvalidField();
       window.location.hash = STEPS.SHIPPING;
+      sendEvent({
+        action: 'stepRedirect',
+        label: 'redirectPaymentToShipping',
+        description: 'User redirect to shipping because Extra Fields are invalid.',
+      });
     }
   });
 
@@ -179,6 +190,12 @@ const DeliverController = (() => {
     const viewTarget = $(this).data('view');
     const content = decodeURIComponent($(this).data('content'));
     window.postMessage({ action: 'setDeliveryView', view: viewTarget, content });
+  });
+
+  // Clear form on adding new address
+  $(document).on('click', '#no-address-search-results', () => {
+    document.getElementById('bash--address-form').reset();
+    document.getElementById('bash--input-street').focus();
   });
 
   // Select address
@@ -216,9 +233,9 @@ const DeliverController = (() => {
   $(document).on('change', 'input[name="addressType"]', function () {
     if ($(this).is(':checked')) {
       if ($(this).val() === 'business') {
-        $('#bash--label-companyBuilding').text('Business name');
+        showBusinessName({ focus: true });
       } else {
-        $('#bash--label-companyBuilding').text('Building/Complex and number');
+        hideBusinessName();
       }
     }
   });
@@ -239,7 +256,9 @@ const DeliverController = (() => {
 
   $(document).on('click', '.remove-cart-item', function (e) {
     e.preventDefault();
-    removeFromCart($(this).data('index'));
+    removeFromCart($(this).data('index')).done(() => {
+      clearLoaders();
+    });
   });
 
   // Form validation
@@ -251,7 +270,7 @@ const DeliverController = (() => {
       case 'setDeliveryView':
         document.querySelector('.bash--delivery-container')?.setAttribute('data-view', data.view);
         if (data.view === 'address-form' || data.view === 'address-edit') {
-          preparePhoneField('#bash--input-complement');
+          preparePhoneField('#bash--input-receiverPhone');
           if (data.content) {
             try {
               const address = JSON.parse(decodeURIComponent($(`#${data.content}`).data('address')));
