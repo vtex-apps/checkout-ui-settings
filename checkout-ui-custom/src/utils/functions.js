@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/browser';
-import { FURNITURE_CAT, RICA_APP, SIM_CAT, TV_CAT } from './const';
+import { RICA_APP, SIM_CAT, TV_CAT } from './const';
 import { validatePhoneNumber } from './phoneFields';
 
 export const catchError = (message) => {
@@ -80,7 +80,6 @@ const waitAndResetLocalStorage = () => {
 const isValidNumberBash = (tel) => validatePhoneNumber(tel);
 
 const getSpecialCategories = (items) => {
-  const furnitureCategories = [FURNITURE_CAT];
   const tvCategories = [TV_CAT];
   const simCardCategories = [SIM_CAT];
   const categories = [];
@@ -97,9 +96,11 @@ const getSpecialCategories = (items) => {
     itemCategories.forEach((category) => {
       if (!category) return;
       if (tvCategories.includes(category)) { hasTVs = true; return; }
-      if (simCardCategories.includes(category)) { hasSimCards = true; return; }
-      if (furnitureCategories.includes(category)) { hasFurniture = true; furnitureCount += 1; }
+      if (simCardCategories.includes(category)) { hasSimCards = true; }
     });
+
+    if (item.modalType === 'FURNITURE') { hasFurniture = true; furnitureCount += 1; }
+
   });
 
   hasFurnitureOnly = furnitureCount === items.length;
