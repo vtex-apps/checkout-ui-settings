@@ -55,7 +55,6 @@ const FURNITURE_FEE_LINK = `
 </a>
 `;
 
-const FURNITURE_CAT = '1169288799';
 const TV_CAT = '938942995';
 const SIM_CAT = '24833302';
 
@@ -73,7 +72,6 @@ export {
   FURNITURE_FEE_LINK,
   SIM_CAT,
   TV_CAT,
-  FURNITURE_CAT,
   GEOLOCATE,
   MANUAL,
   PICKUP,

@@ -1,5 +1,5 @@
 import { MixedProducts, TVorRICAMsg } from '../partials';
-import { FURNITURE_CAT, TIMEOUT_500 } from '../utils/const';
+import { TIMEOUT_500 } from '../utils/const';
 import { addBorderTop, getSpecialCategories } from '../utils/functions';
 
 const ViewController = (() => {
@@ -15,7 +15,7 @@ const ViewController = (() => {
   const checkCartCategories = () => {
     if (window.vtexjs.checkout.orderForm) {
       const { items } = window.vtexjs.checkout.orderForm;
-      const { hasFurniture, hasTVs, hasSimCards, categories } = getSpecialCategories(items);
+      const { hasTVs, hasSimCards, hasFurnitureMixed } = getSpecialCategories(items);
       state.showTVIDForm = hasTVs;
       state.showRICAForm = hasSimCards;
       state.showTVorRICAMsg = state.showTVIDForm || state.showRICAForm;
@@ -25,7 +25,7 @@ const ViewController = (() => {
         - after filter categories, this array includes at least one furniture id
         - there are only one category OR not all the categories in the array are furniture
       */
-      state.showMixedProductsMsg = items.length > 1 && hasFurniture && !categories.every((c) => c === FURNITURE_CAT);
+      state.showMixedProductsMsg = hasFurnitureMixed
     }
   };
 
