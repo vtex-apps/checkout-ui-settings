@@ -10,10 +10,10 @@ const isSelectedAddress = (address, selectedAddress) => {
   });
 
   const selectedAddressObject = JSON.stringify({
-    street: selectedAddress.street,
-    neighborhood: selectedAddress.neighborhood,
-    city: selectedAddress.city,
-    postalCode: selectedAddress.postalCode,
+    street: selectedAddress?.street || '',
+    neighborhood: selectedAddress?.neighborhood || '',
+    city: selectedAddress?.city || '',
+    postalCode: selectedAddress?.postalCode || '',
   });
 
   return addressObject === selectedAddressObject;
