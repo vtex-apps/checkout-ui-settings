@@ -53,7 +53,7 @@ const AddressListing = (address) => {
   <div class="address-radio">
   ${Radio({
     name: 'selected-address',
-    options: [{ checked: !!selectedAddress ?? isSelectedAddress(address, selectedAddress), value: addressName }],
+    options: [{ checked: isSelectedAddress(address, selectedAddress), value: addressName }],
   })}
   </div>
   <div class="address-text">
