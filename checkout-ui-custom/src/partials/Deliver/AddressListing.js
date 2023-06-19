@@ -3,10 +3,10 @@ import Radio from './Elements/Radio';
 
 const isSelectedAddress = (address, selectedAddress) => {
   const addressObject = JSON.stringify({
-    street: address.street,
-    neighborhood: address.neighborhood,
-    city: address.city,
-    postalCode: address.postalCode,
+    street: address?.street || '',
+    neighborhood: address?.neighborhood || '',
+    city: address?.city || '',
+    postalCode: address?.postalCode || '',
   });
 
   const selectedAddressObject = JSON.stringify({
