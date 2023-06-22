@@ -216,6 +216,8 @@ const DeliverController = (() => {
       setAddress(addressByName || address, { validateExtraFields: false });
       $('input[type="radio"][name="selected-address"]:checked').attr('checked', false);
       $(this).attr('checked', true);
+    }).catch((e) => {
+      console.error('Could not get address - address selection', e?.message);
     });
   });
 
