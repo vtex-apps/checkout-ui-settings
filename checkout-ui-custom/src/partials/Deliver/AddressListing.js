@@ -3,17 +3,17 @@ import Radio from './Elements/Radio';
 
 const isSelectedAddress = (address, selectedAddress) => {
   const addressObject = JSON.stringify({
-    street: address.street,
-    neighborhood: address.neighborhood,
-    city: address.city,
-    postalCode: address.postalCode,
+    street: address?.street || '',
+    neighborhood: address?.neighborhood || '',
+    city: address?.city || '',
+    postalCode: address?.postalCode || '',
   });
 
   const selectedAddressObject = JSON.stringify({
-    street: selectedAddress.street,
-    neighborhood: selectedAddress.neighborhood,
-    city: selectedAddress.city,
-    postalCode: selectedAddress.postalCode,
+    street: selectedAddress?.street || '',
+    neighborhood: selectedAddress?.neighborhood || '',
+    city: selectedAddress?.city || '',
+    postalCode: selectedAddress?.postalCode || '',
   });
 
   return addressObject === selectedAddressObject;
@@ -53,7 +53,7 @@ const AddressListing = (address) => {
   <div class="address-radio">
   ${Radio({
     name: 'selected-address',
-    options: [{ checked: !!selectedAddress ?? isSelectedAddress(address, selectedAddress), value: addressName }],
+    options: [{ checked: isSelectedAddress(address, selectedAddress), value: addressName }],
   })}
   </div>
   <div class="address-text">
