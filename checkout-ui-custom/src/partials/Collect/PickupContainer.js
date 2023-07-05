@@ -1,4 +1,4 @@
-const PickupContainer = () => `<div class="pickup-map-container">
+const PickupContainer = () => `<div class="pickup-map-container" id="tfg-pickup-container">
           <div class="pickup-map-icon">
             <svg class="icon-map" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
               <rect width="48" height="48" rx="24" fill="#2424E4"/>
