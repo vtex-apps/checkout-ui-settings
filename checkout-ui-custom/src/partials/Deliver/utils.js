@@ -8,6 +8,17 @@ import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './c
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
 
+/**
+ * isInSouthAfrica
+ * Validate coordinates to ensure that they are in South Africa.
+ * @param {[lnt, lat]} coordinates 
+ * @returns 
+ */
+export const isInSouthAfrica = (coordinates) => {
+  const [lng, lat] = coordinates;
+  return lng >= 16.3440 && lng <= 32.8301 && lat >= -34.8191 && lat <= -22.1277;
+}
+
 export const setDeliveryLoading = () => {
   document.querySelector('.bash--delivery-container').classList.add('shimmer');
 };
@@ -131,7 +142,20 @@ export const populateAddressForm = (address) => {
   let lat;
   let lng;
   try {
-    [lat, lng] = JSON.parse(JSON.stringify(geoCoordinate));
+    [lng, lat] = JSON.parse(JSON.stringify(geoCoordinate));
+
+    if (!isInSouthAfrica([lng, lat])) {
+      // Coordinates are most likely still at [lat, lng]
+      if (isInSouthAfrica[lat, lng]) {
+        lng = lat;
+        lat = lng
+      } else {
+        // Unset the coordinates
+        lng = 0;
+        lat = 0
+      }
+    }
+
   } catch (e) {
     console.warn('Could not parse geo coords', { address, geoCoordinate });
   }
