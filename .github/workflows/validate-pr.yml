@@ -1,0 +1,35 @@
+name: Validate PR body
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  validate_body:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get PR template
+        id: get_template
+        run: |
+          echo "::set-output name=length::$(wc -c .github/PULL_REQUEST_TEMPLATE.md | awk '{print $1}')"
+
+      - name: Get PR body
+        id: get_body
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.pull_request.body
+            return body
+
+      - name: Check length
+        env:
+          BODY: ${{ steps.get_body.outputs.result }}
+          TEMPLATE_LENGTH: ${{ steps.get_template.outputs.length }}
+        run: |
+          if [ ${#BODY} -lt $TEMPLATE_LENGTH ]; then
+            echo "PR body is not filled out. Please fill out the template and explain what you did, what must be reviewed."
+            exit 1
+          fi
