@@ -159,7 +159,6 @@ const AddressForm = () => {
       required: true,
       value: getBestRecipient({ type: 'delivery' }),
     },
-    // Note: historically used incorrectly for Address line 2
     {
       name: 'complement',
       required: false,
@@ -173,6 +172,9 @@ const AddressForm = () => {
       required: true,
       type: 'tel',
       helperText: 'We send shipping updates to this number.',
+      minlength: 9,
+      error: 'Please enter a valid phone number',
+      containerClasses: 'custom-field-complement' // for sa flag
     },
   ];
 
