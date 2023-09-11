@@ -226,6 +226,8 @@ const CollectController = (() => {
   };
 
   const prePopulateReceiverName = () => {
+    if ($('#pickup-receiver').length < 1) return;
+
     const receiverName = getBestRecipient(
       {
         preferred: window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName,
@@ -233,9 +235,9 @@ const CollectController = (() => {
       },
     ).trim();
 
-    console.info('prePopulateReceiverName', { receiverName });
-
-    $('#pickup-receiver').val(receiverName.trim());
+    if (receiverName.length > 0 && $('#pickup-receiver')?.val()?.trim() === '') {
+      $('#pickup-receiver').val(receiverName);
+    }
   };
 
   const addCustomPhoneInput = () => {
@@ -247,9 +249,7 @@ const CollectController = (() => {
       $('.btn-go-to-payment-wrapper').before(PickupPhoneField);
     }
 
-    if (phoneNumber) $('#custom-pickup-complement').val(phoneNumber);
-
-    prePopulateReceiverName();
+    if (phoneNumber) $('#custom-pickup-complement').val(phoneNumber).css('border', 0);
   };
 
   //! TODO: al merger a develop podemos refactorizar esta función llevándola a utils
@@ -276,6 +276,8 @@ const CollectController = (() => {
     $('#shipping-option-pickup-in-point').one('click', () => {
       state.collectReset = true;
     });
+
+    prePopulateReceiverName();
 
     if (window.location.hash === STEPS.SHIPPING && shippingLoaded) {
       state.inCollect = $('#shipping-option-pickup-in-point').hasClass('shp-method-option-active');

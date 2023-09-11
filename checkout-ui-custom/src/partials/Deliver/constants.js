@@ -7,6 +7,7 @@ export const requiredAddressFields = [
   'city',
   'country',
   'postalCode',
+  'receiverPhone'
 ];
 
 export const requiredRicaFields = [

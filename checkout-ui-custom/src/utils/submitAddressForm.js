@@ -53,10 +53,7 @@ const submitAddressForm = async (event) => {
   // for shippingData
   address.geoCoordinates = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
 
-  console.info('### submitAddressForm @@##', { address, fields });
-
   const shippingAddress = address;
-
   const { isValid, invalidFields } = addressIsValid(address, false);
 
   if (!isValid) {

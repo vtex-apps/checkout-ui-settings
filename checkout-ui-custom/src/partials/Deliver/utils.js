@@ -1,5 +1,5 @@
 import { PICKUP, RICA_APP, TV_APP } from '../../utils/const';
-import { getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
+import { getSpecialCategories, hideBusinessName, isValidNumberBash, showBusinessName } from '../../utils/functions';
 import { getBestPhoneNumber } from '../../utils/phoneFields';
 import {
   getOrderFormCustomData
@@ -275,10 +275,8 @@ export const addressIsValid = (address, validateExtraFields = true) => {
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
-  let requiredFields = [];
+  let requiredFields = requiredAddressFields;
   const invalidFields = [];
-
-  requiredFields = [...requiredAddressFields];
 
   if (hasTVs && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredTVFields];
@@ -290,6 +288,14 @@ export const addressIsValid = (address, validateExtraFields = true) => {
 
   for (let i = 0; i < requiredFields.length; i++) {
     if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);
+  }
+
+  if (requiredFields.includes('receiverPhone') && !invalidFields.includes('receiverPhone') &&
+    !isValidNumberBash(address.receiverPhone)) {
+    invalidFields.push('receiverPhone');
+    $('#bash--input-receiverPhone').addClass('invalid');
+    $('#bash--label-receiverPhone').focus();
+
   }
 
   return { isValid: !invalidFields.length, invalidFields };

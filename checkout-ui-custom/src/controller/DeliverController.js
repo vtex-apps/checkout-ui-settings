@@ -263,6 +263,11 @@ const DeliverController = (() => {
     });
   });
 
+  // Invalid fields - remove styling on click, keyup
+  $(document).on('keyup click', '.invalid', function () {
+    $(this).removeClass("invalid")
+  });
+
   // Form validation
   window.addEventListener('message', (event) => {
     const { data } = event;

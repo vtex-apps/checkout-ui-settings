@@ -21,17 +21,38 @@ export const validatePhoneNumber = (tel) => {
  * @param value - string value
  * @returns string
  */
-const formattedPhoneNumber = (value, doFormat = true) => {
+
+const formattedPhoneNumber = (value, isBackSpace = false) => {
   value = value.replace(/[^0-9+*#]+/g, '').trim();
 
-  // 'xxx xxx *'
-  if (value.length >= 6 && doFormat) {
-    return [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');
+  // Eg. 072 123 4567
+  if (value[0] === '0') {
+    if (value.length >= 6) {
+      // 'xxx xxx *'
+      const newValue = [value.slice(0, 3), value.slice(3, 6), value.slice(6)].join(' ');
+
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // 'xxx *'
+    if (value.length >= 3) {
+      const newValue = [value.slice(0, 3), value.slice(3)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // Eg. 72 123 4567
+  } else {
+    if (value.length >= 5) {
+      // 'xx xxx *'
+      const newValue = [value.slice(0, 2), value.slice(2, 5), value.slice(5)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
+    // 'xx *'
+    if (value.length >= 2) {
+      const newValue = [value.slice(0, 2), value.slice(2)].join(' ');
+      return isBackSpace ? newValue.trim() : newValue;
+    }
   }
-  // 'xxx *'
-  if (value.length >= 3 && doFormat) {
-    return [value.slice(0, 3), value.slice(3)].join(' ');
-  }
+
+  if (isBackSpace) return value.trim();
 
   return value;
 };
