@@ -1,16 +1,14 @@
 import { PICKUP, RICA_APP, TV_APP } from '../../utils/const';
-import { getSpecialCategories, hideBusinessName, showBusinessName } from '../../utils/functions';
+import { getSpecialCategories, hideBusinessName, isValidNumberBash, showBusinessName } from '../../utils/functions';
 import isInSouthAfrica from '../../utils/isInSouthAfrica';
 import { getBestPhoneNumber } from '../../utils/phoneFields';
-import {
-  getOrderFormCustomData
-} from '../../utils/services';
-import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './constants';
+import { getOrderFormCustomData } from '../../utils/services';
 import { DeliveryError } from './DeliveryError';
 import { Alert } from './Elements/Alert';
+import { requiredAddressFields, requiredRicaFields, requiredTVFields } from './constants';
 
 export const setDeliveryLoading = () => {
-  document.querySelector('.bash--delivery-container').classList.add('shimmer');
+  document.querySelector('.bash--delivery-container')?.classList.add('shimmer');
 };
 
 export const setPickupLoading = () => {
@@ -87,7 +85,7 @@ const populateAddressFromSearch = (address) => {
   const { street, neighborhood, postalCode, state, city, lat, lng } = address;
 
   // Clear any populated fields
-  document.getElementById('bash--address-form').reset();
+  document.getElementById('bash--address-form')?.reset();
 
   // Clear hidden ID fields to prevent overwriting existing.
   document.getElementById('bash--input-addressId').value = '';
@@ -127,7 +125,7 @@ export const populateAddressForm = (address) => {
   } = address;
 
   // Clear any populated fields
-  document.getElementById('bash--address-form').reset();
+  document.getElementById('bash--address-form')?.reset();
   hideBusinessName();
   let lat;
   let lng;
@@ -136,7 +134,7 @@ export const populateAddressForm = (address) => {
 
     if (!isInSouthAfrica([lng, lat])) {
       // Coordinates are most likely still at [lat, lng]
-      if (isInSouthAfrica[lat, lng]) {
+      if (isInSouthAfrica[(lat, lng)]) {
         lng = lat;
         lat = lng;
       } else {
@@ -182,9 +180,11 @@ export const populateAddressForm = (address) => {
   // Only overwrite defaults if values exist.
   if (receiverName) document.getElementById('bash--input-receiverName').value = receiverName ?? '';
   if (complement) document.getElementById('bash--input-complement').value = complement ?? '';
-  document
-    .getElementById('bash--input-receiverPhone')
-    .value = getBestPhoneNumber({ preferred: receiverPhone, type: 'delivery', fields });
+  document.getElementById('bash--input-receiverPhone').value = getBestPhoneNumber({
+    preferred: receiverPhone,
+    type: 'delivery',
+    fields,
+  });
 
   $(':invalid').trigger('change');
 };
@@ -239,9 +239,9 @@ export const populateExtraFields = (address, fields, prefix = '', override = fal
   for (let i = 0; i < fields.length; i++) {
     const fieldId = `bash--input-${prefix}${fields[i]}`;
     if (
-      document.getElementById(fieldId)
-      && (address[fields[i]] || override)
-      && (!document.getElementById(fieldId).value || override)
+      document.getElementById(fieldId) &&
+      (address[fields[i]] || override) &&
+      (!document.getElementById(fieldId).value || override)
     ) {
       document.getElementById(fieldId).value = address[fields[i]];
     }
@@ -288,10 +288,8 @@ export const addressIsValid = (address, validateExtraFields = true) => {
   const { items } = window.vtexjs.checkout.orderForm;
   const { hasTVs, hasSimCards } = getSpecialCategories(items);
 
-  let requiredFields = [];
+  let requiredFields = requiredAddressFields;
   const invalidFields = [];
-
-  requiredFields = [...requiredAddressFields];
 
   if (hasTVs && validateExtraFields) {
     requiredFields = [...requiredFields, ...requiredTVFields];
@@ -303,6 +301,16 @@ export const addressIsValid = (address, validateExtraFields = true) => {
 
   for (let i = 0; i < requiredFields.length; i++) {
     if (!address[requiredFields[i]]) invalidFields.push(requiredFields[i]);
+  }
+
+  if (
+    requiredFields.includes('receiverPhone') &&
+    !invalidFields.includes('receiverPhone') &&
+    !isValidNumberBash(address.receiverPhone)
+  ) {
+    invalidFields.push('receiverPhone');
+    $('#bash--input-receiverPhone').addClass('invalid');
+    $('#bash--label-receiverPhone').focus();
   }
 
   return { isValid: !invalidFields.length, invalidFields };
