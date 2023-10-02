@@ -29,7 +29,7 @@ const submitAddressForm = async (event) => {
     'complement',
     'companyBuilding',
     'lat',
-    'lng'
+    'lng',
   ];
 
   const address = {
@@ -48,10 +48,10 @@ const submitAddressForm = async (event) => {
 
   address.addressName = address.addressName || address.addressId;
   address.addressId = address.addressId || address.addressName;
-  // for MasterData
-  address.geoCoordinate = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
-  // for shippingData
-  address.geoCoordinates = [parseFloat(address.lat) || '', parseFloat(address.lng) || ''];
+
+  const geoCoords = [parseFloat(address.lng) || '', parseFloat(address.lat) || ''];
+  address.geoCoordinate = geoCoords; // for MasterData
+  address.geoCoordinates = geoCoords; // for shippingData
 
   const shippingAddress = address;
   const { isValid, invalidFields } = addressIsValid(address, false);
