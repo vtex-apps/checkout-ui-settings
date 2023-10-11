@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { requiredAddressFields } from '../partials/Deliver/constants';
 import { addressIsValid, showAlertBox } from '../partials/Deliver/utils';
 import { addOrUpdateAddress, getAddressByName } from './services';
@@ -66,6 +67,15 @@ const submitAddressForm = async (event) => {
         view: 'address-form',
       });
     }
+
+    window.postMessage(
+      {
+        type: 'ADDRESS_VALIDATION_ERROR',
+        message: 'Address validation error. See invalidFields.',
+        invalidFields,
+      },
+      '*'
+    );
 
     return;
   }

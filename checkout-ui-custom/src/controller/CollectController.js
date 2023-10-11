@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { InputError } from '../partials';
 import { PickupPhoneField } from '../partials/AddressForm';
 import PickupContainer from '../partials/Collect/PickupContainer';
@@ -22,7 +23,7 @@ const CollectController = (() => {
     $('#change-pickup-button').text('Available pickup points');
     $('h2.vtex-omnishipping-1-x-geolocationTitle.ask-for-geolocation-title').text('Find nearby Click & Collect points');
     $('h3.vtex-omnishipping-1-x-subtitle.ask-for-geolocation-subtitle').text(
-      "Search for addresses that you frequently use and we'll locate stores nearby.",
+      "Search for addresses that you frequently use and we'll locate stores nearby."
     );
 
     if (state.pickupSelected) {
@@ -35,10 +36,10 @@ const CollectController = (() => {
     // Modify view to match design for a selected pickup point
     if ($('#change-pickup-button').length) {
       $(
-        '<button class="vtex-omnishipping-1-x-pickupPointSeeMore button-see-pickup-point btn btn-link" id="tfg-pickup-see-more-button" type="button">Collect Point Details</button>',
+        '<button class="vtex-omnishipping-1-x-pickupPointSeeMore button-see-pickup-point btn btn-link" id="tfg-pickup-see-more-button" type="button">Collect Point Details</button>'
       ).appendTo('.vtex-omnishipping-1-x-PickupPoint');
       $(
-        '<button class="vtex-change-pickup button-change-pickup-point" id="tfg-pickup-button" type="button">Change</button>',
+        '<button class="vtex-change-pickup button-change-pickup-point" id="tfg-pickup-button" type="button">Change</button>'
       ).appendTo('.vtex-omnishipping-1-x-PickupPoint');
       $('#change-pickup-button').remove();
       $('#details-pickup-button').remove();
@@ -58,7 +59,7 @@ const CollectController = (() => {
 
     const iframeFunctions = function (state) {
       $('<div class="tfg-pickup-map" id="tfg-pickup-map"><div class="tfg-pickup-map-content"></div></div>').appendTo(
-        $('body'),
+        $('body')
       );
       $('body').css('position', 'fixed');
       $('body').css('width', '100%');
@@ -119,7 +120,7 @@ const CollectController = (() => {
     $('.delivery-group-content').empty();
     $('.btn-go-to-payment-wrapper').empty();
     $(
-      '<div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" stroke="#FCFCFC" fill="#FCFCFC"/><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" stroke="#000" fill="#000"><animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite"/></path></svg><div>',
+      '<div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" stroke="#FCFCFC" fill="#FCFCFC"/><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" stroke="#000" fill="#000"><animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite"/></path></svg><div>'
     )
       .css({ display: 'flex', 'justify-content': 'center', 'align-items': 'center', 'min-height': '100px' })
       .appendTo('.delivery-group-content');
@@ -161,6 +162,14 @@ const CollectController = (() => {
         $(`${parent} span.error`).show();
         scrollToInvalidField();
         state.validForm = false;
+
+        window.postMessage(
+          {
+            type: 'COLLECTION_VALIDATION_ERROR',
+            message: `${field} is invalid`,
+          },
+          '*'
+        );
       } else {
         $(parent).removeClass('error');
       }
@@ -219,7 +228,7 @@ const CollectController = (() => {
           eventCategory: 'Checkout_SystemError',
           action: 'OrderFormFailed',
           label: 'Could not getOrderForm() from vtex',
-          description: 'Could not load orderForm for Collect.'
+          description: 'Could not load orderForm for Collect.',
         });
       }
     }
@@ -228,12 +237,10 @@ const CollectController = (() => {
   const prePopulateReceiverName = () => {
     if ($('#pickup-receiver').length < 1) return;
 
-    const receiverName = getBestRecipient(
-      {
-        preferred: window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName,
-        type: 'collect',
-      },
-    ).trim();
+    const receiverName = getBestRecipient({
+      preferred: window?.vtexjs?.checkout?.orderForm?.shippingData?.address?.receiverName,
+      type: 'collect',
+    }).trim();
 
     if (receiverName.length > 0 && $('#pickup-receiver')?.val()?.trim() === '') {
       $('#pickup-receiver').val(receiverName);
@@ -284,7 +291,10 @@ const CollectController = (() => {
       state.pickupSelected = $('div.ask-for-geolocation').length === 0;
 
       if (state.inCollect) {
-        if ((!$('#tfg-pickup-button').length && !$('#tfg-pickup-see-more-button').length) || (!$('#find-pickups-manually-search').length && !$('#find-pickups-button-new').length)) {
+        if (
+          (!$('#tfg-pickup-button').length && !$('#tfg-pickup-see-more-button').length) ||
+          (!$('#find-pickups-manually-search').length && !$('#find-pickups-button-new').length)
+        ) {
           pickupMap();
         }
         clearLoaders();
@@ -370,7 +380,7 @@ const CollectController = (() => {
 
   return {
     state,
-    init: () => { },
+    init: () => {},
   };
 })();
 
